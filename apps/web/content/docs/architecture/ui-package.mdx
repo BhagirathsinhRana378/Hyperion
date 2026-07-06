@@ -1,0 +1,135 @@
+---
+title: UI Package
+description: Design system primitives, global styles, and theme infrastructure.
+icon: Component
+---
+
+import { File, Folder, Files } from 'fumadocs-ui/components/files'
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
+
+The design system layer. shadcn/ui components, Tailwind themes, global styles, and the `cn()` utility. Both `apps/native` and `apps/web` consume this package for visual primitives.
+
+## Directory Structure
+
+<Files>
+  <Folder name="packages/ui/src" defaultOpen>
+    <Folder name="components" defaultOpen>
+      <File name="button.tsx, card.tsx, command.tsx, dialog.tsx, drawer.tsx, tabs.tsx, ... (25+ primitives)" />
+      <Folder name="landing">
+        <File name="animated-container.tsx, animated-group.tsx, border-beam.tsx, logo-cloud.tsx, text-hover-effect.tsx, ..." />
+      </Folder>
+      <Folder name="svgs">
+        <File name="Brand and platform SVG icons (biome, nextjs, react, tauri, windows, ...)" />
+      </Folder>
+    </Folder>
+    <Folder name="hooks">
+      <File name="use-mobile.ts" />
+    </Folder>
+    <Folder name="styles">
+      <File name="globals.css, themes.css" />
+    </Folder>
+    <Folder name="lib">
+      <File name="utils.ts" />
+    </Folder>
+  </Folder>
+</Files>
+
+## Components
+
+<Tabs items={["Primitives", "Landing", "SVGs"]}>
+  <Tab value="Primitives">
+
+25+ shadcn/ui components (`radix-vega` style) in the root of `src/components/`:
+
+`avatar`, `breadcrumb`, `button`, `card`, `collapsible`, `command`, `dialog`, `drawer`, `dropdown-menu`, `input`, `input-group`, `kbd`, `label`, `radio-group`, `scroll-area`, `select`, `separator`, `sheet`, `sidebar`, `skeleton`, `sonner`, `tabs`, `textarea`, `tooltip`
+
+Most are built on Radix UI primitives. Exceptions: `card`, `input`, `breadcrumb` (native HTML), `skeleton` (CSS animation), `sidebar` (custom compound component), `command` (`cmdk`), `drawer` (`vaul`), `sonner` (toast library).
+
+  </Tab>
+  <Tab value="Landing">
+
+Landing page components. All animations use the Motion library.
+
+| Component | What it does |
+|---|---|
+| `animated-container.tsx` | Scroll-triggered entrance animation wrapper |
+| `animated-group.tsx` | Staggered entrance animations |
+| `border-beam.tsx` | Animated border beam effect |
+| `infinite-slider.tsx` | Auto-scrolling horizontal slider |
+| `logo-cloud.tsx` | Tech logos display |
+| `logo.tsx` | App logo |
+| `progressive-blur.tsx` | Gradient blur overlay |
+| `text-effect.tsx` | Animated text reveal |
+| `text-hover-effect.tsx` | Interactive text hover effect |
+
+  </Tab>
+  <Tab value="SVGs">
+
+Brand and platform SVG icons as React components.
+
+| Icon | Source |
+|---|---|
+| `biome.tsx`, `nextjs.tsx`, `react.tsx`, `rust.tsx`, `tauri.tsx`, `turborepo.tsx` | Tech stack logos |
+| `tailwindcss.tsx`, `motion.tsx`, `radixUi.tsx` | Library logos |
+| `windows.tsx`, `linux.tsx`, `apple.tsx`, `android.tsx` | Platform icons |
+
+  </Tab>
+</Tabs>
+
+## Hooks
+
+| Hook | What it does |
+|---|---|
+| `use-mobile.ts` | Returns `true` below the mobile breakpoint (required by `sidebar.tsx`) |
+
+## Utilities
+
+| File | What it provides |
+|---|---|
+| `utils.ts` | `cn()` — Tailwind class merge utility (`clsx` + `tailwind-merge`) |
+
+## Exports
+
+Wildcard exports in `package.json`. No barrel files.
+
+```json title="package.json (exports)"
+{
+  "./globals.css": "./src/styles/globals.css",
+  "./postcss.config": "./postcss.config.mjs",
+  "./components/*": "./src/components/*.tsx",
+  "./lib/*": "./src/lib/*.ts",
+  "./hooks/*": "./src/hooks/*.ts"
+}
+```
+
+```tsx
+// Usage
+import { Button } from "@workspace/ui/components/button";
+import { Sidebar } from "@workspace/ui/components/sidebar";
+import { cn } from "@workspace/ui/lib/utils";
+```
+
+<Callout type="info">
+Direct path imports (no barrel index). Tree-shaking works out of the box and circular dependency issues are avoided.
+</Callout>
+
+## Global Styles
+
+```css title="packages/ui/src/styles/globals.css"
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./themes.css";
+
+@source "../../../../apps/**/*.{ts,tsx}";
+@source "../../../core/src/**/*.{ts,tsx}";
+@source "../**/*.{ts,tsx}";
+
+@custom-variant dark (&:is(.dark *));
+```
+
+The `@source` directives tell Tailwind to scan the UI package, the core package, and all apps for class usage. Both apps import this stylesheet via `@workspace/ui/globals.css`.
+
+<Callout type="warn">
+Don't create separate Tailwind entry points in the apps. Use the shared `globals.css` so all workspaces share the same design tokens and utilities.
+</Callout>

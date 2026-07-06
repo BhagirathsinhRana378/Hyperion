@@ -1,0 +1,213 @@
+---
+title: CLI Package
+description: Scaffolding CLI. Downloads, renames, and configures Hyperion projects.
+icon: Terminal
+---
+
+import { File, Folder, Files } from 'fumadocs-ui/components/files'
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
+
+Published to npm as [`create-hyperion`](https://www.npmjs.com/package/create-hyperion). Downloads the latest source, renames all identifiers to match your project, configures Android and iOS packaging, inits git, and optionally installs dependencies.
+
+## Usage
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+  <Tab value="npm">
+    ```bash
+    npm create hyperion@latest
+    ```
+  </Tab>
+  <Tab value="pnpm">
+    ```bash
+    pnpm create hyperion@latest
+    ```
+  </Tab>
+  <Tab value="yarn">
+    ```bash
+    yarn create hyperion@latest
+    ```
+  </Tab>
+  <Tab value="bun">
+    ```bash
+    bunx create-hyperion@latest
+    ```
+  </Tab>
+</Tabs>
+
+The CLI runs in interactive mode by default. You can also pass flags for CI or scripted setups:
+
+```bash
+npm create hyperion@latest --name <your-project-name> --github-user <your-github-username> --no-install --no-git
+```
+
+| Flag | Description |
+|---|---|
+| `-n, --name <name>` | Project name |
+| `-d, --directory <dir>` | Output directory (defaults to `./<name>`) |
+| `-i, --identifier <id>` | App identifier, reverse-domain (defaults to `com.<name>.app`) |
+| `-g, --github-user <user>` | GitHub username or org |
+| `-v, --app-version <ver>` | Initial version (defaults to `0.1.0`) |
+| `--no-install` | Skip `pnpm install` |
+| `--no-git` | Skip `git init` |
+| `-b, --branch <branch>` | Template branch to clone (defaults to `master`) |
+
+## Directory Structure
+
+<Files>
+  <Folder name="packages/cli" defaultOpen>
+    <Folder name="src" defaultOpen>
+      <File name="index.ts" />
+      <File name="scaffold.ts" />
+      <File name="prompts.ts" />
+      <File name="consts.ts" />
+      <Folder name="actions" defaultOpen>
+        <File name="clone.ts" />
+        <Folder name="rename" defaultOpen>
+          <File name="index.ts" />
+          <File name="native.ts" />
+          <File name="web.ts" />
+          <File name="version.ts" />
+          <File name="utils.ts" />
+        </Folder>
+        <File name="clean.ts" />
+        <File name="git.ts" />
+        <File name="install.ts" />
+      </Folder>
+      <Folder name="utils">
+        <File name="validate.ts" />
+        <File name="validate.test.ts" />
+      </Folder>
+    </Folder>
+    <Folder name="templates">
+      <File name="README.md" />
+      <Folder name="docs">
+        <File name="index.mdx" />
+        <File name="meta.json" />
+      </Folder>
+    </Folder>
+    <File name="package.json" />
+    <File name="tsconfig.json" />
+    <File name="tsup.config.ts" />
+  </Folder>
+</Files>
+
+## How It Works
+
+The scaffold pipeline runs 6 steps in order:
+
+<Tabs items={["1. Download", "2. Templates", "3. Rename", "4. Clean", "5. Git", "6. Install"]}>
+  <Tab value="1. Download">
+
+```typescript title="actions/clone.ts"
+import { downloadTemplate } from "giget";
+import { TEMPLATE_SOURCE } from "../consts.js";
+
+export async function cloneTemplate(
+  directory: string,
+  branch: string = "master",
+): Promise<string> {
+  const { dir } = await downloadTemplate(`${TEMPLATE_SOURCE}#${branch}`, {
+    dir: directory,
+    force: true,
+  });
+  return dir;
+}
+```
+
+Downloads the source from `github:BhagirathsinhRana378/hyperion` using giget. The branch defaults to `master` but can be overridden with `--branch`. No git history is carried over.
+
+  </Tab>
+  <Tab value="2. Templates">
+
+Replaces branded content with clean starter files (shadow templates):
+
+- `apps/web/content/docs/` → replaced with minimal starter docs from `templates/docs/`
+- Root `README.md` → replaced with a project template, `{{PROJECT_NAME}}` is substituted with the user's project name
+
+This ensures the scaffolded project starts with a clean documentation structure instead of the Hyperion source docs.
+
+  </Tab>
+  <Tab value="3. Rename">
+
+The most complex step. Split into focused modules under `actions/rename/`:
+
+- **`utils.ts`** — shared helpers (`shouldSkip`, `replaceInFile`)
+- **`web.ts`** — renames web-specific config (`site.ts`, `layout.tsx`, `next.config.mjs`)
+- **`native.ts`** — renames Tauri config, Android/iOS identifiers, and `Cargo.toml` metadata
+- **`version.ts`** — updates version fields across `package.json`, `Cargo.toml`, `Cargo.lock`, `tauri.conf.json`, and `.release-please-manifest.json`
+
+The global find-replace covers these identifiers:
+
+| Search term | Replaced with |
+|---|---|
+| `com.hyperion.app` | User's app identifier |
+| `hyperion_lib` | `<project_name_snake>_lib` |
+| `Hyperion` | PascalCase project name |
+| `BhagirathsinhRana378` | User's GitHub username |
+| `hyperion` | User's project name |
+
+Binary files, lock files, and build artifacts are skipped via pattern matching.
+
+  </Tab>
+  <Tab value="4. Clean">
+
+Removes files that only belong to the source repo:
+
+```typescript title="consts.ts"
+export const FILES_TO_CLEAN = [
+  "CHANGELOG.md",
+  "CONTRIBUTING.md",
+  "packages/cli",
+  ".github/FUNDING.yml",
+  ".github/workflows/publish-cli.yml",
+  ".github/assets",
+] as const;
+```
+
+Also removes `packages/cli` references from `release-please-config.json` and `.release-please-manifest.json`.
+
+  </Tab>
+  <Tab value="5. Git">
+
+Runs `git init` and creates an initial commit. Skipped if `--no-git` was passed or if the user chose "No" in the interactive prompt. Falls back gracefully if git is not available on the system.
+
+  </Tab>
+  <Tab value="6. Install">
+
+Runs `pnpm install` unless `--no-install` was passed. Before attempting installation, the CLI checks if pnpm is available on the system. If pnpm is not found, the project is still created successfully but dependencies are skipped with a helpful message guiding the user to install pnpm and run `pnpm install` manually.
+
+  </Tab>
+</Tabs>
+
+## Interactive Prompts
+
+In interactive mode, the CLI asks these questions:
+
+| Prompt | Default |
+|---|---|
+| Project name | — |
+| App identifier (reverse-domain) | `com.<project_name>.app` |
+| GitHub username / org | `your-github-username` |
+| Initial version | `0.1.0` |
+| Install dependencies? | Yes |
+| Initialize a new git repository? | Yes |
+
+After answering, a summary is shown and the user can confirm or re-enter their choices.
+
+## Build & Development
+
+The CLI is built with tsup and published independently from the monorepo:
+
+| Script | Command |
+|---|---|
+| `build` | `tsup` (bundles to `dist/index.js`) |
+| `dev` | `tsup --watch` |
+| `start` | `node ./dist/index.js` |
+| `test` | `vitest run` |
+
+The CLI version is auto-injected from `package.json` at build time via `tsup.config.ts` `define`, so it always stays in sync.
+
+<Callout type="info">
+The CLI has its own version (`vX.Y.Z`) separate from the monorepo version. It's published to npm via the `publish-cli.yml` GitHub Actions workflow on new releases.
+</Callout>

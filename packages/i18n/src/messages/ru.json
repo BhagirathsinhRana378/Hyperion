@@ -1,0 +1,143 @@
+{
+  "HomePage": {
+    "title": "Вы находитесь на главной странице."
+  },
+  "OverviewPage": {
+    "title": "Вы находитесь на странице Панель управления/Обзор."
+  },
+  "AnalyticsPage": {
+    "title": "Вы находитесь на странице Панель управления/Аналитика."
+  },
+  "ReportsPage": {
+    "title": "Вы находитесь на странице Панель управления/Отчеты."
+  },
+  "Greet": {
+    "placeholder": "Введите имя...",
+    "button": "Приветствовать",
+    "error": "Произошла ошибка. Пожалуйста, попробуйте еще раз.",
+    "successGreeting": "Привет, {name}! {source} передает привет!",
+    "loadingTauri": "Подключение к системе...",
+    "loadingWeb": "Подключение к сети...",
+    "missingName": "Отсутствует информация",
+    "missingNameDesc": "Пожалуйста, введите имя для приветствия."
+  },
+  "LanguageCard": {
+    "title": "Язык",
+    "description": "Выберите предпочитаемый язык"
+  },
+  "ModeCard": {
+    "title": "Режимы",
+    "description": "Выберите свой режим или настройте свой стиль",
+    "light": "Светлый",
+    "dark": "Темный",
+    "system": "Системный"
+  },
+  "SidebarVariantCard": {
+    "title": "Вариант боковой панели",
+    "description": "Выберите предпочитаемый вариант боковой панели",
+    "sidebar": "Боковая панель",
+    "floating": "Плавающая",
+    "inset": "Встроенная"
+  },
+  "ThemesList": {
+    "title": "Темы",
+    "description": "Используйте стандартные или пользовательские темы",
+    "searchPlaceholder": "Поиск тем...",
+    "sortBy": "Сортировать по",
+    "sortDefault": "По умолчанию",
+    "sortAZ": "Имя (A-Z)",
+    "sortZA": "Имя (Z-A)",
+    "noThemesTitle": "Темы не найдены",
+    "noThemesDescription": "Нет тем, соответствующих вашему поисковому запросу."
+  },
+  "Navigation": {
+    "home": "Главная",
+    "dashboard": "Панель управления",
+    "overview": "Обзор",
+    "analytics": "Аналитика",
+    "reports": "Отчеты",
+    "github": "Github",
+    "feedback": "Обратная связь",
+    "settings": "Настройки",
+    "platform": "Платформа",
+    "projects": "Проекты",
+    "projectAlpha": "Проект Альфа",
+    "viewProject": "Просмотреть проект",
+    "shareProject": "Поделиться проектом",
+    "deleteProject": "Удалить проект",
+    "more": "Еще",
+    "upgradeToPro": "Обновить до Pro",
+    "account": "Аккаунт",
+    "billing": "Выставление счетов",
+    "notifications": "Уведомления",
+    "logOut": "Выйти",
+    "search": "Поиск..."
+  },
+  "HotkeysDialog": {
+    "title": "Горячие клавиши",
+    "description": "Список клавиш.",
+    "general": "Общее",
+    "navigation": "Навигация",
+    "commandPalette": "Палитра команд",
+    "toggleMode": "Сменить режим",
+    "toggleSidebar": "Скрыть панель",
+    "showHotkeys": "Горячие клавиши",
+    "goHome": "На главную",
+    "goDashboard": "В панель управления",
+    "goAnalytics": "Аналитика",
+    "goOverview": "Обзор",
+    "goReports": "К отчетам",
+    "goSettings": "Настройки",
+    "then": "затем"
+  },
+  "CommandPalette": {
+    "commandPalette": "Палитра команд",
+    "search": "Поиск команд...",
+    "noResults": "Не найдено.",
+    "general": "Общее",
+    "toggleMode": "Сменить режим",
+    "toggleSidebar": "Скрыть панель",
+    "showHotkeys": "Горячие клавиши",
+    "navigation": "Навигация",
+    "goHome": "На главную",
+    "goDashboard": "В панель управления",
+    "goAnalytics": "Аналитика",
+    "goOverview": "Обзор",
+    "goReports": "К отчетам",
+    "goSettings": "Настройки",
+    "language": "Язык",
+    "sidebarVariants": "Варианты панели",
+    "sidebar": "Боковая панель",
+    "floating": "Плавающая",
+    "inset": "Встроенная",
+    "themes": "Темы",
+    "navigate": "Навигация",
+    "openOrSelect": "Выбрать",
+    "close": "Закрыть",
+    "then": "затем"
+  },
+  "NotificationCenter": {
+    "emptyTitle": "Нет уведомлений",
+    "emptyDescription": "Вы все прочитали!",
+    "title": "Уведомления",
+    "markAllRead": "Отметить все как прочитанные",
+    "all": "Все",
+    "unread": "Непрочитанные",
+    "seeAll": "Смотреть все",
+    "loginTitle": "Успешный вход",
+    "loginDescription": "Вы безопасно вошли как user@example.com.",
+    "loginTime": "Только что",
+    "mentionTitle": "Новое упоминание",
+    "mentionDescription": "Вас упомянули в новом комментарии.",
+    "mentionTime": "21 минуту назад",
+    "reportTitle": "Отчет готов",
+    "reportDescription": "Аналитический отчет за прошлую неделю был сгенерирован.",
+    "reportTime": "3 часа назад",
+    "exportTitle": "Экспорт завершен",
+    "exportDescription": "Данные загружены в формате CSV.",
+    "exportTime": "Вчера",
+    "versionTitle": "Новая версия",
+    "versionDescription": "Проверьте последнюю версию на наличие новых функций и улучшений.",
+    "versionTime": "2 дня назад"
+  }
+}

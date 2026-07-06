@@ -1,0 +1,143 @@
+{
+  "HomePage": {
+    "title": "Ana Sayfadasınız."
+  },
+  "OverviewPage": {
+    "title": "Kontrol Paneli/Genel Bakış Sayfasındasınız."
+  },
+  "AnalyticsPage": {
+    "title": "Kontrol Paneli/Analitik Sayfasındasınız."
+  },
+  "ReportsPage": {
+    "title": "Kontrol Paneli/Raporlar Sayfasındasınız."
+  },
+  "Greet": {
+    "placeholder": "Bir isim girin...",
+    "button": "Selamla",
+    "error": "Bir hata oluştu. Lütfen tekrar deneyin.",
+    "successGreeting": "Merhaba {name}! {source} sana selam yolladı!",
+    "loadingTauri": "Sisteme bağlanılıyor...",
+    "loadingWeb": "Ağa bağlanılıyor...",
+    "missingName": "Eksik Bilgi",
+    "missingNameDesc": "Lütfen selamlamak için bir isim girin."
+  },
+  "LanguageCard": {
+    "title": "Dil",
+    "description": "Tercih ettiğiniz dili seçin"
+  },
+  "ModeCard": {
+    "title": "Modlar",
+    "description": "Modunuzu seçin veya stilinizi özelleştirin",
+    "light": "Açık",
+    "dark": "Koyu",
+    "system": "Sistem"
+  },
+  "SidebarVariantCard": {
+    "title": "Kenar Çubuğu Varyantı",
+    "description": "Kenar çubuğu varyant tercihinizi seçin",
+    "sidebar": "Kenar Çubuğu",
+    "floating": "Yüzen",
+    "inset": "İçe Çekilmiş"
+  },
+  "ThemesList": {
+    "title": "Temalar",
+    "description": "Varsayılan veya özel temaları kullanın",
+    "searchPlaceholder": "Tema ara...",
+    "sortBy": "Sırala",
+    "sortDefault": "Varsayılan",
+    "sortAZ": "İsim (A-Z)",
+    "sortZA": "İsim (Z-A)",
+    "noThemesTitle": "Tema bulunamadı",
+    "noThemesDescription": "Arama terimi ile eşleşen tema yok."
+  },
+  "Navigation": {
+    "home": "Ana Sayfa",
+    "dashboard": "Kontrol Paneli",
+    "overview": "Genel Bakış",
+    "analytics": "Analitik",
+    "reports": "Raporlar",
+    "github": "Github",
+    "feedback": "Geri Bildirim",
+    "settings": "Ayarlar",
+    "platform": "Platform",
+    "projects": "Projeler",
+    "projectAlpha": "Proje Alpha",
+    "viewProject": "Projeyi Görüntüle",
+    "shareProject": "Projeyi Paylaş",
+    "deleteProject": "Projeyi Sil",
+    "more": "Daha Fazla",
+    "upgradeToPro": "Pro'ya Yükselt",
+    "account": "Hesap",
+    "billing": "Faturalama",
+    "notifications": "Bildirimler",
+    "logOut": "Çıkış Yap",
+    "search": "Ara..."
+  },
+  "HotkeysDialog": {
+    "title": "Klavye Kısayolları",
+    "description": "Tüm kullanılabilir klavye kısayollarının listesi.",
+    "general": "Genel",
+    "navigation": "Geçiş",
+    "commandPalette": "Komut Paleti",
+    "toggleMode": "Aydınlık/Karanlık Modu Değiştir",
+    "toggleSidebar": "Kenar Çubuğunu Aç/Kapat",
+    "showHotkeys": "Klavye Kısayollarını Göster",
+    "goHome": "Ana Sayfaya Git",
+    "goDashboard": "Kontrol Paneline Git",
+    "goAnalytics": "Analitiklere Git",
+    "goOverview": "Genel Bakışa Git",
+    "goReports": "Raporlara Git",
+    "goSettings": "Ayarlara Git",
+    "then": "sonra"
+  },
+  "CommandPalette": {
+    "commandPalette": "Komut Paleti",
+    "search": "Komut ara...",
+    "noResults": "Sonuç bulunamadı.",
+    "general": "Genel",
+    "toggleMode": "Aydınlık/Karanlık Modu Değiştir",
+    "toggleSidebar": "Kenar Çubuğunu Aç/Kapat",
+    "showHotkeys": "Klavye Kısayollarını Göster",
+    "navigation": "Geçiş",
+    "goHome": "Ana Sayfaya Git",
+    "goDashboard": "Kontrol Paneline Git",
+    "goAnalytics": "Analitiklere Git",
+    "goOverview": "Genel Bakışa Git",
+    "goReports": "Raporlara Git",
+    "goSettings": "Ayarlara Git",
+    "language": "Dil",
+    "sidebarVariants": "Kenar Çubuğu Görünümleri",
+    "sidebar": "Kenar Çubuğu",
+    "floating": "Yüzen",
+    "inset": "İçe Çekilmiş",
+    "themes": "Temalar",
+    "navigate": "Gezin",
+    "openOrSelect": "Aç/Seç",
+    "close": "Kapat",
+    "then": "sonra"
+  },
+  "NotificationCenter": {
+    "emptyTitle": "Bildirim yok",
+    "emptyDescription": "Tüm bildirimler okundu!",
+    "title": "Bildirimler",
+    "markAllRead": "Tümünü okundu olarak işaretle",
+    "all": "Tümü",
+    "unread": "Okunmayan",
+    "seeAll": "Tüm bildirimleri görüntüle",
+    "loginTitle": "Giriş Başarılı",
+    "loginDescription": "user@example.com olarak güvenli bir şekilde giriş yaptınız.",
+    "loginTime": "Az önce",
+    "mentionTitle": "Yeni Bahsedilme",
+    "mentionDescription": "Yeni bir yorumda bahsedildiniz.",
+    "mentionTime": "21 dakika önce",
+    "reportTitle": "Rapor Oluşturuldu",
+    "reportDescription": "Geçen haftanın analiz raporu oluşturuldu.",
+    "reportTime": "3 saat önce",
+    "exportTitle": "Dışa Aktarma Tamamlandı",
+    "exportDescription": "İstediğiniz veri CSV formatında indirildi.",
+    "exportTime": "Dün",
+    "versionTitle": "Yeni Sürüm Yayınlandı",
+    "versionDescription": "Yeni özellikler ve iyileştirmeler için en son sürümü kontrol edin.",
+    "versionTime": "2 gün önce"
+  }
+}

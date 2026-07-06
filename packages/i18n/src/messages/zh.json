@@ -1,0 +1,143 @@
+{
+  "HomePage": {
+    "title": "您在主页。"
+  },
+  "OverviewPage": {
+    "title": "您在仪表板/概览页面。"
+  },
+  "AnalyticsPage": {
+    "title": "您在仪表板/分析页面。"
+  },
+  "ReportsPage": {
+    "title": "您在仪表板/报表页面。"
+  },
+  "Greet": {
+    "placeholder": "请输入一个名字...",
+    "button": "问候",
+    "error": "发生错误。请重试。",
+    "successGreeting": "你好，{name}！{source} 向你发送了问候！",
+    "loadingTauri": "正在连接到系统...",
+    "loadingWeb": "正在连接到网络...",
+    "missingName": "信息缺失",
+    "missingNameDesc": "请输入一个名字进行问候。"
+  },
+  "LanguageCard": {
+    "title": "语言",
+    "description": "选择您的首选语言"
+  },
+  "ModeCard": {
+    "title": "模式",
+    "description": "选择您的模式或自定义您的样式",
+    "light": "浅色",
+    "dark": "深色",
+    "system": "系统"
+  },
+  "SidebarVariantCard": {
+    "title": "侧边栏变体",
+    "description": "选择您的侧边栏变体偏好",
+    "sidebar": "侧边栏",
+    "floating": "浮动",
+    "inset": "嵌入"
+  },
+  "ThemesList": {
+    "title": "主题",
+    "description": "使用默认或自定义主题",
+    "searchPlaceholder": "搜索主题...",
+    "sortBy": "排序方式",
+    "sortDefault": "默认",
+    "sortAZ": "名称 (A-Z)",
+    "sortZA": "名称 (Z-A)",
+    "noThemesTitle": "未找到主题",
+    "noThemesDescription": "没有与您的搜索词匹配的主题。"
+  },
+  "Navigation": {
+    "home": "主页",
+    "dashboard": "仪表板",
+    "overview": "概览",
+    "analytics": "分析",
+    "reports": "报表",
+    "github": "Github",
+    "feedback": "反馈",
+    "settings": "设置",
+    "platform": "平台",
+    "projects": "项目",
+    "projectAlpha": "项目Alpha",
+    "viewProject": "查看项目",
+    "shareProject": "分享项目",
+    "deleteProject": "删除项目",
+    "more": "更多",
+    "upgradeToPro": "升级到Pro",
+    "account": "账户",
+    "billing": "账单",
+    "notifications": "通知",
+    "logOut": "退出登录",
+    "search": "搜索..."
+  },
+  "HotkeysDialog": {
+    "title": "键盘快捷键",
+    "description": "快捷键列表",
+    "general": "通用",
+    "navigation": "导航",
+    "commandPalette": "命令面板",
+    "toggleMode": "切换昼夜模式",
+    "toggleSidebar": "切换侧边栏",
+    "showHotkeys": "显示快捷键",
+    "goHome": "首页",
+    "goDashboard": "仪表盘",
+    "goAnalytics": "分析",
+    "goOverview": "概览",
+    "goReports": "前往报表",
+    "goSettings": "设置",
+    "then": "然后"
+  },
+  "CommandPalette": {
+    "commandPalette": "命令面板",
+    "search": "搜索命令...",
+    "noResults": "未找到结果",
+    "general": "通用",
+    "toggleMode": "切换昼夜模式",
+    "toggleSidebar": "切换侧边栏",
+    "showHotkeys": "显示快捷键",
+    "navigation": "导航",
+    "goHome": "首页",
+    "goDashboard": "仪表盘",
+    "goAnalytics": "分析",
+    "goOverview": "概览",
+    "goReports": "前往报表",
+    "goSettings": "设置",
+    "language": "语言",
+    "sidebarVariants": "侧边栏",
+    "sidebar": "侧边栏",
+    "floating": "浮动",
+    "inset": "嵌入",
+    "themes": "主题",
+    "navigate": "导航",
+    "openOrSelect": "打开/选择",
+    "close": "关闭",
+    "then": "然后"
+  },
+  "NotificationCenter": {
+    "emptyTitle": "无通知",
+    "emptyDescription": "所有通知已读！",
+    "title": "通知",
+    "markAllRead": "全部标记为已读",
+    "all": "全部",
+    "unread": "未读",
+    "seeAll": "查看所有通知",
+    "loginTitle": "登录成功",
+    "loginDescription": "您已安全登录为 user@example.com。",
+    "loginTime": "刚刚",
+    "mentionTitle": "新提及",
+    "mentionDescription": "您在一条新评论中被提及。",
+    "mentionTime": "21 分钟前",
+    "reportTitle": "报告已生成",
+    "reportDescription": "上一周的分析报告已生成。",
+    "reportTime": "3 小时前",
+    "exportTitle": "导出完成",
+    "exportDescription": "您请求的数据已以 CSV 格式下载。",
+    "exportTime": "昨天",
+    "versionTitle": "新版本发布",
+    "versionDescription": "检查最新版本以获取新功能和改进。",
+    "versionTime": "2 天前"
+  }
+}

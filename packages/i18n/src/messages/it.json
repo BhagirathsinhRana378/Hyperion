@@ -1,0 +1,143 @@
+{
+  "HomePage": {
+    "title": "Sei nella pagina iniziale."
+  },
+  "OverviewPage": {
+    "title": "Sei nella pagina Cruscotto/Panoramica."
+  },
+  "AnalyticsPage": {
+    "title": "Sei nella pagina Cruscotto/Analisi."
+  },
+  "ReportsPage": {
+    "title": "Sei nella pagina Cruscotto/Rapporti."
+  },
+  "Greet": {
+    "placeholder": "Inserisci un nome...",
+    "button": "Saluta",
+    "error": "Si è verificato un errore. Per favore riprova.",
+    "successGreeting": "Ciao {name}! {source} ti invia i suoi saluti!",
+    "loadingTauri": "Connessione al sistema in corso...",
+    "loadingWeb": "Connessione alla rete in corso...",
+    "missingName": "Informazioni mancanti",
+    "missingNameDesc": "Inserisci un nome per salutare."
+  },
+  "LanguageCard": {
+    "title": "Lingua",
+    "description": "Seleziona la tua lingua preferita"
+  },
+  "ModeCard": {
+    "title": "Modalità",
+    "description": "Scegli la tua modalità o personalizza il tuo stile",
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "system": "Sistema"
+  },
+  "SidebarVariantCard": {
+    "title": "Variante della barra laterale",
+    "description": "Scegli la tua preferenza per la variante della barra laterale",
+    "sidebar": "Barra laterale",
+    "floating": "Fluttuante",
+    "inset": "Incassato"
+  },
+  "ThemesList": {
+    "title": "Temi",
+    "description": "Usa temi predefiniti o personalizzati",
+    "searchPlaceholder": "Cerca temi...",
+    "sortBy": "Ordina per",
+    "sortDefault": "Predefinito",
+    "sortAZ": "Nome (A-Z)",
+    "sortZA": "Nome (Z-A)",
+    "noThemesTitle": "Nessun tema trovato",
+    "noThemesDescription": "Nessun tema corrisponde al tuo termine di ricerca."
+  },
+  "Navigation": {
+    "home": "Home",
+    "dashboard": "Cruscotto",
+    "overview": "Panoramica",
+    "analytics": "Analisi",
+    "reports": "Rapporti",
+    "github": "Github",
+    "feedback": "Feedback",
+    "settings": "Impostazioni",
+    "platform": "Piattaforma",
+    "projects": "Progetti",
+    "projectAlpha": "Progetto Alpha",
+    "viewProject": "Visualizza progetto",
+    "shareProject": "Condividi progetto",
+    "deleteProject": "Elimina progetto",
+    "more": "Altro",
+    "upgradeToPro": "Aggiorna a Pro",
+    "account": "Account",
+    "billing": "Fatturazione",
+    "notifications": "Notifiche",
+    "logOut": "Esci",
+    "search": "Cerca..."
+  },
+  "HotkeysDialog": {
+    "title": "Scorciatoie da Tastiera",
+    "description": "Elenco delle scorciatoie.",
+    "general": "Generale",
+    "navigation": "Navigazione",
+    "commandPalette": "Riquadro dei Comandi",
+    "toggleMode": "Cambia Modalità",
+    "toggleSidebar": "Cambia Barra Laterale",
+    "showHotkeys": "Mostra Scorciatoie",
+    "goHome": "Vai alla Home",
+    "goDashboard": "Vai al Dashboard",
+    "goAnalytics": "Vai alle Analitiche",
+    "goOverview": "Vai alla Panoramica",
+    "goReports": "Vai ai Rapporti",
+    "goSettings": "Vai alle Impostazioni",
+    "then": "poi"
+  },
+  "CommandPalette": {
+    "commandPalette": "Riquadro dei Comandi",
+    "search": "Cerca comando...",
+    "noResults": "Nessun risultato.",
+    "general": "Generale",
+    "toggleMode": "Cambia Modalità",
+    "toggleSidebar": "Cambia Barra Laterale",
+    "showHotkeys": "Mostra Scorciatoie",
+    "navigation": "Navigazione",
+    "goHome": "Vai alla Home",
+    "goDashboard": "Vai al Dashboard",
+    "goAnalytics": "Vai alle Analitiche",
+    "goOverview": "Vai alla Panoramica",
+    "goReports": "Vai ai Rapporti",
+    "goSettings": "Vai alle Impostazioni",
+    "language": "Lingua",
+    "sidebarVariants": "Varianti della Barra Laterale",
+    "sidebar": "Barra laterale",
+    "floating": "Fluttuante",
+    "inset": "Incassato",
+    "themes": "Temi",
+    "navigate": "Naviga",
+    "openOrSelect": "Apri/Seleziona",
+    "close": "Chiudi",
+    "then": "poi"
+  },
+  "NotificationCenter": {
+    "emptyTitle": "Nessuna notifica",
+    "emptyDescription": "Tutto aggiornato!",
+    "title": "Notifiche",
+    "markAllRead": "Segna tutti come letti",
+    "all": "Tutti",
+    "unread": "Non letti",
+    "seeAll": "Vedi tutte le notifiche",
+    "loginTitle": "Accesso completato",
+    "loginDescription": "Accesso effettuato come user@example.com.",
+    "loginTime": "Ora",
+    "mentionTitle": "Nuova menzione",
+    "mentionDescription": "Sei stato menzionato in un commento.",
+    "mentionTime": "21 minuti fa",
+    "reportTitle": "Rapporto generato",
+    "reportDescription": "Il rapporto analitico della settimana precedente è stato generato.",
+    "reportTime": "3 ore fa",
+    "exportTitle": "Esportazione completata",
+    "exportDescription": "I dati sono stati scaricati in CSV.",
+    "exportTime": "Ieri",
+    "versionTitle": "Nuova versione",
+    "versionDescription": "Controlla l'ultima versione per nuove funzionalità e miglioramenti.",
+    "versionTime": "2 giorni fa"
+  }
+}

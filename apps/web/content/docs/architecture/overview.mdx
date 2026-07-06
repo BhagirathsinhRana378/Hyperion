@@ -1,0 +1,147 @@
+---
+title: Overview
+description: Monorepo layout, workspace graph, and Turborepo pipeline.
+icon: Package
+---
+
+import { File, Folder, Files } from 'fumadocs-ui/components/files'
+import { Callout } from 'fumadocs-ui/components/callout'
+import { Mermaid } from '@/components/mdx/mermaid'
+
+The root monorepo. pnpm workspaces with Turborepo orchestration, two apps and six packages.
+
+## Directory Structure
+
+```yaml title="pnpm-workspace.yaml"
+packages:
+  - "apps/*"
+  - "packages/*"
+```
+
+Internal packages reference each other with `"workspace:*"` in `package.json`. pnpm resolves these to the local workspace copy at install time, so changes are picked up immediately without publishing.
+
+<Files>
+  <Folder name="apps" defaultOpen>
+    <Folder name="native">
+      <File name="Tauri desktop & mobile app (Next.js static export + Rust)" />
+    </Folder>
+    <Folder name="web">
+      <File name="Web app, landing page, docs site (Next.js SSR + Fumadocs)" />
+    </Folder>
+  </Folder>
+  <Folder name="packages" defaultOpen>
+    <Folder name="core">
+      <File name="Business logic: pages, stores, hooks, providers, config" />
+    </Folder>
+    <Folder name="ui">
+      <File name="Design system: shadcn/ui primitives, themes, styles" />
+    </Folder>
+    <Folder name="i18n">
+      <File name="Locale config, messages, routing, middleware (next-intl)" />
+    </Folder>
+    <Folder name="cli">
+      <File name="Scaffolding CLI (create-hyperion)" />
+    </Folder>
+    <Folder name="typescript-config">
+      <File name="Shared TypeScript configs (base, nextjs, react-library)" />
+    </Folder>
+  </Folder>
+  <File name="turbo.json" />
+  <File name="pnpm-workspace.yaml" />
+  <File name="package.json" />
+  <File name="tsconfig.json" />
+</Files>
+
+## Dependency Graph
+
+<Mermaid chart={`graph TD
+  subgraph Apps
+    native["apps/native"]
+    web["apps/web"]
+  end
+
+  subgraph Packages
+    core["packages/core"]
+    ui["packages/ui"]
+    i18n["packages/i18n"]
+    cli["packages/cli"]
+  end
+
+  subgraph Tooling
+    ts["packages/typescript-config"]
+  end
+
+  native --> core
+  native --> ui
+  native --> i18n
+  web --> core
+  web --> ui
+  web --> i18n
+  core --> ui
+  core --> i18n
+  ui --> i18n
+
+  native -.-> ts
+  web -.-> ts
+  core -.-> ts
+  ui -.-> ts
+  i18n -.-> ts
+  cli -.-> ts
+`} />
+
+Solid arrows are runtime dependencies. Dashed arrows are dev/tooling dependencies (every package uses the shared TypeScript configs). The `cli` package is independent and published to npm separately. `core` depends on `ui` for design system primitives.
+
+## Turborepo Pipeline
+
+```json title="turbo.json"
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}
+```
+
+| Task | Behavior |
+|---|---|
+| `build` | Builds dependencies first (`^build`), caches `.next` output |
+| `dev` | Parallel dev servers, no caching |
+| `typecheck` | Type-checks dependency packages first, cacheable |
+| `clean` | Removes build artifacts, not cached |
+
+## Code Quality & Formatting
+
+Instead of delegating linting and formatting to individual packages via Turborepo, Hyperion uses **Biome (via the Ultracite preset)** as a single root-level tool.
+
+- **Single Source of Truth**: The `biome.jsonc` file at the root dictates all rules.
+- **Zero Config for Packages**: Workspaces don't need their own linting dependencies or configs.
+- **Speed**: Biome processes the entire monorepo in milliseconds natively, bypassing the need for Turborepo's orchestration and caching for these specific tasks.
+
+Run `pnpm check` to catch issues, or `pnpm fix` to auto-format and resolve them.
+
+## Root Files
+
+| File | Purpose |
+|---|---|
+| `turbo.json` | Task pipeline, caching rules |
+| `pnpm-workspace.yaml` | Workspace declarations |
+| `package.json` | Root scripts, devDependencies, engine constraints |
+| `tsconfig.json` | TypeScript project references |
+| `biome.jsonc` | Root Biome configuration |
+| `release-please-config.json` | Versioning and changelog automation |
+| `.release-please-manifest.json` | Current version for each tracked package |

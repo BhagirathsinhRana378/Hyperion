@@ -1,0 +1,143 @@
+{
+  "HomePage": {
+    "title": "Você está na página inicial."
+  },
+  "OverviewPage": {
+    "title": "Você está na página Painel de Controle/Visão Geral."
+  },
+  "AnalyticsPage": {
+    "title": "Você está na página Painel de Controle/Análise."
+  },
+  "ReportsPage": {
+    "title": "Você está na página Painel de Controle/Relatórios."
+  },
+  "Greet": {
+    "placeholder": "Digite um nome...",
+    "button": "Saudar",
+    "error": "Ocorreu um erro. Por favor, tente novamente.",
+    "successGreeting": "Olá {name}! {source} envia saudações!",
+    "loadingTauri": "Conectando ao sistema...",
+    "loadingWeb": "Conectando à rede...",
+    "missingName": "Informação ausente",
+    "missingNameDesc": "Por favor, digite um nome para saudar."
+  },
+  "LanguageCard": {
+    "title": "Idioma",
+    "description": "Selecione seu idioma preferido"
+  },
+  "ModeCard": {
+    "title": "Modos",
+    "description": "Escolha seu modo ou personalize seu estilo",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema"
+  },
+  "SidebarVariantCard": {
+    "title": "Variante da barra lateral",
+    "description": "Escolha sua preferência de variante da barra lateral",
+    "sidebar": "Barra lateral",
+    "floating": "Flutuante",
+    "inset": "Inserido"
+  },
+  "ThemesList": {
+    "title": "Temas",
+    "description": "Use temas padrão ou personalizados",
+    "searchPlaceholder": "Pesquisar temas...",
+    "sortBy": "Ordenar por",
+    "sortDefault": "Padrão",
+    "sortAZ": "Nome (A-Z)",
+    "sortZA": "Nome (Z-A)",
+    "noThemesTitle": "Nenhum tema encontrado",
+    "noThemesDescription": "Nenhum tema corresponde ao seu termo de pesquisa."
+  },
+  "Navigation": {
+    "home": "Início",
+    "dashboard": "Painel de Controle",
+    "overview": "Visão Geral",
+    "analytics": "Análise",
+    "reports": "Relatórios",
+    "github": "Github",
+    "feedback": "Feedback",
+    "settings": "Configurações",
+    "platform": "Plataforma",
+    "projects": "Projetos",
+    "projectAlpha": "Projeto Alpha",
+    "viewProject": "Ver projeto",
+    "shareProject": "Compartilhar projeto",
+    "deleteProject": "Excluir projeto",
+    "more": "Mais",
+    "upgradeToPro": "Atualizar para Pro",
+    "account": "Conta",
+    "billing": "Faturamento",
+    "notifications": "Notificações",
+    "logOut": "Sair",
+    "search": "Pesquisar..."
+  },
+  "HotkeysDialog": {
+    "title": "Atalhos de Teclado",
+    "description": "Lista de atalhos.",
+    "general": "Geral",
+    "navigation": "Navegação",
+    "commandPalette": "Paleta de Comandos",
+    "toggleMode": "Alternar Modo",
+    "toggleSidebar": "Alternar Barra Lateral",
+    "showHotkeys": "Mostrar Atalhos",
+    "goHome": "Ir para Home",
+    "goDashboard": "Ir para Dashboard",
+    "goAnalytics": "Ir para Análises",
+    "goOverview": "Ir para Visão Geral",
+    "goReports": "Ir para Relatórios",
+    "goSettings": "Ir para Configurações",
+    "then": "depois"
+  },
+  "CommandPalette": {
+    "commandPalette": "Paleta de Comandos",
+    "search": "Buscar comandos...",
+    "noResults": "Sem resultados.",
+    "general": "Geral",
+    "toggleMode": "Alternar Modo",
+    "toggleSidebar": "Alternar Barra Lateral",
+    "showHotkeys": "Mostrar Atalhos",
+    "navigation": "Navegação",
+    "goHome": "Ir para Home",
+    "goDashboard": "Ir para Dashboard",
+    "goAnalytics": "Ir para Análises",
+    "goOverview": "Ir para Visão Geral",
+    "goReports": "Ir para Relatórios",
+    "goSettings": "Ir para Configurações",
+    "language": "Idioma",
+    "sidebarVariants": "Variantes da Barra Lateral",
+    "sidebar": "Barra lateral",
+    "floating": "Flutuante",
+    "inset": "Inserido",
+    "themes": "Temas",
+    "navigate": "Navegar",
+    "openOrSelect": "Abrir/Selecionar",
+    "close": "Fechar",
+    "then": "depois"
+  },
+  "NotificationCenter": {
+    "emptyTitle": "Sem notificações",
+    "emptyDescription": "Tudo atualizado!",
+    "title": "Notificações",
+    "markAllRead": "Marcar todas como lidas",
+    "all": "Todas",
+    "unread": "Não lidas",
+    "seeAll": "Ver todas as notificações",
+    "loginTitle": "Login bem-sucedido",
+    "loginDescription": "Você fez login de forma segura como user@example.com.",
+    "loginTime": "Agora mesmo",
+    "mentionTitle": "Nova menção",
+    "mentionDescription": "Você foi mencionado em um novo comentário.",
+    "mentionTime": "21 minutos atrás",
+    "reportTitle": "Relatório gerado",
+    "reportDescription": "O relatório analítico da semana anterior foi gerado.",
+    "reportTime": "3 horas atrás",
+    "exportTitle": "Exportação concluída",
+    "exportDescription": "Os dados foram baixados no formato CSV.",
+    "exportTime": "Ontem",
+    "versionTitle": "Nova versão lançada",
+    "versionDescription": "Verifique a versão mais recente para novos recursos e melhorias.",
+    "versionTime": "2 dias atrás"
+  }
+}

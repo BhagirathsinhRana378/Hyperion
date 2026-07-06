@@ -1,0 +1,66 @@
+{
+  "name": "create-hyperion",
+  "version": "0.1.2",
+  "description": "Scaffolding CLI for Hyperion",
+  "license": "MIT",
+  "author": "BhagirathsinhRana378",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "hyperion",
+    "tauri",
+    "nextjs",
+    "turborepo",
+    "scaffold",
+    "create",
+    "cli",
+    "monorepo",
+    "template"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BhagirathsinhRana378/hyperion.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/BhagirathsinhRana378/hyperion/issues"
+  },
+  "homepage": "https://hyperion.dev",
+  "type": "module",
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "bin": {
+    "hyperion": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "start": "node ./dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist .turbo",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.5.1",
+    "commander": "^14.0.3",
+    "execa": "^9.6.1",
+    "fs-extra": "^11.3.5",
+    "giget": "^3.3.0",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.19.43",
+    "@workspace/typescript-config": "workspace:*",
+    "tsup": "^8.5.1",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.9"
+  }
+}

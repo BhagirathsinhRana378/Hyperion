@@ -1,0 +1,143 @@
+{
+  "HomePage": {
+    "title": "You are on the Home Page."
+  },
+  "OverviewPage": {
+    "title": "You are on the Dashboard/Overview Page."
+  },
+  "AnalyticsPage": {
+    "title": "You are on the Dashboard/Analytics Page."
+  },
+  "ReportsPage": {
+    "title": "You are on the Dashboard/Reports Page."
+  },
+  "Greet": {
+    "placeholder": "Enter a name...",
+    "button": "Greet",
+    "error": "An error occurred. Please try again.",
+    "successGreeting": "Hello {name}! {source} sends greetings!",
+    "loadingTauri": "Connecting to the system...",
+    "loadingWeb": "Connecting to the network...",
+    "missingName": "Missing Information",
+    "missingNameDesc": "Please enter a name to greet."
+  },
+  "LanguageCard": {
+    "title": "Language",
+    "description": "Select your preferred language"
+  },
+  "ModeCard": {
+    "title": "Modes",
+    "description": "Choose your mode or customize your style",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "SidebarVariantCard": {
+    "title": "Sidebar Variant",
+    "description": "Choose your sidebar variant preference",
+    "sidebar": "Sidebar",
+    "floating": "Floating",
+    "inset": "Inset"
+  },
+  "ThemesList": {
+    "title": "Themes",
+    "description": "Use default or custom themes",
+    "searchPlaceholder": "Search themes...",
+    "sortBy": "Sort by",
+    "sortDefault": "Default",
+    "sortAZ": "Name (A-Z)",
+    "sortZA": "Name (Z-A)",
+    "noThemesTitle": "No themes found",
+    "noThemesDescription": "No themes match your search term."
+  },
+  "Navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "overview": "Overview",
+    "analytics": "Analytics",
+    "reports": "Reports",
+    "github": "Github",
+    "feedback": "Feedback",
+    "settings": "Settings",
+    "platform": "Platform",
+    "projects": "Projects",
+    "projectAlpha": "Project Alpha",
+    "viewProject": "View Project",
+    "shareProject": "Share Project",
+    "deleteProject": "Delete Project",
+    "more": "More",
+    "upgradeToPro": "Upgrade to Pro",
+    "account": "Account",
+    "billing": "Billing",
+    "notifications": "Notifications",
+    "logOut": "Log out",
+    "search": "Search..."
+  },
+  "HotkeysDialog": {
+    "title": "Keyboard Shortcuts",
+    "description": "List of all available keyboard shortcuts.",
+    "general": "General",
+    "navigation": "Navigation",
+    "commandPalette": "Command Palette",
+    "toggleMode": "Toggle Light/Dark Mode",
+    "toggleSidebar": "Toggle Sidebar",
+    "showHotkeys": "Show Keyboard Shortcuts",
+    "goHome": "Go to Home",
+    "goDashboard": "Go to Dashboard",
+    "goAnalytics": "Go to Analytics",
+    "goOverview": "Go to Overview",
+    "goReports": "Go to Reports",
+    "goSettings": "Go to Settings",
+    "then": "then"
+  },
+  "CommandPalette": {
+    "commandPalette": "Command Palette",
+    "search": "Type a command or search...",
+    "noResults": "No results found.",
+    "general": "General",
+    "toggleMode": "Toggle Light/Dark Mode",
+    "toggleSidebar": "Toggle Sidebar",
+    "showHotkeys": "Show Keyboard Shortcuts",
+    "navigation": "Navigation",
+    "goHome": "Go to Home",
+    "goDashboard": "Go to Dashboard",
+    "goAnalytics": "Go to Analytics",
+    "goOverview": "Go to Overview",
+    "goReports": "Go to Reports",
+    "goSettings": "Go to Settings",
+    "language": "Language",
+    "sidebarVariants": "Sidebar Variants",
+    "sidebar": "Sidebar",
+    "floating": "Floating",
+    "inset": "Inset",
+    "themes": "Themes",
+    "navigate": "Navigate",
+    "openOrSelect": "Open/Select",
+    "close": "Close",
+    "then": "then"
+  },
+  "NotificationCenter": {
+    "emptyTitle": "No notifications",
+    "emptyDescription": "You're all caught up!",
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "all": "All",
+    "unread": "Unread",
+    "seeAll": "See all notifications",
+    "loginTitle": "Login Successful",
+    "loginDescription": "You have securely signed in as user@example.com.",
+    "loginTime": "Just now",
+    "mentionTitle": "New Mention",
+    "mentionDescription": "You have been mentioned in a new comment.",
+    "mentionTime": "21 minutes ago",
+    "reportTitle": "Report Generated",
+    "reportDescription": "The analytics report for the previous week has been generated.",
+    "reportTime": "3 hours ago",
+    "exportTitle": "Export Completed",
+    "exportDescription": "The data you requested has been downloaded in CSV format.",
+    "exportTime": "Yesterday",
+    "versionTitle": "New Version Released",
+    "versionDescription": "Check the latest version for new features and improvements.",
+    "versionTime": "2 days ago"
+  }
+}

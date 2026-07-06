@@ -1,0 +1,143 @@
+{
+  "HomePage": {
+    "title": "Vous êtes sur la page d'accueil."
+  },
+  "OverviewPage": {
+    "title": "Vous êtes sur la page Tableau de bord/Aperçu."
+  },
+  "AnalyticsPage": {
+    "title": "Vous êtes sur la page Tableau de bord/Analyse."
+  },
+  "ReportsPage": {
+    "title": "Vous êtes sur la page Tableau de bord/Rapports."
+  },
+  "Greet": {
+    "placeholder": "Entrez un nom...",
+    "button": "Saluer",
+    "error": "Une erreur s'est produite. Veuillez réessayer.",
+    "successGreeting": "Bonjour {name} ! {source} vous envoie ses salutations !",
+    "loadingTauri": "Connexion au système...",
+    "loadingWeb": "Connexion au réseau...",
+    "missingName": "Informations manquantes",
+    "missingNameDesc": "Veuillez entrer un nom pour saluer."
+  },
+  "LanguageCard": {
+    "title": "Langue",
+    "description": "Sélectionnez votre langue préférée"
+  },
+  "ModeCard": {
+    "title": "Modes",
+    "description": "Choisissez votre mode ou personnalisez votre style",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  },
+  "SidebarVariantCard": {
+    "title": "Variante de la barre latérale",
+    "description": "Choisissez votre préférence de variante de barre latérale",
+    "sidebar": "Barre latérale",
+    "floating": "Flottante",
+    "inset": "Encart"
+  },
+  "ThemesList": {
+    "title": "Thèmes",
+    "description": "Utilisez des thèmes par défaut ou personnalisés",
+    "searchPlaceholder": "Rechercher des thèmes...",
+    "sortBy": "Trier par",
+    "sortDefault": "Par défaut",
+    "sortAZ": "Nom (A-Z)",
+    "sortZA": "Nom (Z-A)",
+    "noThemesTitle": "Aucun thème trouvé",
+    "noThemesDescription": "Aucun thème ne correspond à votre terme de recherche."
+  },
+  "Navigation": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "overview": "Aperçu",
+    "analytics": "Analyse",
+    "reports": "Rapports",
+    "github": "Github",
+    "feedback": "Commentaires",
+    "settings": "Paramètres",
+    "platform": "Plateforme",
+    "projects": "Projets",
+    "projectAlpha": "Projet Alpha",
+    "viewProject": "Voir le projet",
+    "shareProject": "Partager le projet",
+    "deleteProject": "Supprimer le projet",
+    "more": "Plus",
+    "upgradeToPro": "Passer à Pro",
+    "account": "Compte",
+    "billing": "Facturation",
+    "notifications": "Notifications",
+    "logOut": "Se déconnecter",
+    "search": "Rechercher..."
+  },
+  "HotkeysDialog": {
+    "title": "Raccourcis Clavier",
+    "description": "Liste des raccourcis.",
+    "general": "Général",
+    "navigation": "Navigation",
+    "commandPalette": "Palette de Commandes",
+    "toggleMode": "Basculer Mode",
+    "toggleSidebar": "Basculer Barre Latérale",
+    "showHotkeys": "Raccourcis Clavier",
+    "goHome": "Accueil",
+    "goDashboard": "Tableau de bord",
+    "goAnalytics": "Analytique",
+    "goOverview": "Aperçu",
+    "goReports": "Rapports",
+    "goSettings": "Paramètres",
+    "then": "puis"
+  },
+  "CommandPalette": {
+    "commandPalette": "Palette de Commandes",
+    "search": "Rechercher...",
+    "noResults": "Aucun résultat.",
+    "general": "Général",
+    "toggleMode": "Basculer Mode",
+    "toggleSidebar": "Basculer Barre Latérale",
+    "showHotkeys": "Raccourcis Clavier",
+    "navigation": "Navigation",
+    "goHome": "Accueil",
+    "goDashboard": "Tableau de bord",
+    "goAnalytics": "Analytique",
+    "goOverview": "Aperçu",
+    "goReports": "Rapports",
+    "goSettings": "Paramètres",
+    "language": "Langue",
+    "sidebarVariants": "Variantes",
+    "sidebar": "Barre latérale",
+    "floating": "Flottante",
+    "inset": "Encart",
+    "themes": "Thèmes",
+    "navigate": "Naviguer",
+    "openOrSelect": "Ouvrir",
+    "close": "Fermer",
+    "then": "puis"
+  },
+  "NotificationCenter": {
+    "emptyTitle": "Aucune notification",
+    "emptyDescription": "Vous êtes à jour !",
+    "title": "Notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "all": "Tout",
+    "unread": "Non lu",
+    "seeAll": "Voir tout",
+    "loginTitle": "Connexion réussie",
+    "loginDescription": "Vous êtes connecté en toute sécurité.",
+    "loginTime": "À l'instant",
+    "mentionTitle": "Nouvelle mention",
+    "mentionDescription": "Vous avez été mentionné dans un commentaire.",
+    "mentionTime": "il y a 21 minutes",
+    "reportTitle": "Rapport généré",
+    "reportDescription": "Le rapport analytique de la semaine précédente a été généré.",
+    "reportTime": "il y a 3 heures",
+    "exportTitle": "Exportation terminée",
+    "exportDescription": "Les données ont été téléchargées.",
+    "exportTime": "Hier",
+    "versionTitle": "Nouvelle version",
+    "versionDescription": "Consultez la dernière version pour découvrir de nouvelles fonctionnalités et améliorations.",
+    "versionTime": "il y a 2 jours"
+  }
+}
