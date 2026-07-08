@@ -5,7 +5,6 @@ import { routing } from "@workspace/i18n/routing";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
-import { AppLayout } from "./components/app-layout";
 import "@workspace/ui/globals.css";
 
 const geistSans = Geist({
@@ -66,7 +65,7 @@ export default async function RootLayout({
           messages={localeMessages}
           timeZone="UTC"
         >
-          <AppLayout>{children}</AppLayout>
+          {children}
         </NextIntlClientProvider>
       </body>
     </html>
