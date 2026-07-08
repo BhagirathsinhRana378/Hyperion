@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuthStore } from "@workspace/core/stores/auth-store";
+import { useRouter } from "@workspace/i18n/navigation";
 import { useEffect } from "react";
 
 interface AuthProviderProps {
@@ -9,6 +10,7 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const { initialize, loading, user } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
     initialize();
@@ -16,9 +18,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     if (!(loading || user)) {
-      window.location.href = "/auth/sign-in";
+      router.push("/sign-in");
     }
-  }, [loading, user]);
+  }, [loading, user, router]);
 
   if (loading) {
     return (

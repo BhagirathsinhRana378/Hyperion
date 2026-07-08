@@ -10,16 +10,20 @@ export function SignInPage() {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-      provider: "google",
-    });
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        options: {
+          redirectTo: `${window.location.origin}/api/auth/callback`,
+        },
+        provider: "google",
+      });
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        setError(error.message);
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to initialize authentication.");
     }
   };
 
@@ -28,17 +32,22 @@ export function SignInPage() {
     setLoading(true);
     setError("");
 
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+      } else {
+        window.location.href = "/home";
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to initialize authentication.");
       setLoading(false);
-    } else {
-      window.location.href = "/home";
     }
   };
 

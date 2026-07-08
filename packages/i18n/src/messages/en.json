@@ -70,7 +70,9 @@
     "billing": "Billing",
     "notifications": "Notifications",
     "logOut": "Log out",
-    "search": "Search..."
+    "search": "Search...",
+    "workspace": "Workspace",
+    "kanban": "Kanban"
   },
   "HotkeysDialog": {
     "title": "Keyboard Shortcuts",

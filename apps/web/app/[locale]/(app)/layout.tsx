@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthProvider } from "@workspace/core/components/auth/auth-provider";
 import { AppLayout } from "@workspace/core/components/layout/app-layout";
 import { Link, usePathname, useRouter } from "@workspace/i18n/navigation";
 
@@ -12,12 +13,14 @@ export default function AppGroupLayout({ children }: AppGroupLayoutProps) {
   const pathname = usePathname();
 
   return (
-    <AppLayout
-      LinkComponent={Link}
-      navigate={(path) => router.push(path)}
-      pathname={pathname}
-    >
-      {children}
-    </AppLayout>
+    <AuthProvider>
+      <AppLayout
+        LinkComponent={Link}
+        navigate={(path) => router.push(path)}
+        pathname={pathname}
+      >
+        {children}
+      </AppLayout>
+    </AuthProvider>
   );
 }
