@@ -1,3 +1,5 @@
+mod terminal;
+
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -21,7 +23,14 @@ fn greet(name: &str) -> GreetResponse {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            terminal::create_terminal,
+            terminal::write_terminal,
+            terminal::resize_terminal,
+            terminal::get_terminal_history,
+            terminal::close_terminal
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

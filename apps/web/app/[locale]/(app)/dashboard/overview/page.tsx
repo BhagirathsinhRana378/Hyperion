@@ -1,5 +1,10 @@
-import { OverviewPage } from "@workspace/core/pages/subpages/overview-page";
+import { redirect } from "@workspace/i18n/navigation";
 
-export default function Overview() {
-  return <OverviewPage />;
+export default async function DashboardOverviewRedirect({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  redirect({ href: "/workspace", locale });
 }
