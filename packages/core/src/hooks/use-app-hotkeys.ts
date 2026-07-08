@@ -58,51 +58,6 @@ export function useAppHotkeys({ navigate }: UseAppHotkeysOptions) {
     }
   );
 
-  // Go to Home
-  useHotkeys(
-    getKeys("go-home"),
-    (e: KeyboardEvent) => {
-      e.preventDefault();
-      navigate("/home");
-    },
-    { enableOnFormTags: false }
-  );
-  // Go to Dashboard
-  useHotkeys(
-    getKeys("go-dashboard"),
-    (e: KeyboardEvent) => {
-      e.preventDefault();
-      navigate("/dashboard/overview");
-    },
-    { enableOnFormTags: false }
-  );
-  // Go to Analytics
-  useHotkeys(
-    getKeys("go-analytics"),
-    (e: KeyboardEvent) => {
-      e.preventDefault();
-      navigate("/dashboard/analytics");
-    },
-    { enableOnFormTags: false }
-  );
-  // Go to Overview
-  useHotkeys(
-    getKeys("go-overview"),
-    (e: KeyboardEvent) => {
-      e.preventDefault();
-      navigate("/dashboard/overview");
-    },
-    { enableOnFormTags: false }
-  );
-  // Go to Reports
-  useHotkeys(
-    getKeys("go-reports"),
-    (e: KeyboardEvent) => {
-      e.preventDefault();
-      navigate("/dashboard/reports");
-    },
-    { enableOnFormTags: false }
-  );
   // Go to Settings
   useHotkeys(
     getKeys("go-settings"),

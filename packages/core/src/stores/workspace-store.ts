@@ -3,15 +3,22 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+export interface TerminalPane {
+  id: string;
+  title: string;
+}
+
 export interface Workspace {
   createdAt: number;
   id: string;
   name: string;
+  panes: TerminalPane[];
+  terminalCount: number;
 }
 
 interface WorkspaceState {
   activeWorkspaceId: string | null;
-  createWorkspace: (name: string) => Workspace;
+  createWorkspace: (name: string, terminalCount: number) => Workspace;
   deleteWorkspace: (id: string) => void;
   renameWorkspace: (id: string, name: string) => void;
   setActiveWorkspace: (id: string) => void;
@@ -22,15 +29,26 @@ function generateId(): string {
   return crypto.randomUUID();
 }
 
+function createPanes(count: number): TerminalPane[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: generateId(),
+    title: `Terminal ${i + 1}`,
+  }));
+}
+
 export const useWorkspaceStore = create<WorkspaceState>()(
   persist(
-    (set, _get) => ({
+    (set) => ({
       activeWorkspaceId: null,
-      createWorkspace: (name: string) => {
+      workspaces: [],
+      createWorkspace: (name: string, terminalCount: number) => {
+        const clamped = Math.min(8, Math.max(1, terminalCount));
         const workspace: Workspace = {
           createdAt: Date.now(),
           id: generateId(),
           name,
+          terminalCount: clamped,
+          panes: createPanes(clamped),
         };
         set((state) => ({
           activeWorkspaceId: workspace.id,
@@ -60,10 +78,9 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       setActiveWorkspace: (id: string) => {
         set({ activeWorkspaceId: id });
       },
-      workspaces: [],
     }),
     {
-      name: "hyperion-workspaces",
+      name: "hyperion-workspaces-v2",
       storage: createJSONStorage(() => localStorage),
     }
   )

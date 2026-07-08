@@ -5,7 +5,6 @@ import { HotkeysDialog } from "@workspace/core/components/common/hotkeys-dialog"
 import { ProfileDrawer } from "@workspace/core/components/common/profile-drawer";
 import { AppHeader } from "@workspace/core/components/layout/app-header";
 import { AppSidebar } from "@workspace/core/components/layout/app-sidebar";
-import { MobileBottomNav } from "@workspace/core/components/navigation/mobile-bottom-nav";
 import { navigationData } from "@workspace/core/config/navigation";
 import { useAppHotkeys } from "@workspace/core/hooks/use-app-hotkeys";
 import { ThemeProvider } from "@workspace/core/providers/theme-provider";
@@ -51,18 +50,19 @@ export function AppLayout({
       enableSystem={true}
     >
       <TooltipProvider>
-        <SidebarProvider className="h-screen pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+        <SidebarProvider className="h-screen bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
           <HotkeysRegistrar navigate={navigate} />
-          <AppSidebar LinkComponent={LinkComponent} pathname={pathname} />
-          <SidebarInset>
+          <AppSidebar
+            LinkComponent={LinkComponent}
+            navigate={navigate}
+            pathname={pathname}
+          />
+          <SidebarInset className="flex min-w-0 flex-col bg-background">
             <AppHeader LinkComponent={LinkComponent} pathname={pathname} />
-            {children}
+            <main className="flex flex-1 flex-col overflow-hidden">
+              {children}
+            </main>
             <Toaster />
-            <MobileBottomNav
-              items={navigationData.navMobile}
-              LinkComponent={LinkComponent}
-              pathname={pathname}
-            />
           </SidebarInset>
           <HotkeysDialog />
           <CommandPalette navigate={navigate} />

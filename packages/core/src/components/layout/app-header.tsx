@@ -2,30 +2,20 @@
 
 import { ModeToggle } from "@workspace/core/components/common/mode-toggle";
 import { NotificationCenter } from "@workspace/core/components/common/notification-center";
-import { navigationData } from "@workspace/core/config/navigation";
 import { formatHotkeyDisplay } from "@workspace/core/lib/utils";
 import { useCommandPaletteStore } from "@workspace/core/stores/command-palette-store";
-import { useTranslations } from "@workspace/i18n";
+import { useWorkspaceStore } from "@workspace/core/stores/workspace-store";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@workspace/ui/components/breadcrumb";
 import { Button } from "@workspace/ui/components/button";
 import { Kbd } from "@workspace/ui/components/kbd";
-import { Separator } from "@workspace/ui/components/separator";
-import { SidebarTrigger } from "@workspace/ui/components/sidebar";
-import { Search } from "lucide-react";
-import { type ComponentType, Fragment } from "react";
-
-function formatSegment(segment: string): string {
-  return segment
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
+import { useSidebar } from "@workspace/ui/components/sidebar";
+import { ChevronRight, Search } from "lucide-react";
+import type { ComponentType } from "react";
 
 interface AppHeaderProps {
   LinkComponent?:
@@ -40,98 +30,101 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ pathname, LinkComponent = "a" }: AppHeaderProps) {
-  const segments = pathname
-    .split("/")
-    .filter((s) => Boolean(s) && s !== "home");
-  const t = useTranslations("Navigation");
-  const isHome = pathname === "/home" || pathname === "/";
-  const getBreadcrumbHref = (href: string) => {
-    const navItem = navigationData.navMain.find((item) => item.url === href);
-    return navItem?.href ?? href;
-  };
+  const { open } = useSidebar();
   const toggleCommandPalette = useCommandPaletteStore((s) => s.toggle);
+  const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
+  const workspaces = useWorkspaceStore((s) => s.workspaces);
+
+  if (!open) {
+    return null;
+  }
+  const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId);
+
+  const isSettings = pathname === "/settings";
+  const hotkeyDisplay = formatHotkeyDisplay("mod+k");
 
   return (
-    <header className="hidden h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:flex">
-      <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
-        <SidebarTrigger className="-ml-1 cursor-pointer" />
-        <Separator
-          className="mx-2 data-vertical:h-4 data-vertical:self-center"
-          orientation="vertical"
-        />
-
+    <header className="flex h-10.5 shrink-0 items-center justify-between border-border/40 border-b bg-background/95 px-4 backdrop-blur-md transition-[width,height] ease-linear md:px-6">
+      {/* Left section: breadcrumbs */}
+      <div className="flex items-center gap-2">
         <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              {isHome ? (
-                <BreadcrumbPage>{t("home")}</BreadcrumbPage>
+          <BreadcrumbList className="flex items-center gap-1.5 font-semibold text-muted-foreground/90 text-xs">
+            <BreadcrumbItem>
+              {isSettings ? (
+                <LinkComponent
+                  className="font-bold text-[11px] uppercase tracking-wider transition-colors hover:text-foreground"
+                  href="/workspace"
+                >
+                  Workspaces
+                </LinkComponent>
               ) : (
-                <LinkComponent href="/home">{t("home")}</LinkComponent>
+                <span className="font-bold text-[11px] text-muted-foreground/60 uppercase tracking-wider">
+                  Workspaces
+                </span>
               )}
             </BreadcrumbItem>
 
-            {segments.map((segment, index) => {
-              const href = `/${segments.slice(0, index + 1).join("/")}`;
-              const breadcrumbHref = getBreadcrumbHref(href);
-              const isLast = index === segments.length - 1;
-              // Try to get translation, fallback to formatted segment
-              const displayText =
-                t(segment) === segment ? formatSegment(segment) : t(segment);
+            {isSettings && (
+              <>
+                <ChevronRight className="size-3 text-muted-foreground/45" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="font-bold text-[11px] text-foreground uppercase tracking-wider">
+                    Settings
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </>
+            )}
 
-              return (
-                <Fragment key={href}>
-                  <BreadcrumbSeparator className="hidden md:block" />
-                  <BreadcrumbItem>
-                    {isLast ? (
-                      <BreadcrumbPage>{displayText}</BreadcrumbPage>
-                    ) : (
-                      <LinkComponent
-                        className="hidden md:block"
-                        href={breadcrumbHref}
-                      >
-                        {displayText}
-                      </LinkComponent>
-                    )}
-                  </BreadcrumbItem>
-                </Fragment>
-              );
-            })}
+            {!isSettings && activeWorkspace && (
+              <>
+                <ChevronRight className="size-3 text-muted-foreground/45" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="font-sans font-semibold text-foreground text-sm tracking-tight">
+                    {activeWorkspace.name}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </>
+            )}
           </BreadcrumbList>
         </Breadcrumb>
+      </div>
 
-        <div className="ml-auto flex items-center gap-1">
-          <Button
-            className="hidden w-64 justify-between lg:flex"
-            onClick={toggleCommandPalette}
-            size="sm"
-            variant="outline"
-          >
-            <span className="flex items-center gap-2">
-              <Search className="size-4 text-muted-foreground" />
-              <span className="font-normal text-muted-foreground">
-                {t("search")}
-              </span>
-            </span>
-            <span className="flex items-center gap-1">
-              <Kbd>{formatHotkeyDisplay("mod")}</Kbd>
-              <Kbd>K</Kbd>
-            </span>
-          </Button>
-          <Button
-            className="flex lg:hidden"
-            onClick={toggleCommandPalette}
-            size="icon"
-            variant="ghost"
-          >
-            <Search className="size-4" />
-          </Button>
-          <Separator
-            className="mx-2 hidden data-vertical:h-4 data-vertical:self-center lg:block"
-            orientation="vertical"
-          />
-          <NotificationCenter />
-          <ModeToggle />
-        </div>
+      {/* Middle section: centered Raycast-style search bar */}
+      <div className="absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:block">
+        <button
+          className="flex w-68 items-center justify-between rounded-lg border border-border/45 bg-muted/20 px-3 py-1 text-muted-foreground text-xs shadow-2xs transition-all hover:border-border/80 hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40"
+          onClick={toggleCommandPalette}
+          type="button"
+        >
+          <span className="flex items-center gap-2">
+            <Search className="size-3.5 text-muted-foreground/75" />
+            <span>Search or command...</span>
+          </span>
+          <span className="flex items-center gap-0.5 opacity-80">
+            {hotkeyDisplay.map((key) => (
+              <Kbd
+                className="h-4.5 min-w-4 px-1 font-bold text-[9px]"
+                key={key}
+              >
+                {key}
+              </Kbd>
+            ))}
+          </span>
+        </button>
+      </div>
+
+      {/* Right section: tools, settings, alerts */}
+      <div className="flex items-center gap-2">
+        <Button
+          className="flex rounded-lg text-muted-foreground hover:bg-muted/80 hover:text-foreground md:hidden"
+          onClick={toggleCommandPalette}
+          size="icon"
+          variant="ghost"
+        >
+          <Search className="size-4" />
+        </Button>
+        <NotificationCenter />
+        <ModeToggle />
       </div>
     </header>
   );

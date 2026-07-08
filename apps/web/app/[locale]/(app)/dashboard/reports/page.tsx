@@ -1,5 +1,10 @@
-import { ReportsPage } from "@workspace/core/pages/subpages/reports-page";
+import { redirect } from "@workspace/i18n/navigation";
 
-export default function Reports() {
-  return <ReportsPage />;
+export default async function DashboardReportsRedirect({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  redirect({ href: "/workspace", locale });
 }

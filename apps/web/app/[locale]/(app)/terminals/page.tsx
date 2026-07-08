@@ -1,5 +1,10 @@
-import { TerminalsPage } from "@workspace/core/pages/terminals-page";
+import { redirect } from "@workspace/i18n/navigation";
 
-export default function Terminals() {
-  return <TerminalsPage />;
+export default async function TerminalsRedirect({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  redirect({ href: "/workspace", locale });
 }

@@ -25,34 +25,10 @@ export const hotkeys: HotkeyDefinition[] = [
     category: "general",
   },
   {
-    id: "go-home",
-    keys: "g>h",
-    translationKey: "goHome",
-    category: "navigation",
-  },
-  {
-    id: "go-dashboard",
-    keys: "g>d",
-    translationKey: "goDashboard",
-    category: "navigation",
-  },
-  {
-    id: "go-overview",
-    keys: "g>o",
-    translationKey: "goOverview",
-    category: "navigation",
-  },
-  {
-    id: "go-analytics",
-    keys: "g>a",
-    translationKey: "goAnalytics",
-    category: "navigation",
-  },
-  {
-    id: "go-reports",
-    keys: "g>r",
-    translationKey: "goReports",
-    category: "navigation",
+    id: "new-workspace",
+    keys: "mod+n",
+    translationKey: "newWorkspace",
+    category: "general",
   },
   {
     id: "go-settings",

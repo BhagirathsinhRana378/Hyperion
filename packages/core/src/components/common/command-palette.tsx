@@ -1,5 +1,6 @@
 "use client";
 
+import { NewWorkspaceDialog } from "@workspace/core/components/common/new-workspace-dialog";
 import { hotkeys } from "@workspace/core/config/hotkeys";
 import { themes } from "@workspace/core/config/themes";
 import { useDrawerHistory } from "@workspace/core/hooks/use-drawer-history";
@@ -9,6 +10,7 @@ import { useCommandPaletteStore } from "@workspace/core/stores/command-palette-s
 import { useHotkeysDialogStore } from "@workspace/core/stores/hotkeys-store";
 import { useSidebarStore } from "@workspace/core/stores/sidebar-store";
 import { useThemeStore } from "@workspace/core/stores/theme-store";
+import { useWorkspaceStore } from "@workspace/core/stores/workspace-store";
 import { useTranslations } from "@workspace/i18n";
 import {
   Command,
@@ -41,22 +43,19 @@ import { cn } from "@workspace/ui/lib/utils";
 import {
   Check,
   CornerDownLeftIcon,
-  FileText,
-  Home,
   Keyboard,
-  LayoutDashboard,
   LayoutTemplate,
-  LineChart,
   Moon,
   MoveDown,
   MoveUp,
   Palette,
   PanelLeft,
+  Plus,
   Settings,
   Sun,
-  View,
+  Terminal,
 } from "lucide-react";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 
 function CommandMenuItem({
   children,
@@ -97,6 +96,11 @@ export function CommandPalette({
   const { variant, setVariant } = useSidebarStore();
   const { selectedTheme, setSelectedTheme } = useThemeStore();
   const toggleHotkeysDialog = useHotkeysDialogStore((s) => s.toggle);
+
+  // Workspaces access
+  const { workspaces, activeWorkspaceId, setActiveWorkspace } =
+    useWorkspaceStore();
+  const [newWorkspaceOpen, setNewWorkspaceOpen] = useState(false);
 
   const runCommand = useCallback(
     (command: () => unknown) => {
@@ -145,7 +149,10 @@ export function CommandPalette({
           isMobile && "h-full"
         )}
       >
-        <CommandInput autoFocus={true} placeholder={t("search")} />
+        <CommandInput
+          autoFocus={true}
+          placeholder="Type a command or search workspaces..."
+        />
         <CommandList
           className={cn(
             "no-scrollbar scroll-pt-2 scroll-pb-1.5",
@@ -155,6 +162,48 @@ export function CommandPalette({
           <CommandEmpty className="py-12 text-center text-muted-foreground text-sm">
             {t("noResults")}
           </CommandEmpty>
+
+          <CommandGroup className={groupClasses} heading="Workspaces">
+            <CommandMenuItem
+              onSelect={() => {
+                close();
+                setNewWorkspaceOpen(true);
+              }}
+            >
+              <Plus className="mr-2 size-4 text-primary" />
+              <span>Create New Workspace</span>
+              {getKeysDisplay("new-workspace")}
+            </CommandMenuItem>
+
+            {workspaces.map((ws) => (
+              <CommandMenuItem
+                key={ws.id}
+                onSelect={() =>
+                  runCommand(() => {
+                    setActiveWorkspace(ws.id);
+                    navigate("/workspace");
+                  })
+                }
+              >
+                <Terminal
+                  className={cn(
+                    "mr-2 size-4",
+                    ws.id === activeWorkspaceId
+                      ? "text-primary"
+                      : "text-muted-foreground"
+                  )}
+                />
+                <span>{ws.name}</span>
+                {ws.id === activeWorkspaceId && (
+                  <span className="ml-auto rounded bg-primary/10 px-1.5 py-0.5 font-bold text-[10px] text-primary uppercase tracking-wider">
+                    Active
+                  </span>
+                )}
+              </CommandMenuItem>
+            ))}
+          </CommandGroup>
+
+          <CommandSeparator className="my-2" />
 
           <CommandGroup className={groupClasses} heading={t("general")}>
             <CommandMenuItem
@@ -193,53 +242,12 @@ export function CommandPalette({
                 {getKeysDisplay("show-hotkeys")}
               </CommandMenuItem>
             )}
-          </CommandGroup>
 
-          <CommandSeparator className="my-2" />
-
-          <CommandGroup className={groupClasses} heading={t("navigation")}>
-            <CommandMenuItem
-              onSelect={() => runCommand(() => navigate("/home"))}
-            >
-              <Home />
-              <span>{t("goHome")}</span>
-              {getKeysDisplay("go-home")}
-            </CommandMenuItem>
-            <CommandMenuItem
-              onSelect={() => runCommand(() => navigate("/dashboard/overview"))}
-            >
-              <LayoutDashboard />
-              <span>{t("goDashboard")}</span>
-              {getKeysDisplay("go-dashboard")}
-            </CommandMenuItem>
-            <CommandMenuItem
-              onSelect={() => runCommand(() => navigate("/dashboard/overview"))}
-            >
-              <View />
-              <span>{t("goOverview")}</span>
-              {getKeysDisplay("go-overview")}
-            </CommandMenuItem>
-            <CommandMenuItem
-              onSelect={() =>
-                runCommand(() => navigate("/dashboard/analytics"))
-              }
-            >
-              <LineChart />
-              <span>{t("goAnalytics")}</span>
-              {getKeysDisplay("go-analytics")}
-            </CommandMenuItem>
-            <CommandMenuItem
-              onSelect={() => runCommand(() => navigate("/dashboard/reports"))}
-            >
-              <FileText />
-              <span>{t("goReports")}</span>
-              {getKeysDisplay("go-reports")}
-            </CommandMenuItem>
             <CommandMenuItem
               onSelect={() => runCommand(() => navigate("/settings"))}
             >
               <Settings />
-              <span>{t("goSettings")}</span>
+              <span>Settings</span>
               {getKeysDisplay("go-settings")}
             </CommandMenuItem>
           </CommandGroup>
@@ -248,7 +256,6 @@ export function CommandPalette({
 
           {!isMobile && (
             <>
-              <CommandSeparator className="my-2" />
               <CommandGroup
                 className={groupClasses}
                 heading={t("sidebarVariants")}
@@ -268,10 +275,9 @@ export function CommandPalette({
                   )
                 )}
               </CommandGroup>
+              <CommandSeparator className="my-2" />
             </>
           )}
-
-          <CommandSeparator className="my-2" />
 
           <CommandGroup className={groupClasses} heading={t("themes")}>
             {themes.map((themeItem) => {
@@ -331,35 +337,40 @@ export function CommandPalette({
     </>
   );
 
-  if (isMobile) {
-    return (
-      <Drawer onOpenChange={(open) => !open && close()} open={isOpen}>
-        <DrawerContent
-          className="h-[96dvh] overflow-hidden"
-          onOpenAutoFocus={(e: Event) => e.preventDefault()}
-        >
-          <DrawerHeader className="sr-only">
-            <DrawerTitle>{t("commandPalette")}</DrawerTitle>
-            <DrawerDescription>{t("search")}</DrawerDescription>
-          </DrawerHeader>
-          {paletteContent}
-        </DrawerContent>
-      </Drawer>
-    );
-  }
-
   return (
-    <Dialog onOpenChange={(open) => !open && close()} open={isOpen}>
-      <DialogContent
-        className="top-[15%] translate-y-0 overflow-hidden rounded-xl border-none bg-background bg-clip-padding p-0 pb-10 shadow-2xl ring-4 ring-border/80 sm:max-w-lg"
-        showCloseButton={false}
-      >
-        <DialogHeader className="sr-only">
-          <DialogTitle>{t("commandPalette")}</DialogTitle>
-          <DialogDescription>{t("search")}</DialogDescription>
-        </DialogHeader>
-        {paletteContent}
-      </DialogContent>
-    </Dialog>
+    <>
+      {isMobile ? (
+        <Drawer onOpenChange={(open) => !open && close()} open={isOpen}>
+          <DrawerContent
+            className="h-[96dvh] overflow-hidden"
+            onOpenAutoFocus={(e: Event) => e.preventDefault()}
+          >
+            <DrawerHeader className="sr-only">
+              <DrawerTitle>{t("commandPalette")}</DrawerTitle>
+              <DrawerDescription>{t("search")}</DrawerDescription>
+            </DrawerHeader>
+            {paletteContent}
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog onOpenChange={(open) => !open && close()} open={isOpen}>
+          <DialogContent
+            className="top-[15%] translate-y-0 overflow-hidden rounded-xl border-none bg-background bg-clip-padding p-0 pb-10 shadow-2xl ring-4 ring-border/80 sm:max-w-lg"
+            showCloseButton={false}
+          >
+            <DialogHeader className="sr-only">
+              <DialogTitle>{t("commandPalette")}</DialogTitle>
+              <DialogDescription>{t("search")}</DialogDescription>
+            </DialogHeader>
+            {paletteContent}
+          </DialogContent>
+        </Dialog>
+      )}
+      <NewWorkspaceDialog
+        onCreated={() => navigate("/workspace")}
+        onOpenChange={setNewWorkspaceOpen}
+        open={newWorkspaceOpen}
+      />
+    </>
   );
 }
