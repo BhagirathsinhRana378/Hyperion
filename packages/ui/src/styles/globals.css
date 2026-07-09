@@ -1,9 +1,8 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@xterm/xterm/css/xterm.css";
 @import "./themes.css";
-@import "./mistral-tokens.css";
 
 @source "../../../../apps/**/*.{ts,tsx}";
 @source "../../../core/src/**/*.{ts,tsx}";
