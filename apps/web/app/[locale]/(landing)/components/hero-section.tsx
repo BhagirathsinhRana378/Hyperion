@@ -1,3 +1,5 @@
+"use client";
+
 import { siteConfig } from "@workspace/core/config/site";
 import { fetchLatestGithubVersion } from "@workspace/core/lib/utils";
 import { Button } from "@workspace/ui/components/button";
@@ -152,7 +154,7 @@ export default function HeroSection() {
 
               <TextEffect
                 as="h1"
-                className="mx-auto mt-8 max-w-4xl text-balance text-5xl max-md:font-semibold md:text-7xl lg:mt-16 xl:text-[5.25rem]"
+                className="mx-auto mt-8 max-w-4xl text-balance text-5xl max-md:font-semibold md:text-7xl lg:mt-16 xl:text-[5.25rem] font-display tracking-tighter"
                 preset="fade-in-blur"
                 speedSegment={0.3}
               >
@@ -239,7 +241,7 @@ export default function HeroSection() {
                   width="1920"
                 />
                 <BorderBeam
-                  className="from-transparent via-primary to-transparent"
+                  className="from-transparent via-mistral-primary to-transparent"
                   duration={6}
                   size={200}
                 />

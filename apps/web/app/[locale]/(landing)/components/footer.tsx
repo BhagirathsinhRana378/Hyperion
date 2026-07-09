@@ -127,12 +127,12 @@ export function Footer() {
           {footerLinks.map((section, index) => (
             <AnimatedContainer delay={0.1 + index * 0.1} key={section.label}>
               <div className="mb-10 md:mb-0">
-                <h3 className="text-xs">{section.label}</h3>
+                <h3 className="text-xs text-mistral-slate">{section.label}</h3>
                 <ul className="mt-4 space-y-2 text-muted-foreground text-sm">
                   {section.links.map((link) => (
                     <li key={link.title}>
                       <Link
-                        className="inline-flex items-center duration-250 hover:text-foreground [&_svg]:me-1 [&_svg]:size-4"
+                        className="inline-flex items-center duration-250 hover:text-mistral-primary [&_svg]:me-1 [&_svg]:size-4"
                         href={link.href}
                         key={`${section.label}-${link.title}`}
                         rel={
@@ -155,7 +155,7 @@ export function Footer() {
         <TextHoverEffect text={siteConfig.name.toUpperCase()} />
       </div>
       <BorderBeam
-        className="from-transparent via-primary to-transparent"
+        className="from-transparent via-mistral-primary to-transparent"
         duration={6}
         size={200}
       />

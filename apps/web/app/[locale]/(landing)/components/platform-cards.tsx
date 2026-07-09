@@ -1,6 +1,7 @@
 import { siteConfig } from "@workspace/core/config/site";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
+import { Reveal } from "@workspace/ui/components/marketing/reveal";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -89,21 +90,24 @@ export default function PlatformCards({ assets }: PlatformCardsProps) {
   return (
     <section className="py-16 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
-        <div className="text-center">
-          <h2 className="text-balance font-semibold text-4xl lg:text-5xl">
-            Available Platforms
-          </h2>
-          <p className="mt-4 text-muted-foreground">
-            Download {siteConfig.name} for your platform.
-          </p>
-        </div>
+        <Reveal direction="up" duration={300}>
+          <div className="text-center">
+            <h2 className="text-balance font-display font-semibold text-4xl tracking-tighter lg:text-5xl">
+              Available Platforms
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Download {siteConfig.name} for your platform.
+            </p>
+          </div>
+        </Reveal>
         <div className="mx-auto mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-16 lg:grid-cols-6">
-          {platformCards.map((platform) => (
-            <PlatformCard
-              assets={assets}
-              key={platform.name}
-              platform={platform}
-            />
+          {platformCards.map((platform, i) => (
+            <Reveal direction="up" duration={250} index={i} key={platform.name}>
+              <PlatformCard
+                assets={assets}
+                platform={platform}
+              />
+            </Reveal>
           ))}
         </div>
       </div>

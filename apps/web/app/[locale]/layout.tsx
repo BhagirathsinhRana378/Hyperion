@@ -3,7 +3,7 @@ import { themeInitScript } from "@workspace/core/scripts/theme-init";
 import { hasLocale, NextIntlClientProvider } from "@workspace/i18n";
 import { routing } from "@workspace/i18n/routing";
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { SerwistProvider } from "../serwist";
 import "../globals.css";
@@ -16,6 +16,24 @@ const fontSans = Geist({
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+});
+
+const fontDisplay = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-display",
+  axes: ["SOFT", "WONK", "opsz"],
+});
+
+const fontBody = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500", "600"],
+});
+
+const fontCode = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-code",
+  weight: ["400", "500"],
 });
 
 const APP_NAME = siteConfig.name;
@@ -94,7 +112,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
+        className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} ${fontBody.variable} ${fontCode.variable} font-sans antialiased`}
       >
         <SerwistProvider swUrl="/serwist/sw.js">
           <NextIntlClientProvider>{children}</NextIntlClientProvider>

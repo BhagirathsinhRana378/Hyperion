@@ -1,6 +1,7 @@
 import { ThemeProvider } from "@workspace/core/providers/theme-provider";
-import { Footer } from "./components/footer";
-import { HeroHeader } from "./components/header";
+import { HyperionNav } from "./components/hyperion-nav";
+import { HyperionFooter } from "./components/hyperion-footer";
+import { GradientBand } from "./components/gradient-band";
 
 interface LandingLayoutProps {
   children: React.ReactNode;
@@ -15,9 +16,12 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
       enableColorScheme={true}
       enableSystem={true}
     >
-      <HeroHeader />
-      {children}
-      <Footer />
+      <div className="flex min-h-screen flex-col">
+        <HyperionNav />
+        <main className="flex-1">{children}</main>
+        <GradientBand variant="full" />
+        <HyperionFooter />
+      </div>
     </ThemeProvider>
   );
 }
