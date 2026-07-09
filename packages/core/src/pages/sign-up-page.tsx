@@ -119,7 +119,7 @@ export function SignUpPage() {
 
         <p className="text-center text-muted-foreground text-sm">
           Already have an account?{" "}
-          <a className="text-primary underline" href="/auth/sign-in">
+          <a className="text-primary underline" href="/sign-in">
             Sign in
           </a>
         </p>

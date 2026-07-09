@@ -14,7 +14,7 @@ export function SignInPage() {
       const supabase = getSupabaseBrowserClient();
       const { error } = await supabase.auth.signInWithOAuth({
         options: {
-          redirectTo: `${window.location.origin}/api/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
         provider: "google",
       });
@@ -124,7 +124,7 @@ export function SignInPage() {
 
         <p className="text-center text-muted-foreground text-sm">
           Don&apos;t have an account?{" "}
-          <a className="text-primary underline" href="/auth/sign-up">
+          <a className="text-primary underline" href="/sign-up">
             Sign up
           </a>
         </p>
