@@ -26,6 +26,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { Fragment, useEffect, useRef, useState } from "react";
+import { HeroBackdrop } from "./hero-backdrop";
 import { CodeBlock, CtaLink, Eyebrow, GlowCard } from "./marketing-kit";
 import { Counter, easeOut, Marquee } from "./motion-primitives";
 
@@ -108,21 +109,6 @@ const TERMINAL_CODE = `$ hyperion swarm start --agents 4
 ● agent-04  reviewing  → PR #214 approved
 
 swarm active · 4 agents · you are in command`;
-
-/* Deterministic particle field — fixed values (no Math.random) so the
-   server and client render identical markup. */
-const PARTICLES = [
-  { left: "8%", top: "22%", size: 3, dur: "13s", delay: "0s", x: "12px" },
-  { left: "16%", top: "58%", size: 2, dur: "17s", delay: "-4s", x: "-10px" },
-  { left: "24%", top: "34%", size: 2, dur: "15s", delay: "-9s", x: "8px" },
-  { left: "36%", top: "70%", size: 3, dur: "19s", delay: "-2s", x: "-14px" },
-  { left: "48%", top: "18%", size: 2, dur: "14s", delay: "-6s", x: "10px" },
-  { left: "58%", top: "62%", size: 2, dur: "18s", delay: "-11s", x: "-8px" },
-  { left: "66%", top: "28%", size: 3, dur: "16s", delay: "-3s", x: "14px" },
-  { left: "74%", top: "54%", size: 2, dur: "20s", delay: "-8s", x: "-12px" },
-  { left: "84%", top: "36%", size: 2, dur: "15s", delay: "-5s", x: "10px" },
-  { left: "92%", top: "64%", size: 3, dur: "17s", delay: "-12s", x: "-10px" },
-];
 
 /* ── Micro components ─────────────────────────────────────── */
 
@@ -280,40 +266,11 @@ export default function HeroSection() {
 
   return (
     <main className="overflow-hidden bg-background">
-      {/* ── Hero ── */}
-      <section className="relative">
-        {/* Breathing single-tone glow */}
-        <div
-          aria-hidden={true}
-          className="landing-glow-breathe -z-10 pointer-events-none absolute inset-x-0 top-0 h-[640px] [background:radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_14%,transparent)_0%,transparent_70%)]"
-        />
-        {/* Faint blueprint grid, masked so it dissolves before content */}
-        <div
-          aria-hidden={true}
-          className="-z-10 pointer-events-none absolute inset-x-0 top-0 h-[720px] opacity-[0.14] [background:linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] [background-size:44px_44px] [mask-image:radial-gradient(ellipse_62%_52%_at_50%_0%,#000_55%,transparent_100%)]"
-        />
-        {/* Drifting accent particles */}
-        <div aria-hidden={true} className="-z-10 pointer-events-none absolute inset-x-0 top-0 h-[640px]">
-          {PARTICLES.map((p) => (
-            <span
-              className="landing-drift absolute rounded-full bg-primary/60"
-              key={`${p.left}-${p.top}`}
-              style={
-                {
-                  left: p.left,
-                  top: p.top,
-                  width: p.size,
-                  height: p.size,
-                  "--drift-dur": p.dur,
-                  "--drift-delay": p.delay,
-                  "--drift-x": p.x,
-                } as CSSProperties
-              }
-            />
-          ))}
-        </div>
+      {/* ── Hero — full-viewport, GridScan holographic backdrop ── */}
+      <section className="relative flex min-h-screen flex-col justify-center">
+        <HeroBackdrop />
 
-        <div className="relative pt-28 md:pt-40">
+        <div className="relative z-10 w-full pt-24 pb-16 md:pt-28">
           <div className="mx-auto max-w-7xl px-6">
             <div className="text-center">
               {/* Announcement pill */}
@@ -403,33 +360,36 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Screenshot — scroll-linked 3D untilt with orbiting border light */}
-          <Reveal direction="up" duration={450} offset={48}>
-            <div
-              className="mask-b-from-55% -mr-56 relative mt-10 overflow-hidden px-2 [perspective:1200px] sm:mr-0 sm:mt-14 md:mt-20"
-              ref={shotRef}
-            >
-              <motion.div
-                className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-border bg-card/40 p-4 shadow-2xl shadow-black/40 will-change-transform"
-                style={{ rotateX, scale, transformPerspective: 1200 }}
-              >
-                <Image
-                  alt="Hyperion workspace screenshot"
-                  className="relative aspect-15/8 rounded-2xl border border-border/50"
-                  height="1080"
-                  priority={true}
-                  src="/app-screen-dark.png"
-                  width="1920"
-                />
-                <BorderBeam
-                  className="from-transparent via-primary to-transparent"
-                  duration={6}
-                  size={200}
-                />
-              </motion.div>
-            </div>
-          </Reveal>
         </div>
+      </section>
+
+      {/* ── Screenshot — scroll-linked 3D untilt with orbiting border light ── */}
+      <section className="relative">
+        <Reveal direction="up" duration={450} offset={48}>
+          <div
+            className="mask-b-from-55% -mr-56 -mt-10 relative overflow-hidden px-2 pb-4 [perspective:1200px] sm:mr-0"
+            ref={shotRef}
+          >
+            <motion.div
+              className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-border bg-card/40 p-4 shadow-2xl shadow-black/40 will-change-transform"
+              style={{ rotateX, scale, transformPerspective: 1200 }}
+            >
+              <Image
+                alt="Hyperion workspace screenshot"
+                className="relative aspect-15/8 rounded-2xl border border-border/50"
+                height="1080"
+                priority={true}
+                src="/app-screen-dark.png"
+                width="1920"
+              />
+              <BorderBeam
+                className="from-transparent via-primary to-transparent"
+                duration={6}
+                size={200}
+              />
+            </motion.div>
+          </div>
+        </Reveal>
       </section>
 
       {/* ── Capability ticker ── */}
