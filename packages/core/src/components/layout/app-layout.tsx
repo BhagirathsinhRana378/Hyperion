@@ -8,7 +8,7 @@ import { AppSidebar } from "@workspace/core/components/layout/app-sidebar";
 import { PanelManager } from "@workspace/core/components/panels/panel-manager";
 import { navigationData } from "@workspace/core/config/navigation";
 import { useAppHotkeys } from "@workspace/core/hooks/use-app-hotkeys";
-import { ThemeProvider } from "@workspace/core/providers/theme-provider";
+
 import {
   SidebarInset,
   SidebarProvider,
@@ -43,13 +43,7 @@ export function AppLayout({
   LinkComponent,
 }: AppLayoutProps) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      disableTransitionOnChange={true}
-      enableColorScheme={true}
-      enableSystem={true}
-    >
+
       <TooltipProvider>
         <SidebarProvider className="h-screen bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
           <HotkeysRegistrar navigate={navigate} />
@@ -71,6 +65,6 @@ export function AppLayout({
           <PanelManager />
         </SidebarProvider>
       </TooltipProvider>
-    </ThemeProvider>
+
   );
 }

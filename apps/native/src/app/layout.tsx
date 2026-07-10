@@ -1,5 +1,6 @@
 import { siteConfig } from "@workspace/core/config/site";
 import { ClerkProvider } from "@workspace/core/providers/clerk-provider";
+import { ThemeProvider } from "@workspace/core/providers/theme-provider";
 import { themeInitScript } from "@workspace/core/scripts/theme-init";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -40,7 +41,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased`}
       >
-        <ClerkProvider>{children}</ClerkProvider>
+        <ClerkProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            disableTransitionOnChange={true}
+            enableColorScheme={true}
+            enableSystem={true}
+          >
+            {children}
+          </ThemeProvider>
+        </ClerkProvider>
       </body>
     </html>
   );
