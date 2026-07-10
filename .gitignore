@@ -38,3 +38,5 @@ npm-debug.log*
 .DS_Store
 *.pem
 *.tsbuildinfo
+# Antigravity Agents
+.agents/

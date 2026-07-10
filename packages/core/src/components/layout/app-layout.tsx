@@ -43,28 +43,26 @@ export function AppLayout({
   LinkComponent,
 }: AppLayoutProps) {
   return (
-
-      <TooltipProvider>
-        <SidebarProvider className="h-screen bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
-          <HotkeysRegistrar navigate={navigate} />
-          <AppSidebar
-            LinkComponent={LinkComponent}
-            navigate={navigate}
-            pathname={pathname}
-          />
-          <SidebarInset className="flex min-w-0 flex-col bg-background">
-            <AppHeader LinkComponent={LinkComponent} pathname={pathname} />
-            <main className="flex flex-1 flex-col overflow-hidden">
-              {children}
-            </main>
-            <Toaster />
-          </SidebarInset>
-          <HotkeysDialog />
-          <CommandPalette navigate={navigate} />
-          <ProfileDrawer user={navigationData.user} />
-          <PanelManager />
-        </SidebarProvider>
-      </TooltipProvider>
-
+    <TooltipProvider>
+      <SidebarProvider className="h-screen bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+        <HotkeysRegistrar navigate={navigate} />
+        <AppSidebar
+          LinkComponent={LinkComponent}
+          navigate={navigate}
+          pathname={pathname}
+        />
+        <SidebarInset className="flex min-w-0 flex-col bg-background">
+          <AppHeader LinkComponent={LinkComponent} pathname={pathname} />
+          <main className="flex flex-1 flex-col overflow-hidden">
+            {children}
+          </main>
+          <Toaster />
+        </SidebarInset>
+        <HotkeysDialog />
+        <CommandPalette navigate={navigate} />
+        <ProfileDrawer user={navigationData.user} />
+        <PanelManager />
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }

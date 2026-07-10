@@ -1,4 +1,3 @@
-
 import { AuthProvider } from "@workspace/core/components/auth/auth-provider";
 import { AppLayout } from "@workspace/core/components/layout/app-layout";
 import { usePathname, useRouter } from "next/navigation";
@@ -13,10 +12,7 @@ export default function AppGroupLayout({ children }: AppGroupLayoutProps) {
 
   return (
     <AuthProvider>
-      <AppLayout
-        navigate={(path) => router.push(path)}
-        pathname={pathname}
-      >
+      <AppLayout navigate={(path) => router.push(path)} pathname={pathname}>
         {children}
       </AppLayout>
     </AuthProvider>
