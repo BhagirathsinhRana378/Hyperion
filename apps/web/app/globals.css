@@ -163,12 +163,30 @@
   animation: landing-grid-flow 3.6s linear infinite;
 }
 
+/* Blinking caret for TextType / terminal typing — replaces the
+   original's gsap opacity yoyo with an equivalent CSS loop. The full
+   cycle is 2× the one-way gsap duration, driven via --caret-dur. */
+@keyframes landing-caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.landing-caret-blink {
+  animation: landing-caret-blink var(--caret-dur, 1s) ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-drift,
   .landing-shimmer,
   .landing-orbit,
   .landing-float,
-  .landing-grid-flow {
+  .landing-grid-flow,
+  .landing-caret-blink {
     animation: none;
   }
 }

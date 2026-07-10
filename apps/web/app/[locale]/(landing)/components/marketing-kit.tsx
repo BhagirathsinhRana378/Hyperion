@@ -4,9 +4,10 @@ import { BorderBeam } from "@workspace/ui/components/landing/border-beam";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
 import { cn } from "@workspace/ui/lib/utils";
 import { Minus, Plus } from "lucide-react";
-import { motion, useInView, useScroll } from "motion/react";
+import { motion, useReducedMotion, useScroll } from "motion/react";
 import type * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import TextType from "./text-type";
 
 /* ─────────────────────────────────────────────────────────────
    Local dark marketing kit for the (landing) route group.
@@ -308,9 +309,18 @@ export function FAQ({
 }
 
 /**
- * Dark terminal-style code block with traffic lights.
- * With `typing`, the code types itself when scrolled into view,
- * trailing a blinking block cursor. Respects prefers-reduced-motion.
+ * CodeBlock — the site's one shared terminal window.
+ *
+ * Fixed-size viewport, like a real terminal app (Warp/iTerm/VS Code):
+ * 360px tall on mobile, 440px on tablet, 500px on desktop, up to
+ * 1000px wide — the window NEVER grows with its content. Output fills
+ * the inside; anything past the viewport scrolls internally
+ * (overflow-y), and while `typing` plays the view stays pinned to the
+ * latest line, so the surrounding layout never shifts.
+ *
+ * Typing is driven by TextType (single pass, starts when scrolled
+ * into view) trailing the same blinking block cursor. Respects
+ * prefers-reduced-motion by rendering the full text statically.
  */
 export function CodeBlock({
   className,
@@ -327,42 +337,39 @@ export function CodeBlock({
   typing?: boolean;
 }) {
   const bodyRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(bodyRef, { once: true, margin: "-60px" });
-  const [chars, setChars] = useState(typing ? 0 : Number.MAX_SAFE_INTEGER);
+  const reduceMotion = useReducedMotion();
+  const showTyping = typing && !reduceMotion && !!code;
 
+  // Auto-scroll: while output is being typed, keep the viewport pinned
+  // to the newest line. A MutationObserver keeps this decoupled from
+  // the typing engine — any DOM growth inside the body re-pins.
   useEffect(() => {
-    if (!(typing && isInView && code)) {
+    const el = bodyRef.current;
+    if (!(el && showTyping)) {
       return;
     }
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setChars(code.length);
-      return;
-    }
-    const id = setInterval(() => {
-      setChars((c) => {
-        if (c >= code.length) {
-          clearInterval(id);
-          return c;
-        }
-        return c + 2;
-      });
-    }, 14);
-    return () => clearInterval(id);
-  }, [typing, isInView, code]);
-
-  const done = !code || chars >= code.length;
+    const observer = new MutationObserver(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+    observer.observe(el, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+    return () => observer.disconnect();
+  }, [showTyping]);
 
   return (
     <Reveal direction="up" duration={350} offset={32}>
       <div
         className={cn(
-          "overflow-hidden rounded-xl border border-border bg-black/50 shadow-2xl shadow-black/40 backdrop-blur-sm",
+          "mx-auto flex h-[360px] w-full max-w-[1000px] flex-col overflow-hidden rounded-xl border border-border bg-black/50 shadow-2xl shadow-black/40 backdrop-blur-sm md:h-[440px] lg:h-[500px]",
           className
         )}
         data-slot="code-block"
         {...props}
       >
-        <div className="flex items-center gap-2 border-border border-b bg-muted/30 px-4 py-2.5">
+        <div className="flex shrink-0 items-center gap-2 border-border border-b bg-muted/30 px-4 py-2.5">
           <span className="size-2.5 rounded-full bg-[#ff5f57]" />
           <span className="size-2.5 rounded-full bg-[#febc2e]" />
           <span className="size-2.5 rounded-full bg-[#28c840]" />
@@ -375,18 +382,30 @@ export function CodeBlock({
             {language}
           </span>
         </div>
-        <div className="overflow-x-auto p-4" ref={bodyRef}>
+        <div
+          className="flex-1 overflow-y-auto overflow-x-hidden p-4 [overscroll-behavior:contain] [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin]"
+          ref={bodyRef}
+        >
           {children ?? (
-            <pre className="font-mono text-foreground/85 text-sm leading-relaxed">
-              <code>{typing ? code?.slice(0, chars) : code}</code>
-              {typing && (
-                <span
-                  aria-hidden={true}
-                  className={cn(
-                    "ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-primary/80",
-                    done && "animate-pulse"
-                  )}
+            <pre className="whitespace-pre-wrap break-words font-mono text-foreground/85 text-sm leading-relaxed">
+              {showTyping && code ? (
+                <TextType
+                  as="span"
+                  cursorCharacter={
+                    <span
+                      aria-hidden={true}
+                      className="inline-block h-4 w-2 translate-y-0.5 bg-primary/80"
+                    />
+                  }
+                  cursorClassName="ml-0.5"
+                  loop={false}
+                  showCursor={true}
+                  startOnVisible={true}
+                  text={code}
+                  typingSpeed={8}
                 />
+              ) : (
+                <code>{code}</code>
               )}
             </pre>
           )}

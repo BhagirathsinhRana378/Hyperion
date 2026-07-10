@@ -533,7 +533,7 @@ export default function HeroSection() {
             </h2>
           </div>
         </Reveal>
-        <div className="mx-auto mt-10 max-w-2xl">
+        <div className="mx-auto mt-10 max-w-[1000px]">
           <CodeBlock
             code={TERMINAL_CODE}
             header="hyperion — swarm"
