@@ -1,14 +1,15 @@
 "use client";
 
-import { CodeBlock } from "@workspace/ui/components/marketing/code-block";
+import { motion } from "motion/react";
 import { Cpu, Layout, Network, Terminal } from "lucide-react";
-import Link from "next/link";
-import { GradientBand } from "../components/gradient-band";
 import {
   Counter,
   Marquee,
   StickyPanels,
+  revealVariants,
+  staggerContainer,
 } from "../components/motion-primitives";
+import { CodeBlock, CtaLink, Eyebrow } from "../components/marketing-kit";
 
 const techStack: string[] = [
   "No cables  ·  No plugins  ·  No setups  ·  Zero config  ·  16 panes  ·  Agent dispatch  ·  Dependency resolution  ·  Real-time sync  ·  Canvas overlay  ·  Monaco editor  ·  xterm.js  ·  node-pty  ·  WebSocket streaming  ·  Container-native  ·  Open source  ·  ",
@@ -55,120 +56,100 @@ hyperion watch --trace --canvas
 > agent: opening terminal session [pane-03]
 > agent: installing dependencies...
 > agent: running tests...
-> agent: task complete ✓ (12.4s)`; // TODO: replace with real asset
+> agent: task complete ✓ (12.4s)`;
 
 export default function CodingPage() {
   return (
     <>
-      {/* Hero */}
-      <section className="relative overflow-hidden pt-32 pb-section-lg">
+      {/* Hero — split layout, terminal front and center */}
+      <section className="relative overflow-hidden pt-36 pb-20 md:pb-28">
         <div
           aria-hidden={true}
-          className="absolute inset-0 -z-10"
-          style={{
-            background:
-              "linear-gradient(135deg, #ffa110 0%, #ff8a00 60%, #fa520f 20%)",
-          }}
-        />
-        <div
-          aria-hidden={true}
-          className="absolute inset-0 -z-10 bg-gradient-to-r from-white/40 to-transparent"
+          className="-z-10 pointer-events-none absolute inset-x-0 top-0 h-[560px] [background:radial-gradient(50%_55%_at_30%_0%,color-mix(in_oklab,var(--color-primary)_12%,transparent)_0%,transparent_70%)] landing-glow-breathe"
         />
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div>
-              <span className="text-micro-uppercase text-mistral-ink/60">
-                Terminal Multiplexer
-              </span>
-              <h1 className="mt-2 font-display text-5xl text-mistral-ink leading-tight md:text-6xl lg:text-hero lg:leading-[1.05] lg:tracking-[-1.5px]">
+            <motion.div
+              animate="visible"
+              initial="hidden"
+              variants={staggerContainer}
+            >
+              <motion.div variants={revealVariants}>
+                <Eyebrow>Terminal Multiplexer</Eyebrow>
+              </motion.div>
+              <motion.h1
+                className="mt-3 font-display text-5xl text-foreground leading-[1.05] tracking-tighter md:text-6xl lg:text-7xl"
+                variants={revealVariants}
+              >
                 The terminal, reimagined.
-              </h1>
-              <p className="mt-6 max-w-xl text-mistral-ink-tint text-subtitle">
+              </motion.h1>
+              <motion.p
+                className="mt-6 max-w-xl text-lg text-muted-foreground"
+                variants={revealVariants}
+              >
                 A multi-pane terminal multiplexer with autonomous AI agent
                 dispatch. Your dev environment, supercharged.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Link
-                  className="inline-flex h-10 items-center justify-center rounded-md bg-mistral-ink px-5 text-button-md text-mistral-on-dark transition-all duration-150 hover:scale-[1.02] active:scale-[0.98]"
-                  href="/contact"
-                >
-                  Get early access
-                </Link>
-                <Link
-                  className="inline-flex h-10 items-center justify-center rounded-md border border-mistral-hairline-strong bg-mistral-canvas/80 px-5 text-button-md text-mistral-ink backdrop-blur-sm transition-all duration-150 hover:scale-[1.02] active:scale-[0.98]"
-                  href="/docs"
-                >
+              </motion.p>
+              <motion.div
+                className="mt-8 flex flex-wrap gap-3"
+                variants={revealVariants}
+              >
+                <CtaLink href="/contact">Get early access</CtaLink>
+                <CtaLink href="/docs" variant="ghost">
                   Read the docs
-                </Link>
-              </div>
-            </div>
-            {/* Terminal mockup placeholder */}
+                </CtaLink>
+              </motion.div>
+            </motion.div>
+
             <CodeBlock
-              className="shadow-mistral-level-3"
               code={codeSample}
               header="agent-dispatch.log"
               language="shell"
+              typing={true}
             />
           </div>
         </div>
       </section>
 
       {/* Marquee tech stack ticker */}
-      <section className="border-mistral-hairline-soft border-y py-4">
-        <Marquee pauseOnHover={false} speed={50}>
+      <section className="border-border border-y py-4">
+        <Marquee className="[mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]" pauseOnHover={false} speed={50}>
           <div className="flex items-center gap-8 px-4">
-            {techStack[0]
-              ?.split("·")
-              .map((item, i) => ({ text: item.trim(), id: `tech-${i}` }))
-              .map(({ text, id }) => (
-                <span
-                  className="whitespace-nowrap text-body-sm-medium text-mistral-stone"
-                  key={id}
-                >
-                  {text}
-                </span>
-              ))}
+            {techStack[0]?.split("·").map((item, i) => (
+              <span
+                className="whitespace-nowrap font-medium text-muted-foreground text-sm"
+                key={i}
+              >
+                {item.trim()}
+              </span>
+            ))}
           </div>
         </Marquee>
       </section>
 
       {/* Stats */}
-      <section className="mx-auto max-w-7xl px-6 py-section-lg">
+      <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-          <div className="text-center sm:text-left">
-            <p className="font-display text-mistral-ink text-stat-display">
-              <Counter suffix="" target={16} />{" "}
-              <span className="text-heading-2">+</span>
-            </p>
-            <p className="mt-2 text-body-sm text-mistral-slate">
-              Tiled terminal panes
-            </p>
-          </div>
-          <div className="text-center sm:text-left">
-            <p className="font-display text-mistral-ink text-stat-display">
-              <Counter suffix="" target={0} />{" "}
-              <span className="text-heading-2">ms</span>
-            </p>
-            <p className="mt-2 text-body-sm text-mistral-slate">
-              Zero-config setup time
-            </p>
-          </div>
-          <div className="text-center sm:text-left">
-            <p className="font-display text-mistral-ink text-stat-display">
-              <Counter suffix="%" target={100} />
-            </p>
-            <p className="mt-2 text-body-sm text-mistral-slate">Open source</p>
-          </div>
+          {[
+            { target: 16, unit: "+", label: "Tiled terminal panes" },
+            { target: 0, unit: "ms", label: "Zero-config setup time" },
+            { target: 100, unit: "%", label: "Open source" },
+          ].map((stat) => (
+            <div className="text-center sm:text-left" key={stat.label}>
+              <p className="font-display text-5xl text-primary tracking-tight md:text-6xl">
+                <Counter target={stat.target} />
+                <span className="text-3xl text-primary/70">{stat.unit}</span>
+              </p>
+              <p className="mt-2 text-muted-foreground text-sm">{stat.label}</p>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Sticky-panel feature walkthrough */}
-      <section className="pb-section-lg">
+      <section className="border-border border-t bg-card/30 pb-20 md:pb-28">
         <StickyPanels panels={features} />
       </section>
-
-      {/* Gradient band */}
-      <GradientBand variant="full" />
     </>
   );
 }

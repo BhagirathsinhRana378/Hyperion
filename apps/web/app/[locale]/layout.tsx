@@ -3,20 +3,17 @@ import { themeInitScript } from "@workspace/core/scripts/theme-init";
 import { hasLocale, NextIntlClientProvider } from "@workspace/i18n";
 import { routing } from "@workspace/i18n/routing";
 import type { Metadata, Viewport } from "next";
-import {
-  Fraunces,
-  Geist,
-  Geist_Mono,
-  Inter,
-  JetBrains_Mono,
-} from "next/font/google";
+import { Geist_Mono, JetBrains_Mono, Lora, Plus_Jakarta_Sans } from "next/font/google";
 import { notFound } from "next/navigation";
 import { SerwistProvider } from "../serwist";
 import "../globals.css";
 
-const fontSans = Geist({
+/* Lora (serif) carries body/small/default text; Plus Jakarta Sans
+   carries display/heading sizes via the font-display utility. */
+const fontSans = Lora({
   subsets: ["latin"],
   variable: "--font-sans",
+  weight: ["400", "500", "600"],
 });
 
 const fontMono = Geist_Mono({
@@ -24,13 +21,13 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 });
 
-const fontDisplay = Fraunces({
+const fontDisplay = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-display",
-  axes: ["SOFT", "WONK", "opsz"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
-const fontBody = Inter({
+const fontBody = Lora({
   subsets: ["latin"],
   variable: "--font-body",
   weight: ["400", "500", "600"],

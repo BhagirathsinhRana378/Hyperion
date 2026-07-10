@@ -1,3 +1,93 @@
 @import "@workspace/ui/globals.css";
 @import "fumadocs-ui/css/shadcn.css";
 @import "fumadocs-ui/css/preset.css";
+
+/* `font-display` was never a registered Tailwind utility anywhere in
+   this build, so every `className="... font-display ..."` across the
+   landing group silently did nothing and headings fell back to the
+   inherited body font. Defined directly as plain CSS (rather than via
+   Tailwind's @theme utility generation, which did not pick up a
+   cross-file self-referencing token here) so it reliably resolves to
+   the Plus Jakarta Sans variable set in app/[locale]/layout.tsx. */
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* ==========================================================================
+   Landing (marketing) theme — 60/30/10.
+   Scoped to the (landing) route group via .landing-theme so the in-app
+   product UI and docs keep their own palette.
+
+   60% — --background: near-black, the dominant surface everywhere.
+   30% — --card/--popover/--secondary/--muted/--border: a ladder of
+         grays (darkest → lightest: card < secondary/muted < popover <
+         border) that creates elevation/hierarchy without any color.
+   10% — --primary: "Hyperion Aura" — a solar amber anchor (Hyperion,
+         Titan of the sun), the ONE flat brand accent for everyday
+         interactive moments: buttons, active nav, links, focus rings,
+         icons, progress indicators, selected state. Never used as a
+         large fill; audited to stay confined to hairlines, buttons,
+         badges, and dots/cursors. The full multi-hue aura spectrum
+         (amber → magenta → violet → cyan) is reserved exclusively for
+         the footer's traveling border beam — see border-trace.tsx —
+         as the site's one signature color flourish, not spread
+         everywhere.
+   ========================================================================== */
+.landing-theme {
+  --background: #0e0e0e;
+  --foreground: #ededed;
+  --card: #16161a;
+  --card-foreground: #ededed;
+  --popover: #1c1c22;
+  --popover-foreground: #ededed;
+  --primary: #ff7a29;
+  --primary-foreground: #180d04;
+  --secondary: #201f26;
+  --secondary-foreground: #ededed;
+  --muted: #201f26;
+  --muted-foreground: #96959e;
+  --accent: #232230;
+  --accent-foreground: #ededed;
+  --border: #2a2a33;
+  --input: #2a2a33;
+  --ring: #ff7a29;
+}
+
+/* Slow ambient breathing glow — used behind hero/section headers on the
+   marketing sub-pages so they feel alive without any color or motion
+   that competes with content. Opacity + scale only (GPU-cheap). */
+@keyframes landing-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.landing-glow-breathe {
+  animation: landing-glow-breathe 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-glow-breathe {
+    animation: none;
+  }
+}
+
+/* Footer wordmark watermark — near-invisible at rest (2–5%) on
+   pointer devices, since the cursor-following spotlight in
+   footer-wordmark.tsx does the reveal. Touch devices have no hover,
+   so they get a slightly higher resting opacity instead. */
+.wordmark-base {
+  opacity: 0.08;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wordmark-base {
+    opacity: 0.035;
+  }
+}

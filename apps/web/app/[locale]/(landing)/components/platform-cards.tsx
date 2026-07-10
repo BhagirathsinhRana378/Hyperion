@@ -1,16 +1,19 @@
 import { siteConfig } from "@workspace/core/config/site";
 import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
+import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import type { Platform } from "@/lib/detect-platform";
 import {
   type PlatformCardData,
   platformCards,
 } from "../download/platform-mappings";
+import { Badge, Eyebrow, GlowCard } from "./marketing-kit";
 
 interface PlatformCardsProps {
   assets: Record<string, string>;
+  detectedPlatform?: Platform;
 }
 
 function DownloadButton({
@@ -29,8 +32,8 @@ function DownloadButton({
   return (
     <Button
       asChild={true}
-      className="w-full cursor-pointer justify-between"
-      variant="outline"
+      className="w-full cursor-pointer justify-between bg-secondary text-secondary-foreground hover:bg-secondary/70 hover:text-primary"
+      variant="secondary"
     >
       <Link
         href={href}
@@ -44,36 +47,44 @@ function DownloadButton({
   );
 }
 
-const colSpanClass = {
-  2: "lg:col-span-2",
-  3: "lg:col-span-3",
-} as const;
+function resolveHref(assetKey: string, assets: Record<string, string>) {
+  return assetKey.startsWith("http") ? assetKey : assets[assetKey];
+}
 
 function PlatformCard({
   platform,
   assets,
+  recommended,
 }: {
   platform: PlatformCardData;
   assets: Record<string, string>;
+  recommended: boolean;
 }) {
+  const resolvedDownloads = platform.downloads.filter((dl) =>
+    resolveHref(dl.assetKey, assets)
+  );
+
   return (
-    <Card
-      className={`group overflow-hidden bg-background text-center shadow-foreground/5 ${colSpanClass[platform.colSpan]}`}
+    <GlowCard
+      beam={recommended}
+      className={cn(
+        "relative w-full p-6 text-center sm:w-[258px]",
+        recommended && "border-primary/40 shadow-[0_0_32px_-14px] shadow-primary/30"
+      )}
     >
-      <CardHeader className="pb-3">
-        <CardDecorator>{platform.icon}</CardDecorator>
-        <h3 className="mt-6 font-medium">{platform.name}</h3>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {platform.downloads.length > 0 ? (
-          platform.downloads.map((dl) => (
+      {recommended && (
+        <Badge className="absolute top-4 left-1/2 -translate-x-1/2" variant="solid">
+          Your platform
+        </Badge>
+      )}
+      <CardDecorator>{platform.icon}</CardDecorator>
+      <h3 className="mt-6 font-medium">{platform.name}</h3>
+      <div className="mt-3 space-y-3">
+        {resolvedDownloads.length > 0 ? (
+          resolvedDownloads.map((dl) => (
             <DownloadButton
               ext={dl.ext}
-              href={
-                dl.assetKey.startsWith("http")
-                  ? dl.assetKey
-                  : assets[dl.assetKey]
-              }
+              href={resolveHref(dl.assetKey, assets)}
               key={dl.assetKey + dl.label}
               label={dl.label}
             />
@@ -81,18 +92,19 @@ function PlatformCard({
         ) : (
           <p className="py-2 text-muted-foreground text-sm">Coming soon</p>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </GlowCard>
   );
 }
 
-export default function PlatformCards({ assets }: PlatformCardsProps) {
+export default function PlatformCards({ assets, detectedPlatform }: PlatformCardsProps) {
   return (
     <section className="py-16 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
         <Reveal direction="up" duration={300}>
-          <div className="text-center">
-            <h2 className="text-balance font-display font-semibold text-4xl tracking-tighter lg:text-5xl">
+          <div className="flex flex-col items-center text-center">
+            <Eyebrow>Platforms</Eyebrow>
+            <h2 className="mt-3 text-balance font-display font-semibold text-4xl tracking-tighter lg:text-5xl">
               Available Platforms
             </h2>
             <p className="mt-4 text-muted-foreground">
@@ -100,10 +112,18 @@ export default function PlatformCards({ assets }: PlatformCardsProps) {
             </p>
           </div>
         </Reveal>
-        <div className="mx-auto mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-16 lg:grid-cols-6">
+        <div className="mx-auto mt-8 flex flex-wrap items-stretch justify-center gap-5 md:mt-16">
           {platformCards.map((platform, i) => (
-            <Reveal direction="up" duration={250} index={i} key={platform.name}>
-              <PlatformCard assets={assets} platform={platform} />
+            <Reveal direction="up" duration={350} index={i} key={platform.name} offset={32}>
+              <PlatformCard
+                assets={assets}
+                platform={platform}
+                recommended={
+                  !!detectedPlatform &&
+                  detectedPlatform !== "unknown" &&
+                  platform.matchKey === detectedPlatform
+                }
+              />
             </Reveal>
           ))}
         </div>
@@ -113,13 +133,13 @@ export default function PlatformCards({ assets }: PlatformCardsProps) {
 }
 
 const CardDecorator = ({ children }: { children: ReactNode }) => (
-  <div className="mask-radial-from-40% mask-radial-to-60% relative mx-auto size-36 duration-200 [--color-border:color-mix(in_oklab,var(--color-foreground)10%,transparent)] group-hover:[--color-border:color-mix(in_oklab,var(--color-foreground)20%,transparent)] dark:[--color-border:color-mix(in_oklab,var(--color-foreground)15%,transparent)] dark:group-hover:[--color-border:color-mix(in_oklab,var(--color-foreground)20%,transparent)]">
+  <div className="mask-radial-from-40% mask-radial-to-60% relative mx-auto size-36 duration-200 [--color-border:color-mix(in_oklab,var(--color-foreground)15%,transparent)] group-hover/card:[--color-border:color-mix(in_oklab,var(--color-foreground)25%,transparent)]">
     <div
       aria-hidden={true}
-      className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-size-[24px_24px] dark:opacity-50"
+      className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-size-[24px_24px] opacity-50"
     />
 
-    <div className="absolute inset-0 m-auto flex size-12 items-center justify-center border-t border-l bg-background">
+    <div className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-lg border border-border bg-secondary transition-transform duration-300 group-hover/card:scale-110 group-hover/card:-rotate-3">
       {children}
     </div>
   </div>

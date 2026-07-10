@@ -1,9 +1,9 @@
 "use client";
 
-import { Badge } from "@workspace/ui/components/marketing/badge";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { GradientBand } from "../components/gradient-band";
+import { Badge, Eyebrow } from "../components/marketing-kit";
 
 const entries = [
   {
@@ -58,46 +58,48 @@ const entries = [
 
 export default function NewsPage() {
   return (
-    <>
-      <section className="mx-auto max-w-6xl px-6 pt-32 pb-section">
-        <h1 className="font-display text-heading-1 text-mistral-ink">
-          Dev log
-        </h1>
-        <p className="mt-4 max-w-2xl text-mistral-ink-tint text-subtitle">
-          Release notes, engineering deep dives, and product updates from the
-          Hyperion team.
-        </p>
+    <section className="relative mx-auto max-w-4xl px-6 pt-36 pb-24 md:pb-32">
+      <div
+        aria-hidden={true}
+        className="-z-10 pointer-events-none absolute inset-x-0 top-0 h-[420px] [background:radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_0%,transparent_70%)] landing-glow-breathe"
+      />
+      <Eyebrow>Dev log</Eyebrow>
+      <h1 className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl">
+        Notes from the build.
+      </h1>
+      <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+        Release notes, engineering deep dives, and product updates from the
+        Hyperion team.
+      </p>
 
-        <div className="mt-12 space-y-6">
-          {entries.map((entry, i) => (
-            <Reveal direction="up" duration={280} index={i} key={entry.slug}>
-              <Link
-                className="group block rounded-xl border border-mistral-hairline-soft bg-mistral-canvas p-6 transition-all duration-200 hover:shadow-mistral-level-2 md:p-8"
-                href={`/news/${entry.slug}`}
-              >
-                <div className="flex flex-wrap items-center gap-3">
-                  {entry.tags.map((tag) => (
-                    <Badge key={tag} variant="cream">
-                      {tag}
-                    </Badge>
-                  ))}
-                  <span className="ml-auto text-caption text-mistral-stone">
-                    {entry.date}
-                  </span>
-                </div>
-                <h2 className="mt-3 font-display text-heading-3 text-mistral-ink transition-colors group-hover:text-mistral-primary">
+      <div className="mt-14 space-y-4">
+        {entries.map((entry, i) => (
+          <Reveal direction="up" duration={280} index={i} key={entry.slug}>
+            <Link
+              className="group block rounded-2xl border border-border bg-card/40 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-black/40 hover:shadow-lg md:p-8"
+              href={`/news/${entry.slug}`}
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                {entry.tags.map((tag) => (
+                  <Badge key={tag}>{tag}</Badge>
+                ))}
+                <span className="ml-auto text-muted-foreground text-xs">
+                  {entry.date}
+                </span>
+              </div>
+              <div className="mt-4 flex items-start justify-between gap-4">
+                <h2 className="font-display text-2xl text-foreground tracking-tight transition-colors duration-200 group-hover:text-primary">
                   {entry.title}
                 </h2>
-                <p className="mt-2 text-body-md text-mistral-slate leading-relaxed">
-                  {entry.excerpt}
-                </p>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      <GradientBand variant="full" />
-    </>
+                <ArrowUpRight className="mt-1 size-5 shrink-0 text-muted-foreground transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-primary" />
+              </div>
+              <p className="mt-2 text-muted-foreground text-sm leading-relaxed md:text-base">
+                {entry.excerpt}
+              </p>
+            </Link>
+          </Reveal>
+        ))}
+      </div>
+    </section>
   );
 }

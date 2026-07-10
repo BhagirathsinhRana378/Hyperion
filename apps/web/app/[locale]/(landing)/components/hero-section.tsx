@@ -7,14 +7,42 @@ import { AnimatedGroup } from "@workspace/ui/components/landing/animated-group";
 import { BorderBeam } from "@workspace/ui/components/landing/border-beam";
 import { LogoCloud } from "@workspace/ui/components/landing/logo-cloud";
 import { TextEffect } from "@workspace/ui/components/landing/text-effect";
-import { ArrowRight, Play, Rocket } from "lucide-react";
+import { Reveal } from "@workspace/ui/components/marketing/reveal";
+import { ArrowRight, Bot, LayoutGrid, Play, Rocket, SquareTerminal } from "lucide-react";
+import { motion, useScroll, useTransform } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { transitionVariants } from "@/lib/animations";
+import { Eyebrow, GlowCard } from "./marketing-kit";
+
+const features = [
+  {
+    icon: LayoutGrid,
+    title: "Workspace System",
+    description: "Tile terminals, editors, and previews into one adaptive canvas.",
+  },
+  {
+    icon: SquareTerminal,
+    title: "Terminal Multiplexer",
+    description: "Run and manage dozens of shells side by side without leaving the browser.",
+  },
+  {
+    icon: Bot,
+    title: "AI Agent Swarm",
+    description: "Delegate tasks to autonomous agents that work your codebase in parallel.",
+  },
+];
 
 export default function HeroSection() {
   const [latestTag, setLatestTag] = useState<string | null>(null);
+  const shotRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: shotRef,
+    offset: ["start end", "start 0.35"],
+  });
+  const rotateX = useTransform(scrollYProgress, [0, 1], [14, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.94, 1]);
 
   useEffect(() => {
     fetchLatestGithubVersion().then((tag) => {
@@ -25,119 +53,30 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <main className="overflow-hidden">
-      <div
-        aria-hidden={true}
-        className="absolute inset-0 isolate hidden opacity-65 contain-strict lg:block"
-      >
-        <div className="absolute top-0 left-0 h-320 w-140 -translate-y-87.5 -rotate-45 rounded-full bg-[radial-gradient(68.54%_68.72%_at_55.02%_31.46%,hsla(0,0%,85%,.08)_0,hsla(0,0%,55%,.02)_50%,hsla(0,0%,45%,0)_80%)]" />
-        <div className="absolute top-0 left-0 h-320 w-60 -rotate-45 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.06)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)] [translate:5%_-50%]" />
-        <div className="absolute top-0 left-0 h-320 w-60 -translate-y-87.5 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.04)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
-      </div>
-      <div
-        className="absolute inset-0 z-0 dark:hidden"
-        style={{
-          backgroundImage: `
-                  linear-gradient(to right, #e7e5e4 1px, transparent 1px),
-                  linear-gradient(to bottom, #e7e5e4 1px, transparent 1px)
-                `,
-          backgroundSize: "20px 20px",
-          backgroundPosition: "0 0, 0 0",
-          maskImage: `
-                  repeating-linear-gradient(
-                    to right,
-                    black 0px,
-                    black 3px,
-                    transparent 3px,
-                    transparent 8px
-                  ),
-                  repeating-linear-gradient(
-                    to bottom,
-                    black 0px,
-                    black 3px,
-                    transparent 3px,
-                    transparent 8px
-                  ),
-                  radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%)
-                `,
-          WebkitMaskImage: `
-                  repeating-linear-gradient(
-                    to right,
-                    black 0px,
-                    black 3px,
-                    transparent 3px,
-                    transparent 8px
-                  ),
-                  repeating-linear-gradient(
-                    to bottom,
-                    black 0px,
-                    black 3px,
-                    transparent 3px,
-                    transparent 8px
-                  ),
-                  radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%)
-                `,
-          maskComposite: "intersect",
-          WebkitMaskComposite: "source-in",
-        }}
-      />
-      <section>
+    <main className="overflow-hidden bg-background">
+      <section className="relative">
+        {/* Soft single-tone glow — no background image, just a gradient for depth */}
+        <div
+          aria-hidden={true}
+          className="-z-10 pointer-events-none absolute inset-x-0 top-0 h-[640px] [background:radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_14%,transparent)_0%,transparent_70%)]"
+        />
+
         <div className="relative pt-24 md:pt-36">
-          <AnimatedGroup
-            className="mask-b-from-35% mask-b-to-90% absolute inset-0 top-56 -z-20 lg:top-32"
-            variants={{
-              container: {
-                visible: {
-                  transition: {
-                    delayChildren: 1,
-                  },
-                },
-              },
-              item: {
-                hidden: {
-                  opacity: 0,
-                  y: 20,
-                },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    type: "spring",
-                    bounce: 0.3,
-                    duration: 2,
-                  },
-                },
-              },
-            }}
-          >
-            <Image
-              alt="background"
-              className="hidden size-full dark:block"
-              height="4095"
-              priority={true}
-              src="/night-background.webp"
-              width="3276"
-            />
-          </AnimatedGroup>
-
-          <div
-            aria-hidden={true}
-            className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--color-background)_75%)]"
-          />
-
           <div className="mx-auto max-w-7xl px-6">
             <div className="text-center sm:mx-auto lg:mt-0 lg:mr-auto">
               <AnimatedGroup variants={transitionVariants}>
                 <Link
-                  className="group mx-auto flex w-fit items-center gap-4 rounded-full border bg-muted p-1 pl-4 shadow-md shadow-zinc-950/5 transition-colors duration-300 hover:bg-background dark:border-t-white/5 dark:shadow-zinc-950 dark:hover:border-t-border"
+                  className="group mx-auto flex w-fit items-center gap-4 rounded-full border border-border bg-card p-1 pl-4 shadow-lg shadow-black/30 transition-colors duration-300 hover:border-primary/40 hover:bg-secondary"
                   href={siteConfig.links.releases}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  <span className="text-foreground text-sm">
-                    {siteConfig.name} v{latestTag} Released
+                  <span className="text-foreground/80 text-sm">
+                    {latestTag
+                      ? `${siteConfig.name} v${latestTag} Released`
+                      : `${siteConfig.name} is live`}
                   </span>
-                  <span className="block h-4 w-0.5 border-l bg-white dark:border-background dark:bg-zinc-700" />
+                  <span className="block h-4 w-0.5 border-l border-border" />
 
                   <div className="size-6 overflow-hidden rounded-full bg-background duration-500 group-hover:bg-muted">
                     <div className="flex w-12 -translate-x-1/2 duration-500 ease-in-out group-hover:translate-x-0">
@@ -162,7 +101,7 @@ export default function HeroSection() {
               </TextEffect>
               <TextEffect
                 as="p"
-                className="mx-auto mt-8 max-w-3xl text-balance text-lg"
+                className="mx-auto mt-8 max-w-3xl text-balance text-lg text-muted-foreground"
                 delay={0.5}
                 per="line"
                 preset="fade-in-blur"
@@ -224,32 +163,57 @@ export default function HeroSection() {
               ...transitionVariants,
             }}
           >
-            <div className="mask-b-from-55% relative mt-8 -mr-56 overflow-hidden px-2 sm:mt-12 sm:mr-0 md:mt-20">
-              <div className="relative inset-shadow-2xs mx-auto max-w-6xl overflow-hidden rounded-2xl border bg-background p-4 shadow-lg shadow-zinc-950/15 ring-1 ring-background dark:inset-shadow-white/20">
+            <div
+              className="mask-b-from-55% relative mt-8 -mr-56 overflow-hidden px-2 [perspective:1200px] sm:mt-12 sm:mr-0 md:mt-20"
+              ref={shotRef}
+            >
+              <motion.div
+                className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-border bg-card/40 p-4 shadow-2xl shadow-black/40 will-change-transform"
+                style={{ rotateX, scale, transformPerspective: 1200 }}
+              >
                 <Image
-                  alt="app screen"
-                  className="relative hidden aspect-15/8 rounded-2xl bg-background mix-blend-luminosity grayscale dark:block"
+                  alt="Hyperion workspace screenshot"
+                  className="relative aspect-15/8 rounded-2xl border border-border/50"
                   height="1080"
+                  priority={true}
                   src="/app-screen-dark.png"
                   width="1920"
                 />
-                <Image
-                  alt="app screen"
-                  className="relative z-2 aspect-15/8 rounded-2xl border border-border/25 mix-blend-luminosity grayscale dark:hidden"
-                  height="1080"
-                  src="/app-screen-light.png"
-                  width="1920"
-                />
                 <BorderBeam
-                  className="from-transparent via-mistral-primary to-transparent"
+                  className="from-transparent via-primary to-transparent"
                   duration={6}
                   size={200}
                 />
-              </div>
+              </motion.div>
             </div>
           </AnimatedGroup>
         </div>
       </section>
+
+      {/* Feature strip — cursor-tilt glow cards, same language as Product/Services */}
+      <section className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+        <Reveal direction="up" duration={250}>
+          <div className="text-center">
+            <Eyebrow className="justify-center">Inside the workspace</Eyebrow>
+          </div>
+        </Reveal>
+        <div className="mt-8 grid gap-6 sm:grid-cols-3">
+          {features.map((feature, i) => (
+            <Reveal direction="up" duration={280} index={i} key={feature.title}>
+              <GlowCard className="h-full p-6">
+                <div className="flex size-11 items-center justify-center rounded-xl border border-border bg-secondary transition-colors duration-300 group-hover/card:border-primary/40">
+                  <feature.icon className="size-5 text-primary transition-transform duration-300 ease-out group-hover/card:scale-110 group-hover/card:-rotate-3" />
+                </div>
+                <h3 className="mt-4 font-medium text-foreground">{feature.title}</h3>
+                <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
+                  {feature.description}
+                </p>
+              </GlowCard>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
       <LogoCloud />
     </main>
   );

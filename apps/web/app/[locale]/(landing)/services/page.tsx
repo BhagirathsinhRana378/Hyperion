@@ -1,12 +1,11 @@
 "use client";
 
-import { MarketingCard } from "@workspace/ui/components/marketing/card";
-import { FAQ } from "@workspace/ui/components/marketing/faq";
 import { cn } from "@workspace/ui/lib/utils";
+import { motion } from "motion/react";
 import { Bot, Check, Eye, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
-import { GradientBand } from "../components/gradient-band";
-import { CornerBrackets } from "../components/motion-primitives";
+import { revealVariants, staggerContainer } from "../components/motion-primitives";
+import { Badge, Eyebrow, FAQ, GlowCard } from "../components/marketing-kit";
 
 const roles = [
   {
@@ -96,109 +95,112 @@ export default function ServicesPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden pt-32 pb-section">
+      <section className="relative overflow-hidden pt-36 pb-16">
         <div
           aria-hidden={true}
-          className="absolute inset-0 -z-10"
-          style={{
-            background:
-              "linear-gradient(135deg, #ffa110 0%, #ff8a00 60%, #fa520f 10%)",
-          }}
+          className="-z-10 pointer-events-none absolute inset-x-0 top-0 h-[480px] [background:radial-gradient(55%_55%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_0%,transparent_70%)] landing-glow-breathe"
         />
-        <div
-          aria-hidden={true}
-          className="absolute inset-0 -z-10 bg-gradient-to-r from-white/40 to-transparent"
-        />
-        <div className="relative mx-auto max-w-3xl px-6 text-center">
-          <h1 className="font-display text-heading-1 text-mistral-ink">
+        <motion.div
+          animate="visible"
+          className="relative mx-auto max-w-3xl px-6 text-center"
+          initial="hidden"
+          variants={staggerContainer}
+        >
+          <motion.div variants={revealVariants}>
+            <Eyebrow>Roles</Eyebrow>
+          </motion.div>
+          <motion.h1
+            className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl"
+            variants={revealVariants}
+          >
             Choose your role.
-          </h1>
-          <p className="mt-4 text-mistral-ink-tint text-subtitle">
+          </motion.h1>
+          <motion.p
+            className="mt-4 text-lg text-muted-foreground"
+            variants={revealVariants}
+          >
             Hyperion adapts to how you work — from solo developer to team
             orchestrator to autonomous agent operator.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </section>
 
       {/* Role-tier cards */}
-      <section className="mx-auto max-w-7xl px-6 pt-12 pb-section-lg">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <section className="mx-auto max-w-7xl px-6 pt-8 pb-20 md:pb-28">
+        <motion.div
+          className="grid gap-5 md:grid-cols-2 lg:grid-cols-4"
+          initial="hidden"
+          variants={staggerContainer}
+          viewport={{ once: true, margin: "-60px" }}
+          whileInView="visible"
+        >
           {roles.map((role) => {
             const Icon = role.icon;
             return (
-              <MarketingCard
-                className={cn(
-                  "relative flex flex-col",
-                  role.featured && "border-2 border-mistral-primary"
-                )}
-                key={role.name}
-                padding="xxl"
-                variant={role.featured ? "cream" : "base"}
-              >
-                {role.featured && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-mistral-primary px-4 py-1 text-caption-bold text-mistral-on-primary">
-                    Flagship role
-                  </span>
-                )}
-                <Icon className="size-8 text-mistral-primary" />
-                <h3 className="mt-4 text-heading-4 text-mistral-ink">
-                  {role.name}
-                </h3>
-                <p className="mt-1 text-body-sm text-mistral-slate">
-                  {role.description}
-                </p>
-                <ul className="mt-6 flex-1 space-y-3">
-                  {role.features.map((f) => (
-                    <li
-                      className="flex items-start gap-2 text-body-sm text-mistral-ink-tint"
-                      key={f}
-                    >
-                      <Check className="mt-0.5 size-4 shrink-0 text-mistral-primary" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="relative mt-8">
+              <motion.div key={role.name} variants={revealVariants}>
+                <GlowCard
+                  beam={role.featured}
+                  className={cn(
+                    "flex h-full flex-col p-8",
+                    role.featured &&
+                      "border-primary/50 shadow-[0_0_40px_-12px] shadow-primary/20"
+                  )}
+                >
+                  {role.featured && (
+                    <Badge className="-top-0 absolute right-6" variant="solid">
+                      Flagship role
+                    </Badge>
+                  )}
+                  <div className="flex size-11 items-center justify-center rounded-xl border border-border bg-secondary">
+                    <Icon className="size-5 text-primary" />
+                  </div>
+                  <h3 className="mt-5 font-medium text-foreground text-lg">
+                    {role.name}
+                  </h3>
+                  <p className="mt-1 text-muted-foreground text-sm">
+                    {role.description}
+                  </p>
+                  <ul className="mt-6 flex-1 space-y-3">
+                    {role.features.map((f) => (
+                      <li
+                        className="flex items-start gap-2 text-foreground/75 text-sm"
+                        key={f}
+                      >
+                        <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
                   <Link
                     className={cn(
-                      "inline-flex h-10 w-full items-center justify-center rounded-md px-5 text-button-md transition-all duration-150 active:scale-[0.98]",
+                      "mt-8 inline-flex h-10 w-full items-center justify-center rounded-full px-5 font-medium text-sm transition-all duration-200 active:scale-[0.98]",
                       role.featured
-                        ? "bg-mistral-primary text-mistral-on-primary hover:scale-[1.02] hover:bg-mistral-primary-deep"
-                        : "border border-mistral-hairline-strong bg-mistral-canvas text-mistral-ink hover:scale-[1.02] hover:bg-mistral-surface"
+                        ? "bg-primary text-primary-foreground hover:bg-primary/85 hover:shadow-[0_0_24px_-4px] hover:shadow-primary/40"
+                        : "border border-border bg-transparent text-foreground hover:border-primary/40 hover:bg-muted/50"
                     )}
                     href={role.href}
                   >
                     {role.cta}
                   </Link>
-                  {role.featured && (
-                    <CornerBrackets
-                      className="pointer-events-none absolute inset-0"
-                      color="#fa520f"
-                      size={12}
-                      strokeWidth={2}
-                    />
-                  )}
-                </div>
-              </MarketingCard>
+                </GlowCard>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </section>
 
       {/* FAQ */}
-      <section className="mx-auto max-w-3xl px-6 pb-section-lg">
-        <h2 className="text-center font-display text-heading-1 text-mistral-ink">
-          Frequently asked questions
-        </h2>
+      <section className="mx-auto max-w-3xl px-6 pb-24 md:pb-32">
+        <div className="text-center">
+          <Eyebrow>FAQ</Eyebrow>
+          <h2 className="mt-3 font-display text-3xl text-foreground tracking-tight md:text-4xl">
+            Frequently asked questions
+          </h2>
+        </div>
         <div className="mt-10">
           <FAQ items={faqItems} />
         </div>
       </section>
-
-      {/* Thin gradient band */}
-      <div className="pb-section-lg">
-        <GradientBand variant="thin" />
-      </div>
     </>
   );
 }

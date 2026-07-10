@@ -1,7 +1,20 @@
 "use client";
 
 import { Github, Linkedin, Twitter } from "lucide-react";
+import { Unbounded } from "next/font/google";
 import Link from "next/link";
+import { BorderTrace } from "./border-trace";
+import { FooterWordmark } from "./footer-wordmark";
+
+const wordmarkFont = Unbounded({
+  subsets: ["latin"],
+  variable: "--font-wordmark",
+  weight: ["700"],
+});
+
+/** Must match the panel's `rounded-[32px]` below — BorderTrace needs the
+ * exact px value to trace a path that aligns with the real corners. */
+const PANEL_RADIUS = 32;
 
 const footerSections = [
   {
@@ -18,7 +31,7 @@ const footerSections = [
     links: [
       { label: "Documentation", href: "/docs" },
       { label: "Quick start", href: "/docs/quick-start" },
-      { label: "Changelog", href: "/news" },
+      { label: "News", href: "/news" },
       { label: "Download", href: "/download" },
     ],
   },
@@ -44,72 +57,78 @@ const footerSections = [
 
 export function HyperionFooter() {
   return (
-    <footer
-      className="bg-mistral-cream text-mistral-ink"
-      data-slot="hyperion-footer"
-    >
-      <div className="mx-auto max-w-7xl px-6 py-section">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="lg:col-span-1">
-            <Link
-              className="font-display text-heading-4 text-mistral-ink"
-              href="/"
-            >
-              Hyperion
-            </Link>
-            <p className="mt-3 max-w-xs text-body-sm text-mistral-steel">
-              The agentic workspace for autonomous software development.
-            </p>
-            <div className="mt-6 flex gap-4">
-              <Link
-                aria-label="GitHub"
-                className="text-mistral-steel transition-colors hover:text-mistral-primary"
-                href="#"
-              >
-                <Github className="size-5" />
+    <footer className="px-4 pb-6 md:px-6 md:pb-10" data-slot="hyperion-footer">
+      <div
+        className="relative mx-auto max-w-7xl overflow-hidden rounded-[32px] border border-foreground/10 bg-card/40 text-foreground backdrop-blur-sm"
+        data-slot="hyperion-footer-panel"
+      >
+        <BorderTrace radius={PANEL_RADIUS} />
+
+        <div className={`${wordmarkFont.variable} p-8 md:p-12`}>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="lg:col-span-1">
+              <Link className="font-display text-foreground text-lg tracking-tight" href="/">
+                Hyperion
               </Link>
-              <Link
-                aria-label="Twitter"
-                className="text-mistral-steel transition-colors hover:text-mistral-primary"
-                href="#"
-              >
-                <Twitter className="size-5" />
-              </Link>
-              <Link
-                aria-label="LinkedIn"
-                className="text-mistral-steel transition-colors hover:text-mistral-primary"
-                href="#"
-              >
-                <Linkedin className="size-5" />
-              </Link>
+              <p className="mt-3 max-w-xs text-muted-foreground text-sm">
+                The agentic workspace for autonomous software development.
+              </p>
+              <div className="mt-6 flex gap-4">
+                <Link
+                  aria-label="GitHub"
+                  className="text-muted-foreground transition-colors duration-200 hover:text-primary"
+                  href="#"
+                >
+                  <Github className="size-5" />
+                </Link>
+                <Link
+                  aria-label="Twitter"
+                  className="text-muted-foreground transition-colors duration-200 hover:text-primary"
+                  href="#"
+                >
+                  <Twitter className="size-5" />
+                </Link>
+                <Link
+                  aria-label="LinkedIn"
+                  className="text-muted-foreground transition-colors duration-200 hover:text-primary"
+                  href="#"
+                >
+                  <Linkedin className="size-5" />
+                </Link>
+              </div>
             </div>
+
+            {footerSections.map((section) => (
+              <div key={section.title}>
+                <h4 className="font-medium text-foreground/50 text-xs uppercase tracking-[0.2em]">
+                  {section.title}
+                </h4>
+                <ul className="mt-4 space-y-3">
+                  {section.links.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        className="text-muted-foreground text-sm transition-colors duration-200 hover:text-primary"
+                        href={link.href}
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
 
-          {footerSections.map((section) => (
-            <div key={section.title}>
-              <h4 className="text-micro-uppercase text-mistral-slate">
-                {section.title}
-              </h4>
-              <ul className="mt-4 space-y-3">
-                {section.links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      className="text-body-sm text-mistral-primary transition-colors hover:text-mistral-primary-deep"
-                      href={link.href}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+          <div className="mt-10 flex flex-col items-center justify-between gap-4 border-border/50 border-t pt-6 sm:flex-row">
+            <p className="text-muted-foreground text-xs">
+              &copy; {new Date().getFullYear()} Hyperion. All rights reserved.
+            </p>
+          </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-mistral-beige-deep border-t pt-8 sm:flex-row">
-          <p className="text-micro text-mistral-steel">
-            &copy; {new Date().getFullYear()} Hyperion. All rights reserved.
-          </p>
+          {/* Hidden-signature wordmark — a watermark, not a lit-up logo */}
+          <div className="mt-2">
+            <FooterWordmark />
+          </div>
         </div>
       </div>
     </footer>

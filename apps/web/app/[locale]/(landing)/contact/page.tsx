@@ -1,126 +1,113 @@
 "use client";
 
-import { MarketingCard } from "@workspace/ui/components/marketing/card";
-import {
-  MarketingInput,
-  MarketingTextarea,
-} from "@workspace/ui/components/marketing/form-fields";
+import { motion } from "motion/react";
 import { Mail, Sparkles, Terminal } from "lucide-react";
-import { GradientBand } from "../components/gradient-band";
-import { CornerBrackets } from "../components/motion-primitives";
+import { revealVariants, staggerContainer } from "../components/motion-primitives";
+import { Eyebrow, GlowCard, Input, Textarea } from "../components/marketing-kit";
+
+const sidebarItems = [
+  {
+    icon: Mail,
+    title: "Email",
+    body: "hello@hyperion.dev",
+  },
+  {
+    icon: Sparkles,
+    title: "Hackathon pilot",
+    body: "Running a hackathon? We offer free team workspaces for the event duration. Mention it in your message.",
+  },
+  {
+    icon: Terminal,
+    title: "Open source",
+    body: "Hyperion is built in the open. Contribute on GitHub or join our community.",
+  },
+];
 
 export default function ContactPage() {
   return (
     <>
       {/* Header */}
-      <section className="mx-auto max-w-3xl px-6 pt-32 text-center">
-        <h1 className="font-display text-heading-1 text-mistral-ink">
-          Request workspace access.
-        </h1>
-        <p className="mt-4 text-mistral-slate text-subtitle">
-          Trying out Hyperion for your team, a hackathon, or your own
-          development workflow — fill out the details and we&apos;ll get you set
-          up.
-        </p>
+      <section className="relative mx-auto max-w-3xl px-6 pt-36 text-center">
+        <div
+          aria-hidden={true}
+          className="-z-10 pointer-events-none absolute inset-x-0 top-0 h-[420px] [background:radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_0%,transparent_70%)] landing-glow-breathe"
+        />
+        <motion.div animate="visible" initial="hidden" variants={staggerContainer}>
+          <motion.div variants={revealVariants}>
+            <Eyebrow>Contact</Eyebrow>
+          </motion.div>
+          <motion.h1
+            className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl"
+            variants={revealVariants}
+          >
+            Request workspace access.
+          </motion.h1>
+          <motion.p
+            className="mt-4 text-lg text-muted-foreground"
+            variants={revealVariants}
+          >
+            Trying out Hyperion for your team, a hackathon, or your own
+            development workflow — fill out the details and we&apos;ll get you
+            set up.
+          </motion.p>
+        </motion.div>
       </section>
 
       {/* Form + Info */}
-      <section className="mx-auto max-w-5xl px-6 pt-12 pb-section-lg">
+      <section className="mx-auto max-w-5xl px-6 pt-14 pb-24 md:pb-32">
         <div className="grid gap-10 lg:grid-cols-[1fr_auto]">
-          {/* Request access panel — cream */}
-          <MarketingCard className="max-w-lg" padding="xxl" variant="cream">
+          <GlowCard className="max-w-lg p-8 md:p-10" tilt={false}>
             <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-              <MarketingInput
-                id="name"
-                label="Name"
-                placeholder="Your name"
-                required
-                type="text"
-              />
-              <MarketingInput
-                id="email"
-                label="Email"
-                placeholder="you@company.com"
-                required
-                type="email"
-              />
-              <MarketingInput
-                id="role"
-                label="Role"
-                placeholder="Developer / Team Lead / Researcher"
-                type="text"
-              />
-              <MarketingInput
-                id="team-size"
-                label="Team size"
-                placeholder="1-5, 5-20, 20+"
-                type="text"
-              />
-              <MarketingTextarea
+              <Input id="name" label="Name" placeholder="Your name" required type="text" />
+              <Input id="email" label="Email" placeholder="you@company.com" required type="email" />
+              <Input id="role" label="Role" placeholder="Developer / Team Lead / Researcher" type="text" />
+              <Input id="team-size" label="Team size" placeholder="1-5, 5-20, 20+" type="text" />
+              <Textarea
                 id="use-case"
                 label="Tell us about your project"
                 placeholder="Hackathon, personal dev environment, team workspace, research..."
                 required
               />
-              <div className="relative">
-                <button
-                  className="inline-flex h-10 w-full items-center justify-center rounded-md bg-mistral-ink px-5 text-button-md text-mistral-on-dark transition-all duration-150 hover:scale-[1.02] hover:bg-mistral-charcoal active:scale-[0.98]"
-                  type="submit"
-                >
-                  Request access
-                </button>
-                <CornerBrackets
-                  className="pointer-events-none absolute inset-0"
-                  color="#1f1f1f"
-                  size={10}
-                  strokeWidth={2}
-                />
-              </div>
+              <button
+                className="inline-flex h-11 w-full items-center justify-center rounded-full bg-primary px-5 font-medium text-primary-foreground text-sm transition-all duration-200 hover:bg-primary/85 hover:shadow-[0_0_24px_-4px] hover:shadow-primary/40 active:scale-[0.98]"
+                type="submit"
+              >
+                Request access
+              </button>
             </form>
-          </MarketingCard>
+          </GlowCard>
 
           {/* Sidebar */}
-          <div className="space-y-8">
-            <div className="flex items-start gap-4">
-              <Mail className="mt-1 size-5 text-mistral-primary" />
-              <div>
-                <h4 className="text-body-md-medium text-mistral-ink">Email</h4>
-                <p className="text-body-sm text-mistral-steel">
-                  hello@hyperion.dev
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <Sparkles className="mt-1 size-5 text-mistral-primary" />
-              <div>
-                <h4 className="text-body-md-medium text-mistral-ink">
-                  Hackathon pilot
-                </h4>
-                <p className="text-body-sm text-mistral-steel">
-                  Running a hackathon? We offer free team workspaces for the
-                  event duration. Mention it in your message.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <Terminal className="mt-1 size-5 text-mistral-primary" />
-              <div>
-                <h4 className="text-body-md-medium text-mistral-ink">
-                  Open source
-                </h4>
-                <p className="text-body-sm text-mistral-steel">
-                  Hyperion is built in the open. Contribute on GitHub or join
-                  our community.
-                </p>
-              </div>
-            </div>
-          </div>
+          <motion.div
+            className="space-y-8"
+            initial="hidden"
+            variants={staggerContainer}
+            viewport={{ once: true, margin: "-60px" }}
+            whileInView="visible"
+          >
+            {sidebarItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  className="flex max-w-sm items-start gap-4"
+                  key={item.title}
+                  variants={revealVariants}
+                >
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-secondary">
+                    <Icon className="size-4 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground text-sm">{item.title}</h4>
+                    <p className="mt-1 text-muted-foreground text-sm leading-relaxed">
+                      {item.body}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
         </div>
       </section>
-
-      <div className="mx-auto max-w-7xl px-6 pb-section-lg">
-        <GradientBand variant="thin" />
-      </div>
     </>
   );
 }

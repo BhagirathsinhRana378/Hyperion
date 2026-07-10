@@ -3,20 +3,9 @@ import { themeInitScript } from "@workspace/core/scripts/theme-init";
 import { hasLocale, messages, NextIntlClientProvider } from "@workspace/i18n";
 import { routing } from "@workspace/i18n/routing";
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { AppLayout } from "./components/app-layout";
 import "@workspace/ui/globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: siteConfig.name,
@@ -51,6 +40,16 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning={true}>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+          rel="stylesheet"
+        />
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted script
           dangerouslySetInnerHTML={{
@@ -58,9 +57,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased`}
-      >
+      <body className="font-sans overflow-hidden antialiased">
         <NextIntlClientProvider
           locale={locale}
           messages={localeMessages}

@@ -51,10 +51,11 @@ export interface DownloadOption {
 }
 
 export interface PlatformCardData {
-  colSpan: 2 | 3;
   downloads: DownloadOption[];
   icon: React.ReactNode;
   name: string;
+  /** Matches against detectPlatform() to highlight the visitor's own platform. */
+  matchKey?: Platform;
 }
 
 // Platform cards data
@@ -62,7 +63,7 @@ export const platformCards: PlatformCardData[] = [
   {
     name: "Windows",
     icon: <Windows aria-hidden={true} className="size-6" />,
-    colSpan: 2,
+    matchKey: "windows",
     downloads: [
       { assetKey: "windows_x64_exe", label: "Standard Installer", ext: ".exe" },
       { assetKey: "windows_x64_msi", label: "System Installer", ext: ".msi" },
@@ -71,7 +72,7 @@ export const platformCards: PlatformCardData[] = [
   {
     name: "macOS",
     icon: <Apple aria-hidden={true} className="size-6" />,
-    colSpan: 2,
+    matchKey: "macos",
     downloads: [
       { assetKey: "macos_aarch64_dmg", label: "Apple Silicon", ext: ".dmg" },
       { assetKey: "macos_x64_dmg", label: "Intel Chip", ext: ".dmg" },
@@ -80,7 +81,7 @@ export const platformCards: PlatformCardData[] = [
   {
     name: "Linux",
     icon: <Linux aria-hidden={true} className="size-6" />,
-    colSpan: 2,
+    matchKey: "linux",
     downloads: [
       { assetKey: "linux_amd64_deb", label: "Debian/Ubuntu", ext: ".deb" },
       {
@@ -93,7 +94,7 @@ export const platformCards: PlatformCardData[] = [
   {
     name: "Android",
     icon: <Android aria-hidden={true} className="size-6" />,
-    colSpan: 3,
+    matchKey: "android",
     downloads: [
       { assetKey: "android_universal_apk", label: "Universal", ext: ".apk" },
       { assetKey: "android_arm64_apk", label: "ARM64", ext: ".apk" },
@@ -102,7 +103,7 @@ export const platformCards: PlatformCardData[] = [
   {
     name: "Other Platforms",
     icon: <Github aria-hidden={true} className="size-6" />,
-    colSpan: 3,
+    matchKey: "ios",
     downloads: [
       {
         assetKey: siteConfig.links.releases,
