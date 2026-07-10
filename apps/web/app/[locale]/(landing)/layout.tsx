@@ -18,7 +18,11 @@ export default function LandingLayout({ children }: LandingLayoutProps) {
       enableSystem={false}
       forcedTheme="dark"
     >
-      <div className="landing-theme flex min-h-screen flex-col bg-background text-foreground">
+      {/* overflow-x-clip (not -hidden: that would break position:sticky
+          descendants) guards the whole marketing site against horizontal
+          scroll from full-width elements that animate scale, like the
+          breathing hero glows. */}
+      <div className="landing-theme flex min-h-screen flex-col overflow-x-clip bg-background text-foreground">
         <ScrollProgress />
         <HyperionNav />
         <main className="flex-1">{children}</main>
