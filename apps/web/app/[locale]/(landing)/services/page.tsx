@@ -6,6 +6,7 @@ import { Bot, Check, Eye, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import { revealVariants, staggerContainer } from "../components/motion-primitives";
 import { Badge, Eyebrow, FAQ, GlowCard } from "../components/marketing-kit";
+import { ParallaxField } from "../components/parallax-field";
 
 const roles = [
   {
@@ -93,13 +94,12 @@ const faqItems = [
 
 export default function ServicesPage() {
   return (
-    <>
+    <div className="relative">
+      {/* 3D parallax background — grid floor + depth-layered shapes */}
+      <ParallaxField />
+
       {/* Hero */}
-      <section className="relative overflow-hidden pt-36 pb-16">
-        <div
-          aria-hidden={true}
-          className="-z-10 pointer-events-none absolute inset-x-0 top-0 h-[480px] [background:radial-gradient(55%_55%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_0%,transparent_70%)] landing-glow-breathe"
-        />
+      <section className="relative pt-36 pb-16">
         <motion.div
           animate="visible"
           className="relative mx-auto max-w-3xl px-6 text-center"
@@ -201,6 +201,6 @@ export default function ServicesPage() {
           <FAQ items={faqItems} />
         </div>
       </section>
-    </>
+    </div>
   );
 }

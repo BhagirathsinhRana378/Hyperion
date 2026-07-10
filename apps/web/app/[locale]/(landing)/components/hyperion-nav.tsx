@@ -33,32 +33,45 @@ export function HyperionNav() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 transition-[padding] duration-500 ease-out"
-      style={{ paddingTop: scrolled ? 12 : 20 }}
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 transition-[padding] duration-500 ease-out sm:px-6"
+      style={{ paddingTop: scrolled ? 16 : 24 }}
     >
       <header
         className={cn(
-          "pointer-events-auto w-full rounded-2xl border transition-[max-width,background-color,border-color,box-shadow] duration-500 ease-out",
-          "border-border/60 bg-background/55 shadow-black/30 shadow-lg backdrop-blur-xl backdrop-saturate-150",
-          scrolled ? "max-w-3xl" : "max-w-6xl"
+          "pointer-events-auto relative w-full rounded-2xl transition-[max-width] duration-500 ease-out",
+          scrolled ? "max-w-5xl" : "max-w-7xl"
         )}
         data-slot="hyperion-nav"
       >
-        {/* hairline sheen along the top edge — glass catching light */}
+        {/* Glass pill — invisible at rest (nav floats flush over the hero with
+         * no box at all), fades in once scrolled. Faded via opacity rather
+         * than toggling border/bg/blur classes directly so the whole glass
+         * treatment cross-fades as one smooth GPU-cheap layer instead of
+         * jumping between discrete utility values. */}
         <div
           aria-hidden={true}
-          className="pointer-events-none absolute inset-x-4 top-0 h-px rounded-full bg-gradient-to-r from-transparent via-foreground/25 to-transparent"
+          className={cn(
+            "pointer-events-none absolute inset-0 rounded-2xl border border-border/60 bg-background/55 shadow-black/30 shadow-lg backdrop-blur-xl backdrop-saturate-150 transition-opacity duration-500 ease-out",
+            scrolled ? "opacity-100" : "opacity-0"
+          )}
+        />
+        {/* hairline sheen along the top edge — only reads once the glass pill is present */}
+        <div
+          aria-hidden={true}
+          className={cn(
+            "pointer-events-none absolute inset-x-4 top-0 h-px rounded-full bg-gradient-to-r from-transparent via-foreground/25 to-transparent transition-opacity duration-500 ease-out",
+            scrolled ? "opacity-100" : "opacity-0"
+          )}
         />
         <nav
-          className="mx-auto flex items-center justify-between px-5 transition-[height] duration-500 ease-out"
-          style={{ height: scrolled ? 48 : 60 }}
+          className="relative mx-auto flex items-center justify-between px-6 transition-[height] duration-500 ease-out"
+          style={{ height: scrolled ? 56 : 64 }}
         >
           <Link aria-label="Home" className="group/logo relative shrink-0" href="/">
             <span
               className={cn(
                 wordmarkFont.className,
-                "bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-primary via-muted-foreground to-primary text-transparent tracking-[0.3em] transition-[background-position,letter-spacing,font-size] duration-700 ease-out group-hover/logo:bg-[position:100%_0%] group-hover/logo:tracking-[0.36em]",
-                scrolled ? "text-xs" : "text-sm"
+                "bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-primary via-muted-foreground to-primary text-transparent text-sm tracking-[0.3em] transition-[background-position,letter-spacing] duration-700 ease-out group-hover/logo:bg-[position:100%_0%] group-hover/logo:tracking-[0.36em]"
               )}
             >
               HYPERION

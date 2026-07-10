@@ -8,9 +8,9 @@ import { notFound } from "next/navigation";
 import { SerwistProvider } from "../serwist";
 import "../globals.css";
 
-/* Lora (serif) carries body/small/default text; Plus Jakarta Sans
+/* Plus Jakarta Sans carries body/small/default text; Lora (serif)
    carries display/heading sizes via the font-display utility. */
-const fontSans = Lora({
+const fontSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
   weight: ["400", "500", "600"],
@@ -21,13 +21,13 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 });
 
-const fontDisplay = Plus_Jakarta_Sans({
+const fontDisplay = Lora({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const fontBody = Lora({
+const fontBody = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-body",
   weight: ["400", "500", "600"],
