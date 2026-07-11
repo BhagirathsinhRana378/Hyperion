@@ -445,7 +445,7 @@ export default function HeroSection() {
       </section>
 
       {/* ── Capability ticker ── */}
-      <section className="border-border/60 border-y py-5">
+      <section className="py-5">
         <Marquee speed={38}>
           {CAPABILITIES.map((cap) => (
             <span
@@ -463,7 +463,7 @@ export default function HeroSection() {
       </section>
 
       {/* ── Stats ── */}
-      <section className="bg-card/20">
+      <section className="landing-band-fade bg-card/20">
         <div className="mx-auto grid max-w-6xl grid-cols-2 md:grid-cols-4 md:divide-x md:divide-border/60">
           {STATS.map((stat, i) => (
             <Reveal direction="up" duration={300} index={i} key={stat.label}>
@@ -518,7 +518,7 @@ export default function HeroSection() {
       </section>
 
       {/* ── Swarm section ── */}
-      <section className="border-border/60 border-t bg-card/20">
+      <section className="landing-band-fade bg-card/20">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 md:py-24 lg:grid-cols-2">
           <div>
             <Reveal direction="up" duration={250}>

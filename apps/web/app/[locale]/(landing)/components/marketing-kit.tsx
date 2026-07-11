@@ -158,7 +158,7 @@ export function CommandBar({
   return (
     <div
       className={cn(
-        "inline-flex max-w-full items-center gap-3 rounded-full border border-border bg-black/50 py-2 pr-2 pl-4 shadow-black/30 shadow-lg backdrop-blur-sm",
+        "inline-flex max-w-full items-center gap-3 rounded-full border border-border bg-card/60 py-2 pr-2 pl-4 shadow-black/30 shadow-lg backdrop-blur-sm",
         className
       )}
       data-slot="command-bar"
@@ -465,16 +465,16 @@ export function CodeBlock({
     <Reveal direction="up" duration={350} offset={32}>
       <div
         className={cn(
-          "mx-auto flex h-[360px] w-full max-w-[1000px] flex-col overflow-hidden rounded-xl border border-border bg-black/50 shadow-2xl shadow-black/40 backdrop-blur-sm md:h-[440px] lg:h-[500px]",
+          "mx-auto flex h-[360px] w-full max-w-[1000px] flex-col overflow-hidden rounded-xl border border-border bg-card/60 shadow-2xl shadow-black/40 backdrop-blur-sm md:h-[440px] lg:h-[500px]",
           className
         )}
         data-slot="code-block"
         {...props}
       >
         <div className="flex shrink-0 items-center gap-2 border-border border-b bg-muted/30 px-4 py-2.5">
-          <span className="size-2.5 rounded-full bg-[#ff5f57]" />
-          <span className="size-2.5 rounded-full bg-[#febc2e]" />
-          <span className="size-2.5 rounded-full bg-[#28c840]" />
+          <span className="size-2.5 rounded-full bg-muted-foreground/25" />
+          <span className="size-2.5 rounded-full bg-muted-foreground/40" />
+          <span className="size-2.5 rounded-full bg-muted-foreground/60" />
           {header && (
             <span className="ml-2 font-mono text-muted-foreground text-xs">
               {header}

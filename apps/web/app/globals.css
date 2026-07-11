@@ -221,3 +221,26 @@
     opacity: 0.10; /* slightly higher than before (was 0.025) */
   }
 }
+
+/* Soft-tinted section band — the shared replacement for hard
+   border-t/border-y dividers between page sections. The surface tint
+   fades to transparent at both edges via mask instead of snapping at
+   a hard line, so it blends into the surrounding background instead
+   of reading as a separate block. Percentage-based stops so it
+   self-scales to any section height. */
+.landing-band-fade {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
+}

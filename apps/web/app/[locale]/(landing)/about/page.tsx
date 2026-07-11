@@ -136,7 +136,7 @@ export default function AboutPage() {
       </section>
 
       {/* Animated stats */}
-      <section className="border-border/60 border-y bg-card/20">
+      <section className="landing-band-fade bg-card/20">
         <div className="mx-auto grid max-w-6xl grid-cols-2 md:grid-cols-4 md:divide-border/60 md:divide-x">
           {stats.map((stat, i) => (
             <Reveal direction="up" duration={300} index={i} key={stat.label}>

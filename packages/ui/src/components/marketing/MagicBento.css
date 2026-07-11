@@ -1,0 +1,67 @@
+/* MagicBento.css — adapted from ReactBits (reactbits.dev, MIT).
+   Border-glow ring + particle base styles only; layout stays in the
+   caller's own Tailwind grid classes. All color comes from the
+   --glow-color custom property (an RGB triplet set inline per grid),
+   so nothing here bakes in a hue — the monochrome palette stays
+   intact regardless of what's passed in. */
+
+.magic-bento-card {
+  position: relative;
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow-intensity: 0;
+  --glow-radius: 200px;
+}
+
+.magic-bento-card--border-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: radial-gradient(
+    var(--glow-radius) circle at var(--glow-x) var(--glow-y),
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.9)) 0%,
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.35)) 35%,
+    transparent 65%
+  );
+  border-radius: inherit;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.magic-bento-particle-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.magic-bento-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.magic-bento-section {
+  position: relative;
+}
+
+.magic-bento-global-spotlight {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 200;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
