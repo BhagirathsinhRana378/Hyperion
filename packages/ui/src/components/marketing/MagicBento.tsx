@@ -98,7 +98,8 @@ function useGlobalSpotlight(
     spotlight.style.background = `radial-gradient(circle, rgba(${glowColor}, 0.09) 0%, rgba(${glowColor}, 0.045) 15%, rgba(${glowColor}, 0.02) 25%, rgba(${glowColor}, 0.01) 40%, rgba(${glowColor}, 0.005) 65%, transparent 70%)`;
     document.body.appendChild(spotlight);
 
-    const { proximity, fadeDistance } = calculateSpotlightValues(spotlightRadius);
+    const { proximity, fadeDistance } =
+      calculateSpotlightValues(spotlightRadius);
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = section.getBoundingClientRect();
@@ -132,12 +133,24 @@ function useGlobalSpotlight(
         if (effectiveDistance <= proximity) {
           glowIntensity = 1;
         } else if (effectiveDistance <= fadeDistance) {
-          glowIntensity = (fadeDistance - effectiveDistance) / (fadeDistance - proximity);
+          glowIntensity =
+            (fadeDistance - effectiveDistance) / (fadeDistance - proximity);
         }
-        updateCardGlowProperties(card, e.clientX, e.clientY, glowIntensity, spotlightRadius);
+        updateCardGlowProperties(
+          card,
+          e.clientX,
+          e.clientY,
+          glowIntensity,
+          spotlightRadius
+        );
       }
 
-      gsap.to(spotlight, { left: e.clientX, top: e.clientY, duration: 0.1, ease: "power2.out" });
+      gsap.to(spotlight, {
+        left: e.clientX,
+        top: e.clientY,
+        duration: 0.1,
+        ease: "power2.out",
+      });
 
       const targetOpacity =
         minDistance <= proximity
@@ -153,7 +166,9 @@ function useGlobalSpotlight(
     };
 
     const handleMouseLeave = () => {
-      for (const card of section.querySelectorAll<HTMLElement>(".magic-bento-card")) {
+      for (const card of section.querySelectorAll<HTMLElement>(
+        ".magic-bento-card"
+      )) {
         card.style.setProperty("--glow-intensity", "0");
       }
       gsap.to(spotlight, { opacity: 0, duration: 0.3, ease: "power2.out" });
@@ -173,10 +188,10 @@ function useGlobalSpotlight(
 interface MagicBentoGridProps {
   children: React.ReactNode;
   className?: string;
-  enableSpotlight?: boolean;
   disableAnimations?: boolean;
-  spotlightRadius?: number;
+  enableSpotlight?: boolean;
   glowColor?: string;
+  spotlightRadius?: number;
 }
 
 /** Wraps a card grid with the shared cursor-tracking spotlight. */
@@ -193,7 +208,13 @@ export function MagicBentoGrid({
   const isMobile = useMobileDetection();
   const shouldDisable = disableAnimations || isMobile || !!reduceMotion;
 
-  useGlobalSpotlight(gridRef, shouldDisable, enableSpotlight, spotlightRadius, glowColor);
+  useGlobalSpotlight(
+    gridRef,
+    shouldDisable,
+    enableSpotlight,
+    spotlightRadius,
+    glowColor
+  );
 
   return (
     <div
@@ -207,13 +228,13 @@ export function MagicBentoGrid({
 }
 
 interface ParticleCardOptions {
-  disableAnimations: boolean;
-  particleCount: number;
-  glowColor: string;
-  enableTilt: boolean;
   clickEffect: boolean;
+  disableAnimations: boolean;
   enableMagnetism: boolean;
   enableStars: boolean;
+  enableTilt: boolean;
+  glowColor: string;
+  particleCount: number;
 }
 
 function useParticleCardEffects(
@@ -320,7 +341,12 @@ function useParticleCardEffects(
       isHoveredRef.current = false;
       clearParticles();
       if (enableTilt) {
-        gsap.to(el, { rotateX: 0, rotateY: 0, duration: 0.3, ease: "power2.out" });
+        gsap.to(el, {
+          rotateX: 0,
+          rotateY: 0,
+          duration: 0.3,
+          ease: "power2.out",
+        });
       }
       if (enableMagnetism) {
         gsap.to(el, { x: 0, y: 0, duration: 0.3, ease: "power2.out" });
@@ -328,7 +354,7 @@ function useParticleCardEffects(
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!enableTilt && !enableMagnetism) {
+      if (!(enableTilt || enableMagnetism)) {
         return;
       }
       const rect = el.getBoundingClientRect();
@@ -400,18 +426,27 @@ function useParticleCardEffects(
       el.removeEventListener("click", handleClick);
       clearParticles();
     };
-  }, [disableAnimations, particleCount, glowColor, enableTilt, clickEffect, enableMagnetism, enableStars, ref]);
+  }, [
+    disableAnimations,
+    particleCount,
+    glowColor,
+    enableTilt,
+    clickEffect,
+    enableMagnetism,
+    enableStars,
+    ref,
+  ]);
 }
 
 interface MagicBentoCardProps extends React.ComponentProps<"div"> {
-  enableStars?: boolean;
-  enableBorderGlow?: boolean;
-  disableAnimations?: boolean;
-  particleCount?: number;
-  glowColor?: string;
-  enableTilt?: boolean;
   clickEffect?: boolean;
+  disableAnimations?: boolean;
+  enableBorderGlow?: boolean;
   enableMagnetism?: boolean;
+  enableStars?: boolean;
+  enableTilt?: boolean;
+  glowColor?: string;
+  particleCount?: number;
 }
 
 /** Drop-in replacement for GlowCard's shell — same recipe, plus

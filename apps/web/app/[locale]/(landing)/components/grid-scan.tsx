@@ -468,10 +468,13 @@ export default function GridScan({
       const rect = el.getBoundingClientRect();
       if (!within(e, rect)) {
         if (leaveTimer === null) {
-          leaveTimer = window.setTimeout(() => {
-            recenter();
-            leaveTimer = null;
-          }, Math.max(0, snapBackDelay));
+          leaveTimer = window.setTimeout(
+            () => {
+              recenter();
+              leaveTimer = null;
+            },
+            Math.max(0, snapBackDelay)
+          );
         }
         return;
       }
@@ -542,7 +545,7 @@ export default function GridScan({
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.NoToneMapping;
     renderer.autoClear = false;
-    renderer.setClearColor(0x000000, 0);
+    renderer.setClearColor(0x00_00_00, 0);
     container.appendChild(renderer.domElement);
 
     const uniforms = {
@@ -574,7 +577,12 @@ export default function GridScan({
       uScanDuration: { value: scanDuration },
       uScanDelay: { value: scanDelay },
       uScanDirection: {
-        value: scanDirection === "backward" ? 1 : scanDirection === "pingpong" ? 2 : 0,
+        value:
+          scanDirection === "backward"
+            ? 1
+            : scanDirection === "pingpong"
+              ? 2
+              : 0,
       },
       uScanStarts: { value: new Array(MAX_SCANS).fill(0) as number[] },
       uScanCount: { value: 0 },

@@ -19,26 +19,30 @@
 .star-border-glow {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  border-radius: inherit;
-  padding: var(--star-thickness, 1.5px);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
   z-index: 0;
+  padding: var(--star-thickness, 1.5px);
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
 }
 
 .star-border-comet {
   position: absolute;
   width: 300%;
   height: 50%;
-  border-radius: 50%;
-  filter: blur(2px);
-  opacity: var(--star-idle-opacity, 0.25);
-  transition: opacity 0.4s ease-out;
   pointer-events: none;
+  border-radius: 50%;
+  opacity: var(--star-idle-opacity, 0.25);
+  filter: blur(2px);
+  transition: opacity 0.4s ease-out;
   will-change: transform;
 }
 
@@ -49,15 +53,25 @@
 .star-border-comet--top {
   top: -25%;
   left: -250%;
-  background: radial-gradient(circle, rgba(var(--star-color), 0.9), transparent 70%);
-  animation: star-border-slide-top var(--star-speed, 7s) ease-in-out infinite alternate;
+  background: radial-gradient(
+    circle,
+    rgba(var(--star-color), 0.9),
+    transparent 70%
+  );
+  animation: star-border-slide-top var(--star-speed, 7s) ease-in-out infinite
+    alternate;
 }
 
 .star-border-comet--bottom {
-  bottom: -25%;
   right: -250%;
-  background: radial-gradient(circle, rgba(var(--star-color), 0.9), transparent 70%);
-  animation: star-border-slide-bottom var(--star-speed, 7s) ease-in-out infinite alternate;
+  bottom: -25%;
+  background: radial-gradient(
+    circle,
+    rgba(var(--star-color), 0.9),
+    transparent 70%
+  );
+  animation: star-border-slide-bottom var(--star-speed, 7s) ease-in-out infinite
+    alternate;
 }
 
 @keyframes star-border-slide-top {
@@ -81,9 +95,9 @@
 .star-border-inner {
   position: relative;
   z-index: 1;
+  box-sizing: border-box;
   height: 100%;
   padding: var(--star-thickness, 1.5px);
-  box-sizing: border-box;
 }
 
 @media (prefers-reduced-motion: reduce), (max-width: 768px) {

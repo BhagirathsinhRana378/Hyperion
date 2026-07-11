@@ -4,29 +4,27 @@ import { Reveal } from "@workspace/ui/components/marketing/reveal";
 import { cn } from "@workspace/ui/lib/utils";
 import { useReducedMotion } from "motion/react";
 import type * as React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import TextType from "./text-type";
 
 /* ─────────────────────────────────────────────────────────────
    Terminal — the site's one shared terminal window, built from
    three reusable pieces:
 
+     TerminalHeader  — The macOS style header with traffic lights,
+                       title, context shell label and border.
+     TerminalContent — The viewport wrapper for terminal lines.
+                       Uses overflow-hidden to prevent internal scrollbars
+                       but automatically keeps scrolled to the bottom.
      TerminalTyping  — TextType preconfigured with Hyperion's
-                        terminal cadence (human-feeling variable
-                        speed, block cursor, single pass, starts
-                        only once scrolled into view).
-     TerminalLine     — one row of output: an optional status
-                        glyph (success/warning/error/info — the
-                        site's one scoped color exception, see
-                        the hyperion-landing-palette rule) plus
-                        typed or static text.
-     Terminal          — the macOS-style window chrome around a
-                        fixed-size, internally-scrolling body.
-
-   Every terminal on the site (hero, features, coding, docs) is
-   this one component with different `lines`/`code`, so a change
-   here is a change everywhere at once.
-──────────────────────────────────────────────────────────── */
+                       terminal cadence.
+ ──────────────────────────────────────────────────────────── */
 
 export type TerminalLineStatus = "success" | "warning" | "error" | "info";
 
@@ -44,9 +42,6 @@ const STATUS_GLYPH: Record<TerminalLineStatus, string> = {
   info: "→",
 };
 
-// Desaturated on purpose (never neon) — the only place besides the
-// traffic lights where this site's monochrome rule is deliberately
-// relaxed, scoped to semantic success/warning/error meaning only.
 const STATUS_CLASS: Record<TerminalLineStatus, string> = {
   success: "text-[#8bbf93]",
   warning: "text-[#cca868]",
@@ -54,49 +49,101 @@ const STATUS_CLASS: Record<TerminalLineStatus, string> = {
   info: "text-muted-foreground",
 };
 
-const CHAR_MS = 42;
-const LINE_PAUSE_MS = 950;
-const BLANK_LINE_MS = 260;
+const CHAR_MS = 45;
+const LINE_PAUSE_MS = 1000;
+const BLANK_LINE_MS = 250;
 
-/** TerminalTyping — TextType preconfigured with Hyperion's terminal
- *  cadence. The one place every terminal's typing animation comes
- *  from, so tuning it once tunes it everywhere. */
+function estimateDuration(text: string) {
+  return text.length * CHAR_MS + LINE_PAUSE_MS;
+}
+
+// ─── Reusable Terminal Header Component ───
+export interface TerminalHeaderProps {
+  shell?: string;
+  title?: string;
+}
+
+export function TerminalHeader({ title, shell = "zsh" }: TerminalHeaderProps) {
+  return (
+    <div className="flex shrink-0 items-center gap-2 border-border border-b bg-muted/30 px-4 py-2.5">
+      <span aria-hidden={true} className="size-2.5 rounded-full bg-[#ec6a5e]" />
+      <span aria-hidden={true} className="size-2.5 rounded-full bg-[#f4bf4f]" />
+      <span aria-hidden={true} className="size-2.5 rounded-full bg-[#61c454]" />
+      {title && (
+        <span className="ml-2 truncate font-mono text-muted-foreground text-xs">
+          {title}
+        </span>
+      )}
+      <span className="ml-auto shrink-0 font-mono text-muted-foreground text-xs">
+        {shell}
+      </span>
+    </div>
+  );
+}
+
+// ─── Reusable Terminal Content Component ───
+export interface TerminalContentProps extends React.ComponentProps<"div"> {
+  bodyRef?: React.RefObject<HTMLDivElement | null>;
+}
+
+export function TerminalContent({
+  children,
+  className,
+  bodyRef,
+  ...props
+}: TerminalContentProps) {
+  return (
+    <div
+      className={cn(
+        "landing-terminal-scroll flex-1 overflow-hidden p-4",
+        className
+      )}
+      ref={bodyRef}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ─── Reusable Terminal Typing Component ───
+export interface TerminalTypingProps {
+  className?: string;
+  delay?: number;
+  loop?: boolean;
+  showCursor?: boolean;
+  text: string;
+}
+
 export function TerminalTyping({
   text,
   delay = 0,
   className,
   showCursor = true,
-}: {
-  text: string;
-  delay?: number;
-  className?: string;
-  showCursor?: boolean;
-}) {
+  loop = false,
+}: TerminalTypingProps) {
   return (
     <TextType
       as="span"
       className={className}
+      cursorBlinkDuration={0.6}
       cursorCharacter="▋"
-      cursorClassName="ml-0.5 text-primary/80"
+      cursorClassName="ml-0.5 text-primary/80 font-mono"
+      deletingSpeed={25}
+      hideCursorWhileTyping={false}
       initialDelay={delay}
-      loop={false}
+      loop={loop}
+      pauseDuration={1000}
       showCursor={showCursor}
       startOnVisible={true}
       text={text}
-      typingSpeed={CHAR_MS}
-      variableSpeed={{ min: 26, max: 62 }}
+      typingSpeed={45}
+      variableSpeed={{ min: 25, max: 70 }}
     />
   );
 }
 
-/** TerminalLine — one row of terminal output. Empty text renders as
- *  a blank spacer between log groups. When typing, the whole row
- *  (status glyph included) waits for its scheduled `delay` before
- *  mounting at all — otherwise every glyph would flash in at once on
- *  mount while only the text trailed in behind it. Once a line
- *  finishes typing its cursor is hidden again (estimated, since
- *  TextType has no completion callback in single-pass mode) unless
- *  it's the terminal's last line, which keeps the resting cursor. */
+// ─── Terminal Line Component ───
 export function TerminalLine({
   line,
   typing,
@@ -155,19 +202,20 @@ export function TerminalLine({
       {typing ? (
         <TerminalTyping showCursor={isLast || !finished} text={data.text} />
       ) : (
-        <span>{data.text}</span>
+        <span>
+          {data.text}
+          {isLast && (
+            <span
+              className="landing-caret-blink ml-0.5 inline-block font-mono text-primary/80"
+              style={{ "--caret-dur": "1.2s" } as CSSProperties}
+            >
+              ▋
+            </span>
+          )}
+        </span>
       )}
     </div>
   );
-}
-
-// TextType's onSentenceComplete never fires in single-pass (loop=false)
-// mode, so sibling lines can't chain off it — instead each line's
-// start is pre-scheduled from an estimate of how long the line before
-// it takes to finish typing, which is what actually produces the
-// "realistic pause between steps" the lines/typed mode is going for.
-function estimateDuration(text: string) {
-  return text.length * CHAR_MS + LINE_PAUSE_MS;
 }
 
 interface TerminalProps extends Omit<React.ComponentProps<"div">, "title"> {
@@ -186,14 +234,6 @@ interface TerminalProps extends Omit<React.ComponentProps<"div">, "title"> {
   typing?: boolean;
 }
 
-/**
- * Terminal — fixed-size viewport like a real terminal app (Warp/
- * iTerm/VS Code): the window never grows with its content. Output
- * scrolls internally and stays pinned to the newest line while
- * typing — unless the visitor has scrolled up to read earlier
- * output, in which case autoscroll pauses until they scroll back
- * down themselves.
- */
 export function Terminal({
   className,
   title,
@@ -206,7 +246,6 @@ export function Terminal({
   ...props
 }: TerminalProps) {
   const bodyRef = useRef<HTMLDivElement>(null);
-  const pinnedRef = useRef(true);
   const reduceMotion = useReducedMotion();
   const animate = typing && !reduceMotion;
 
@@ -223,18 +262,14 @@ export function Terminal({
     });
   }, [lines]);
 
-  // Auto-scroll: keep pinned to the newest line while output grows,
-  // but only while the visitor hasn't manually scrolled up — pinnedRef
-  // is the source of truth, flipped by the body's own onScroll below.
+  // Programmatic scroll: keep pinned to the newest line while output grows
   useEffect(() => {
     const el = bodyRef.current;
     if (!(el && animate)) {
       return;
     }
     const observer = new MutationObserver(() => {
-      if (pinnedRef.current) {
-        el.scrollTop = el.scrollHeight;
-      }
+      el.scrollTop = el.scrollHeight;
     });
     observer.observe(el, {
       childList: true,
@@ -251,37 +286,8 @@ export function Terminal({
         data-slot="terminal"
         {...props}
       >
-        <div className="flex shrink-0 items-center gap-2 border-border border-b bg-muted/30 px-4 py-2.5">
-          <span
-            aria-hidden={true}
-            className="size-2.5 rounded-full bg-[#ec6a5e]"
-          />
-          <span
-            aria-hidden={true}
-            className="size-2.5 rounded-full bg-[#f4bf4f]"
-          />
-          <span
-            aria-hidden={true}
-            className="size-2.5 rounded-full bg-[#61c454]"
-          />
-          {title && (
-            <span className="ml-2 truncate font-mono text-muted-foreground text-xs">
-              {title}
-            </span>
-          )}
-          <span className="ml-auto shrink-0 font-mono text-muted-foreground text-xs">
-            {shell}
-          </span>
-        </div>
-        <div
-          className="landing-terminal-scroll flex-1 overflow-y-auto overflow-x-hidden p-4 [overscroll-behavior:contain]"
-          onScroll={(e) => {
-            const el = e.currentTarget;
-            pinnedRef.current =
-              el.scrollHeight - el.scrollTop - el.clientHeight < 32;
-          }}
-          ref={bodyRef}
-        >
+        <TerminalHeader shell={shell} title={title} />
+        <TerminalContent bodyRef={bodyRef}>
           {children ??
             (lines ? (
               <div
@@ -304,11 +310,19 @@ export function Terminal({
                 {animate && code ? (
                   <TerminalTyping text={code} />
                 ) : (
-                  <code>{code}</code>
+                  <code>
+                    {code}
+                    <span
+                      className="landing-caret-blink ml-0.5 inline-block font-mono text-primary/80"
+                      style={{ "--caret-dur": "1.2s" } as CSSProperties}
+                    >
+                      ▋
+                    </span>
+                  </code>
                 )}
               </pre>
             ))}
-        </div>
+        </TerminalContent>
       </div>
     </Reveal>
   );

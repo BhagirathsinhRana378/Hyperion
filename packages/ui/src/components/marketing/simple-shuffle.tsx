@@ -1,28 +1,28 @@
-import React from 'react';
+import type React from "react";
 
 interface SimpleShuffleProps {
-  text: string;
-  className?: string;
-  style?: React.CSSProperties;
-  // Props kept for compatibility
-  shuffleDirection?: 'left' | 'right' | 'up' | 'down';
-  duration?: number;
   animationMode?: string;
-  shuffleTimes?: number;
+  className?: string;
+  duration?: number;
   ease?: string;
+  loop?: boolean;
+  respectReducedMotion?: boolean;
+  // Props kept for compatibility
+  shuffleDirection?: "left" | "right" | "up" | "down";
+  shuffleTimes?: number;
   stagger?: number;
+  style?: React.CSSProperties;
+  text: string;
   threshold?: number;
   triggerOnce?: boolean;
-  respectReducedMotion?: boolean;
   triggerOnHover?: boolean;
-  loop?: boolean;
   [key: string]: any;
 }
 
 /** Simple fallback Shuffle component – renders text without animation. */
 export default function SimpleShuffle({
   text,
-  className = '',
+  className = "",
   style = {},
   ...rest
 }: SimpleShuffleProps) {

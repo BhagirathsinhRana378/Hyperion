@@ -25,24 +25,24 @@ import {
  */
 
 interface TextTypeProps {
-  className?: string;
-  showCursor?: boolean;
-  hideCursorWhileTyping?: boolean;
-  cursorCharacter?: string | ReactNode;
-  cursorBlinkDuration?: number;
-  cursorClassName?: string;
-  text: string | string[];
   as?: ElementType;
-  typingSpeed?: number;
-  initialDelay?: number;
-  pauseDuration?: number;
+  className?: string;
+  cursorBlinkDuration?: number;
+  cursorCharacter?: string | ReactNode;
+  cursorClassName?: string;
   deletingSpeed?: number;
+  hideCursorWhileTyping?: boolean;
+  initialDelay?: number;
   loop?: boolean;
-  textColors?: string[];
-  variableSpeed?: { min: number; max: number };
   onSentenceComplete?: (sentence: string, index: number) => void;
-  startOnVisible?: boolean;
+  pauseDuration?: number;
   reverseMode?: boolean;
+  showCursor?: boolean;
+  startOnVisible?: boolean;
+  text: string | string[];
+  textColors?: string[];
+  typingSpeed?: number;
+  variableSpeed?: { min: number; max: number };
 }
 
 export default function TextType({
@@ -151,7 +151,9 @@ export default function TextType({
       } else if (currentCharIndex < processedText.length) {
         timeout = setTimeout(
           () => {
-            setDisplayedText((prev) => prev + (processedText[currentCharIndex] ?? ""));
+            setDisplayedText(
+              (prev) => prev + (processedText[currentCharIndex] ?? "")
+            );
             setCurrentCharIndex((prev) => prev + 1);
           },
           variableSpeed ? getRandomSpeed() : typingSpeed
@@ -209,7 +211,9 @@ export default function TextType({
         className={`landing-caret-blink ml-1 inline-block ${cursorClassName} ${
           shouldHideCursor ? "hidden" : ""
         }`}
-        style={{ "--caret-dur": `${cursorBlinkDuration * 2}s` } as CSSProperties}
+        style={
+          { "--caret-dur": `${cursorBlinkDuration * 2}s` } as CSSProperties
+        }
       >
         {cursorCharacter}
       </span>

@@ -4,10 +4,10 @@ import { BorderBeam } from "@workspace/ui/components/landing/border-beam";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
 import { cn } from "@workspace/ui/lib/utils";
 import { Check, Copy, Minus, Plus } from "lucide-react";
-import { motion, useReducedMotion, useScroll } from "motion/react";
+import { motion, useScroll } from "motion/react";
 import type * as React from "react";
-import { useEffect, useRef, useState } from "react";
-import TextType from "./text-type";
+import { useRef, useState } from "react";
+import { Terminal } from "./terminal";
 
 /* ─────────────────────────────────────────────────────────────
    Local dark marketing kit for the (landing) route group.
@@ -442,81 +442,16 @@ export function CodeBlock({
   code?: string;
   typing?: boolean;
 }) {
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const reduceMotion = useReducedMotion();
-  const showTyping = typing && !reduceMotion && !!code;
-
-  // Auto-scroll: while output is being typed, keep the viewport pinned
-  // to the newest line. A MutationObserver keeps this decoupled from
-  // the typing engine — any DOM growth inside the body re-pins.
-  useEffect(() => {
-    const el = bodyRef.current;
-    if (!(el && showTyping)) {
-      return;
-    }
-    const observer = new MutationObserver(() => {
-      el.scrollTop = el.scrollHeight;
-    });
-    observer.observe(el, {
-      childList: true,
-      characterData: true,
-      subtree: true,
-    });
-    return () => observer.disconnect();
-  }, [showTyping]);
-
   return (
-    <Reveal direction="up" duration={350} offset={32}>
-      <div
-        className={cn(
-          "mx-auto flex h-[360px] w-full max-w-[1000px] flex-col overflow-hidden rounded-xl border border-border bg-card/60 shadow-2xl shadow-black/40 backdrop-blur-sm md:h-[440px] lg:h-[500px]",
-          className
-        )}
-        data-slot="code-block"
-        {...props}
-      >
-        <div className="flex shrink-0 items-center gap-2 border-border border-b bg-muted/30 px-4 py-2.5">
-          <span className="size-2.5 rounded-full bg-muted-foreground/25" />
-          <span className="size-2.5 rounded-full bg-muted-foreground/40" />
-          <span className="size-2.5 rounded-full bg-muted-foreground/60" />
-          {header && (
-            <span className="ml-2 font-mono text-muted-foreground text-xs">
-              {header}
-            </span>
-          )}
-          <span className="ml-auto font-mono text-muted-foreground text-xs">
-            {language}
-          </span>
-        </div>
-        <div
-          className="flex-1 overflow-y-auto overflow-x-hidden p-4 [overscroll-behavior:contain] [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin]"
-          ref={bodyRef}
-        >
-          {children ?? (
-            <pre className="whitespace-pre-wrap break-words font-mono text-foreground/85 text-sm leading-relaxed">
-              {showTyping && code ? (
-                <TextType
-                  as="span"
-                  cursorCharacter={
-                    <span
-                      aria-hidden={true}
-                      className="inline-block h-4 w-2 translate-y-0.5 bg-primary/80"
-                    />
-                  }
-                  cursorClassName="ml-0.5"
-                  loop={false}
-                  showCursor={true}
-                  startOnVisible={true}
-                  text={code}
-                  typingSpeed={8}
-                />
-              ) : (
-                <code>{code}</code>
-              )}
-            </pre>
-          )}
-        </div>
-      </div>
-    </Reveal>
+    <Terminal
+      className={className}
+      code={code}
+      shell={language}
+      title={header}
+      typing={typing}
+      {...props}
+    >
+      {children}
+    </Terminal>
   );
 }

@@ -1,36 +1,31 @@
 "use client";
 
+import {
+  MagicBentoCard,
+  MagicBentoGrid,
+} from "@workspace/ui/components/marketing/MagicBento";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
+import { cn } from "@workspace/ui/lib/utils";
 import {
   ArrowRight,
   Bot,
   Brain,
   Eye,
   GitBranch,
-  LayoutGrid,
   ListChecks,
-  Lock,
   Network,
-  SquareKanban,
   SquareTerminal,
   Workflow,
   Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
+import { Badge, CtaLink, Eyebrow, GlowCard } from "../components/marketing-kit";
 import {
   revealVariants,
   staggerContainer,
 } from "../components/motion-primitives";
-import {
-  Badge,
-  CtaLink,
-  Eyebrow,
-  GlowCard,
-} from "../components/marketing-kit";
 import { ParallaxField } from "../components/parallax-field";
 import { Terminal, type TerminalLineInput } from "../components/terminal";
-import { MagicBentoCard, MagicBentoGrid } from "@workspace/ui/components/marketing/MagicBento";
-import { cn } from "@workspace/ui/lib/utils";
 
 /* ── Feature grid — every capability, one card each ───────── */
 
@@ -89,7 +84,6 @@ const features = [
     description:
       "Agents remember your conventions, past decisions, and project context across sessions.",
   },
-
 ];
 
 /* Mini status chips inside the "AI Agent Swarm" hero cell — a quick
@@ -189,7 +183,7 @@ export default function FeaturesPage() {
               <GlowCard beam={pillar.beam} className="flex h-full flex-col p-8">
                 <Badge className="w-fit">{pillar.tag}</Badge>
                 <div className="mt-6 flex size-12 items-center justify-center rounded-xl border border-border bg-secondary transition-colors duration-300 group-hover/card:border-primary/40">
-                  <pillar.icon className="group-hover/card:-rotate-3 size-6 text-primary transition-transform duration-300 ease-out group-hover/card:scale-110" />
+                  <pillar.icon className="size-6 text-primary transition-transform duration-300 ease-out group-hover/card:-rotate-3 group-hover/card:scale-110" />
                 </div>
                 <h2 className="mt-5 font-display font-semibold text-2xl tracking-tight">
                   {pillar.title}
@@ -239,7 +233,7 @@ export default function FeaturesPage() {
                   >
                     <feature.icon
                       className={cn(
-                        "group-hover/card:-rotate-3 text-primary transition-transform duration-300 ease-out group-hover/card:scale-110",
+                        "text-primary transition-transform duration-300 ease-out group-hover/card:-rotate-3 group-hover/card:scale-110",
                         isHero ? "size-6" : "size-5"
                       )}
                     />
@@ -288,7 +282,12 @@ export default function FeaturesPage() {
           </div>
         </Reveal>
         <div className="mt-10">
-          <Terminal lines={DEMO_LINES} shell="zsh" title="hyperion — agents" typing={true} />
+          <Terminal
+            lines={DEMO_LINES}
+            shell="zsh"
+            title="hyperion — agents"
+            typing={true}
+          />
         </div>
       </section>
 

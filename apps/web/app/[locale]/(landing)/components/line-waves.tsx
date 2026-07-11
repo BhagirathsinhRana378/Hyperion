@@ -22,21 +22,21 @@ import { useEffect, useRef } from "react";
  */
 
 interface LineWavesProps {
-  speed?: number;
-  innerLineCount?: number;
-  outerLineCount?: number;
-  warpIntensity?: number;
-  rotation?: number;
-  edgeFadeWidth?: number;
-  colorCycleSpeed?: number;
   brightness?: number;
+  className?: string;
   color1?: string;
   color2?: string;
   color3?: string;
+  colorCycleSpeed?: number;
+  edgeFadeWidth?: number;
   enableMouseInteraction?: boolean;
+  innerLineCount?: number;
   mouseInfluence?: number;
-  className?: string;
+  outerLineCount?: number;
+  rotation?: number;
+  speed?: number;
   style?: CSSProperties;
+  warpIntensity?: number;
 }
 
 function hexToVec3(hex: string): [number, number, number] {

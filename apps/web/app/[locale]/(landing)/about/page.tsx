@@ -3,12 +3,12 @@
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
 import { ArrowRight, Compass, GitFork, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
+import { CtaLink, Eyebrow, GlowCard } from "../components/marketing-kit";
 import {
   Counter,
   revealVariants,
   staggerContainer,
 } from "../components/motion-primitives";
-import { CtaLink, Eyebrow, GlowCard } from "../components/marketing-kit";
 
 const principles = [
   {
@@ -87,7 +87,7 @@ export default function AboutPage() {
       <section className="relative pt-36 pb-14">
         <div
           aria-hidden={true}
-          className="landing-glow-breathe -z-10 pointer-events-none absolute inset-x-0 top-0 h-[460px] [background:radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_0%,transparent_70%)]"
+          className="landing-glow-breathe pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px] [background:radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_0%,transparent_70%)]"
         />
         <motion.div
           animate="visible"
@@ -121,7 +121,7 @@ export default function AboutPage() {
             <Reveal direction="up" duration={300} index={i} key={p.title}>
               <GlowCard className="h-full p-8">
                 <div className="flex size-11 items-center justify-center rounded-xl border border-border bg-secondary transition-colors duration-300 group-hover/card:border-primary/40">
-                  <p.icon className="group-hover/card:-rotate-3 size-5 text-primary transition-transform duration-300 ease-out group-hover/card:scale-110" />
+                  <p.icon className="size-5 text-primary transition-transform duration-300 ease-out group-hover/card:-rotate-3 group-hover/card:scale-110" />
                 </div>
                 <h2 className="mt-5 font-display font-semibold text-xl tracking-tight">
                   {p.title}
@@ -137,7 +137,7 @@ export default function AboutPage() {
 
       {/* Animated stats */}
       <section className="landing-band-fade bg-card/20">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 md:grid-cols-4 md:divide-border/60 md:divide-x">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 md:grid-cols-4 md:divide-x md:divide-border/60">
           {stats.map((stat, i) => (
             <Reveal direction="up" duration={300} index={i} key={stat.label}>
               <div className="group flex flex-col items-center gap-1.5 px-4 py-10 text-center">
@@ -165,7 +165,12 @@ export default function AboutPage() {
         </Reveal>
         <div className="mt-10 grid gap-5 sm:grid-cols-2">
           {beliefs.map((belief, i) => (
-            <Reveal direction="up" duration={280} index={i % 2} key={belief.title}>
+            <Reveal
+              direction="up"
+              duration={280}
+              index={i % 2}
+              key={belief.title}
+            >
               <GlowCard className="h-full p-7" tilt={false}>
                 <h3 className="font-medium text-foreground">{belief.title}</h3>
                 <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
@@ -193,7 +198,7 @@ export default function AboutPage() {
               <li className="relative">
                 <span
                   aria-hidden={true}
-                  className="-left-[37px] absolute top-1.5 flex size-4 items-center justify-center rounded-full border border-primary/40 bg-background"
+                  className="absolute top-1.5 -left-[37px] flex size-4 items-center justify-center rounded-full border border-primary/40 bg-background"
                 >
                   <span className="size-1.5 rounded-full bg-primary" />
                 </span>

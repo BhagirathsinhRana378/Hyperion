@@ -88,7 +88,7 @@ export default function NewsPage() {
     <section className="relative mx-auto max-w-4xl px-6 pt-36 pb-24 md:pb-32">
       <div
         aria-hidden={true}
-        className="landing-glow-breathe -z-10 pointer-events-none absolute inset-x-0 top-0 h-[420px] [background:radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_0%,transparent_70%)]"
+        className="landing-glow-breathe pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] [background:radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_0%,transparent_70%)]"
       />
       <Eyebrow>Dev log</Eyebrow>
       <h1 className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl">
@@ -115,9 +115,9 @@ export default function NewsPage() {
               <div className="relative flex h-36 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-secondary via-card to-background sm:h-auto sm:w-44">
                 <div
                   aria-hidden={true}
-                  className="absolute inset-0 opacity-40 [background:linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] [background-size:20px_20px]"
+                  className="absolute inset-0 opacity-40 [background-size:20px_20px] [background:linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)]"
                 />
-                <entry.icon className="group-hover:-rotate-3 relative size-9 text-muted-foreground transition-all duration-300 group-hover:scale-110 group-hover:text-primary" />
+                <entry.icon className="relative size-9 text-muted-foreground transition-all duration-300 group-hover:-rotate-3 group-hover:scale-110 group-hover:text-primary" />
               </div>
 
               <div className="min-w-0 flex-1">
@@ -130,10 +130,10 @@ export default function NewsPage() {
                   </span>
                 </div>
                 <div className="mt-3 flex items-start justify-between gap-4">
-                  <h2 className="font-display text-xl text-foreground tracking-tight transition-colors duration-200 group-hover:text-primary md:text-2xl">
+                  <h2 className="font-display text-foreground text-xl tracking-tight transition-colors duration-200 group-hover:text-primary md:text-2xl">
                     {entry.title}
                   </h2>
-                  <ArrowUpRight className="group-hover:-translate-y-0.5 mt-1 size-5 shrink-0 text-muted-foreground transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-primary" />
+                  <ArrowUpRight className="mt-1 size-5 shrink-0 text-muted-foreground transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-primary" />
                 </div>
                 <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
                   {entry.excerpt}

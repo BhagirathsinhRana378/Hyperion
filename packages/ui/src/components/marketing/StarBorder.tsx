@@ -7,12 +7,12 @@ import "./StarBorder.css";
 interface StarBorderProps extends React.ComponentProps<"div"> {
   /** RGB triplet, no rgba() wrapper — e.g. "238, 238, 237". */
   color?: string;
+  hoverOpacity?: number;
+  idleOpacity?: number;
   /** One slide cycle, e.g. "7s". Keep slow (6-8s) — ambient, not busy. */
   speed?: string;
   /** Border-ring thickness in px — how much of each comet peeks out. */
   thickness?: number;
-  idleOpacity?: number;
-  hoverOpacity?: number;
 }
 
 /**

@@ -208,7 +208,8 @@
     transform: translateY(0) rotate(0deg);
   }
   50% {
-    transform: translateY(var(--card-float-y, -4px)) rotate(var(--card-float-rot, 0.6deg));
+    transform: translateY(var(--card-float-y, -4px))
+      rotate(var(--card-float-rot, 0.6deg));
   }
 }
 
@@ -270,7 +271,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .wordmark-base {
-    opacity: 0.10; /* slightly higher than before (was 0.025) */
+    opacity: 0.1; /* slightly higher than before (was 0.025) */
   }
 }
 

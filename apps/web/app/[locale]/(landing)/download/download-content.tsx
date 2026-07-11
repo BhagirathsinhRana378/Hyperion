@@ -3,14 +3,13 @@
 import { siteConfig } from "@workspace/core/config/site";
 import { AnimatedGroup } from "@workspace/ui/components/landing/animated-group";
 import { TextEffect } from "@workspace/ui/components/landing/text-effect";
-import { ArrowDown } from "lucide-react";
+import { Reveal } from "@workspace/ui/components/marketing/reveal";
+import { ArrowDown, Check, Minus } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { transitionVariants } from "@/lib/animations";
 import { detectPlatform, type Platform } from "@/lib/detect-platform";
 import type { ReleaseData } from "@/lib/github-releases";
-import { Reveal } from "@workspace/ui/components/marketing/reveal";
-import { Check, Minus } from "lucide-react";
 import { DownloadBackdrop } from "../components/download-backdrop";
 import {
   CommandBar,
@@ -25,15 +24,30 @@ import { platformConfig } from "./platform-mappings";
 const systemRequirements = [
   {
     platform: "Windows",
-    items: ["Windows 10 1809+ (x64 / ARM64)", "8 GB RAM (16 GB recommended)", "WebView2 runtime", "1 GB free disk space"],
+    items: [
+      "Windows 10 1809+ (x64 / ARM64)",
+      "8 GB RAM (16 GB recommended)",
+      "WebView2 runtime",
+      "1 GB free disk space",
+    ],
   },
   {
     platform: "macOS",
-    items: ["macOS 12 Monterey or newer", "Apple Silicon or Intel", "8 GB RAM (16 GB recommended)", "1 GB free disk space"],
+    items: [
+      "macOS 12 Monterey or newer",
+      "Apple Silicon or Intel",
+      "8 GB RAM (16 GB recommended)",
+      "1 GB free disk space",
+    ],
   },
   {
     platform: "Linux",
-    items: ["Ubuntu 20.04+ / Fedora 38+ / Arch", "x64 or ARM64", "webkit2gtk 4.1", "1 GB free disk space"],
+    items: [
+      "Ubuntu 20.04+ / Fedora 38+ / Arch",
+      "x64 or ARM64",
+      "webkit2gtk 4.1",
+      "1 GB free disk space",
+    ],
   },
 ];
 
@@ -227,9 +241,16 @@ export default function DownloadContent({ release }: DownloadContentProps) {
           </Reveal>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {systemRequirements.map((req, i) => (
-              <Reveal direction="up" duration={280} index={i} key={req.platform}>
+              <Reveal
+                direction="up"
+                duration={280}
+                index={i}
+                key={req.platform}
+              >
                 <GlowCard className="h-full p-6" tilt={false}>
-                  <h3 className="font-medium text-foreground">{req.platform}</h3>
+                  <h3 className="font-medium text-foreground">
+                    {req.platform}
+                  </h3>
                   <ul className="mt-4 space-y-2.5">
                     {req.items.map((item) => (
                       <li
