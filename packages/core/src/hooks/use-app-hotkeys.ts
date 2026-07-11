@@ -1,7 +1,6 @@
 "use client";
 
 import { hotkeys } from "@workspace/core/config/hotkeys";
-import { useThemeTransition } from "@workspace/core/hooks/use-theme-transition";
 import { useCommandPaletteStore } from "@workspace/core/stores/command-palette-store";
 import { useHotkeysDialogStore } from "@workspace/core/stores/hotkeys-store";
 import { useSidebar } from "@workspace/ui/components/sidebar";
@@ -13,7 +12,6 @@ interface UseAppHotkeysOptions {
 
 export function useAppHotkeys({ navigate }: UseAppHotkeysOptions) {
   const { toggleSidebar } = useSidebar();
-  const { theme, handleThemeChange } = useThemeTransition();
   const toggleHotkeysDialog = useHotkeysDialogStore((s) => s.toggle);
   const toggleCommandPalette = useCommandPaletteStore((s) => s.toggle);
 
@@ -27,18 +25,6 @@ export function useAppHotkeys({ navigate }: UseAppHotkeysOptions) {
       toggleCommandPalette();
     },
     { enableOnFormTags: false, delimiter: "|" }
-  );
-
-  // Toggle Theme
-  useHotkeys(
-    getKeys("toggle-mode"),
-    (e: KeyboardEvent) => {
-      e.preventDefault();
-      handleThemeChange(
-        (theme === "dark" ? "light" : "dark") as "light" | "dark"
-      );
-    },
-    { enableOnFormTags: false }
   );
 
   // Toggle Sidebar

@@ -1,6 +1,5 @@
 "use client";
 
-import { ModeToggle } from "@workspace/core/components/common/mode-toggle";
 import { NotificationCenter } from "@workspace/core/components/common/notification-center";
 import { formatHotkeyDisplay } from "@workspace/core/lib/utils";
 import { useAgentStore } from "@workspace/core/stores/agent-store";
@@ -139,7 +138,6 @@ export function AppHeader({ pathname, LinkComponent = "a" }: AppHeaderProps) {
           <Sparkles className="size-4" />
         </Button>
         <NotificationCenter />
-        <ModeToggle />
       </div>
     </header>
   );

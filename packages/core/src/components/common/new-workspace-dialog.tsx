@@ -183,7 +183,7 @@ const getCommandLabel = (cmd: string) => {
   if (!cmd) {
     return "None";
   }
-  return cmd.length > 20 ? cmd.substring(0, 18) + "..." : cmd;
+  return cmd.length > 20 ? `${cmd.slice(0, 18)}...` : cmd;
 };
 
 export function NewWorkspaceDialog({
