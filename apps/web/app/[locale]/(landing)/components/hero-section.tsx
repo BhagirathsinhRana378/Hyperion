@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Bot,
   Check,
+  Eye,
   Github,
   LayoutGrid,
   SquareKanban,
@@ -26,11 +27,13 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { HeroBackdrop } from "./hero-backdrop";
 import { CodeBlock, CtaLink, Eyebrow, GlowCard } from "./marketing-kit";
 import CountUp from "@workspace/ui/components/marketing/CountUp";
+import { MagicBentoCard, MagicBentoGrid } from "@workspace/ui/components/marketing/MagicBento";
 import ShinyText from "@workspace/ui/components/marketing/ShinyText";
+import { StarBorder } from "@workspace/ui/components/marketing/StarBorder";
 import { easeOut, Marquee } from "./motion-primitives";
 
 /* ── Copy ─────────────────────────────────────────────────── */
@@ -72,10 +75,30 @@ const CAPABILITIES = [
 ];
 
 const STATS = [
-  { value: 8, suffix: "", label: "terminals in one workspace" },
-  { value: 24, suffix: "/7", label: "autonomous operation" },
-  { value: 100, suffix: "%", label: "faster iteration loops" },
-  { value: 100, suffix: "%", label: "under your command" },
+  {
+    value: 8,
+    suffix: "",
+    label: "Terminals",
+    description: "Tiled into one adaptive workspace.",
+  },
+  {
+    value: 99.9,
+    suffix: "%",
+    label: "Agent Uptime",
+    description: "Autonomous agents that keep working.",
+  },
+  {
+    value: 10,
+    suffix: "×",
+    label: "Faster Delivery",
+    description: "Parallel agents cut iteration time.",
+  },
+  {
+    value: 100,
+    suffix: "%",
+    label: "Under Command",
+    description: "You approve every merge, always.",
+  },
 ];
 
 const FEATURES = [
@@ -109,6 +132,15 @@ const FEATURES = [
   },
 ];
 
+/* Mini tile preview inside the "Workspace System" hero cell — a
+   literal small tiling of what the sentence above describes. */
+const WORKSPACE_TILES = [
+  { icon: SquareTerminal, label: "Terminal" },
+  { icon: LayoutGrid, label: "Editor" },
+  { icon: Eye, label: "Preview" },
+  { icon: SquareKanban, label: "Task board" },
+];
+
 const SWARM_CHECKLIST = [
   "Agents plan, code, test, and review in parallel",
   "Every action lands in a terminal you can inspect",
@@ -127,6 +159,99 @@ const TERMINAL_CODE = `$ hyperion swarm start --agents 4
 swarm active · 4 agents · you are in command`;
 
 /* ── Micro components ─────────────────────────────────────── */
+
+/** One floating glass stat card — counts up once on entry, then eases
+ *  into an independent slow float+rotate drift (paused on hover).
+ *  Lift + tilt + scale are cursor-driven (same recipe as GlowCard) on
+ *  an inner element, kept separate from the float wrapper so the two
+ *  transforms never fight over the same node. Every card is the same
+ *  fixed height via grid stretch + h-full all the way down, and the
+ *  description reserves a fixed two-line slot so no card's content
+ *  shifts the number/label baseline relative to its neighbors. */
+function HeroStatCard({
+  value,
+  suffix,
+  label,
+  description,
+  index,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  description: string;
+  index: number;
+}) {
+  const reduceMotion = useReducedMotion();
+  const [floating, setFloating] = useState(false);
+  const onCountEnd = useCallback(() => setFloating(true), []);
+
+  return (
+    <Reveal
+      className="h-full"
+      direction="up"
+      duration={340}
+      index={index}
+    >
+      <div
+        className={cn(
+          "h-full",
+          floating && !reduceMotion && "landing-card-float hover:[animation-play-state:paused]"
+        )}
+        style={
+          {
+            "--card-float-y": "-4px",
+            "--card-float-rot": index % 2 === 0 ? "0.7deg" : "-0.7deg",
+            "--card-float-dur": `${5.5 + index * 0.4}s`,
+            "--card-float-delay": `${index * 0.3}s`,
+          } as CSSProperties
+        }
+      >
+        <StarBorder className="h-full rounded-3xl" thickness={1.5}>
+          <div
+            className="group relative flex h-full flex-col items-center justify-center gap-1 rounded-3xl border border-white/[0.08] bg-card/30 px-6 py-8 text-center shadow-[0_8px_30px_-14px_rgba(0,0,0,0.5)] backdrop-blur-sm transition-[transform,border-color,box-shadow] duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] hover:border-primary/25 hover:shadow-[0_20px_48px_-16px_rgba(0,0,0,0.6)]"
+            onMouseEnter={(e) => {
+              if (reduceMotion) {
+                return;
+              }
+              e.currentTarget.style.transform =
+                "perspective(700px) rotateX(0deg) rotateY(0deg) translateY(-7px) scale(1.025)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "";
+            }}
+            onMouseMove={(e) => {
+              if (reduceMotion) {
+                return;
+              }
+              const rect = e.currentTarget.getBoundingClientRect();
+              const px = (e.clientX - rect.left) / rect.width - 0.5;
+              const py = (e.clientY - rect.top) / rect.height - 0.5;
+              e.currentTarget.style.transform = `perspective(700px) rotateX(${py * -4}deg) rotateY(${px * 4}deg) translateY(-7px) scale(1.025)`;
+            }}
+          >
+            <span className="font-display text-4xl text-foreground transition-colors duration-300 group-hover:text-primary md:text-5xl">
+              <CountUp
+                className="count-up-text"
+                delay={index * 0.12}
+                duration={1.3}
+                onEnd={onCountEnd}
+                separator=","
+                to={value}
+              />
+              {suffix}
+            </span>
+            <span className="mt-1 font-medium text-[11px] text-muted-foreground uppercase tracking-[0.16em]">
+              {label}
+            </span>
+            <span className="mt-0.5 flex min-h-[2.25rem] items-center text-muted-foreground/70 text-xs leading-relaxed">
+              {description}
+            </span>
+          </div>
+        </StarBorder>
+      </div>
+    </Reveal>
+  );
+}
 
 /** One headline word — blur-to-sharp rise, staggered by index. */
 function Word({
@@ -463,20 +588,17 @@ export default function HeroSection() {
       </section>
 
       {/* ── Stats ── */}
-      <section className="landing-band-fade bg-card/20">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 md:grid-cols-4 md:divide-x md:divide-border/60">
+      <section className="py-16 md:py-24">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 px-6 sm:grid-cols-2 lg:grid-cols-4">
           {STATS.map((stat, i) => (
-            <Reveal direction="up" duration={300} index={i} key={stat.label}>
-              <div className="group flex flex-col items-center gap-1.5 px-4 py-10 text-center">
-                <span className="font-display text-4xl text-foreground transition-colors duration-300 group-hover:text-primary md:text-5xl">
-                  <CountUp className="count-up-text" duration={2} separator="," to={stat.value} />
-                  {stat.suffix}
-                </span>
-                <span className="text-muted-foreground text-sm">
-                  {stat.label}
-                </span>
-              </div>
-            </Reveal>
+            <HeroStatCard
+              description={stat.description}
+              index={i}
+              key={stat.label}
+              label={stat.label}
+              suffix={stat.suffix}
+              value={stat.value}
+            />
           ))}
         </div>
       </section>
@@ -491,30 +613,82 @@ export default function HeroSection() {
             </h2>
           </div>
         </Reveal>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map((feature, i) => (
-            <Reveal direction="up" duration={280} index={i} key={feature.title}>
-              <GlowCard className="h-full p-6">
-                <div className="flex size-11 items-center justify-center rounded-xl border border-border bg-secondary transition-colors duration-300 group-hover/card:border-primary/40">
-                  <feature.icon className="size-5 text-primary transition-transform duration-300 ease-out group-hover/card:-rotate-3 group-hover/card:scale-110" />
-                </div>
-                <h3 className="mt-4 font-medium text-foreground">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-                <Link
-                  className="group/link mt-4 inline-flex items-center gap-1 text-primary text-sm"
-                  href={feature.href}
+        <MagicBentoGrid className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {FEATURES.map((feature, i) => {
+            // Bento mosaic (lg+ only): first tile is the large hero cell,
+            // the last spans wide beneath it; the two in between stay
+            // standard size. Below lg everything stacks as a plain grid.
+            const isHero = i === 0;
+            const isWide = i === FEATURES.length - 1;
+            return (
+              <Reveal
+                className={cn(
+                  isHero && "lg:col-span-2 lg:row-span-2",
+                  isWide && "lg:col-span-2"
+                )}
+                direction="up"
+                duration={280}
+                index={i}
+                key={feature.title}
+              >
+                <MagicBentoCard
+                  className={cn(
+                    "flex h-full flex-col p-6",
+                    isHero && "lg:p-8"
+                  )}
+                  enableMagnetism={false}
                 >
-                  Explore
-                  <ArrowRight className="size-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
-                </Link>
-              </GlowCard>
-            </Reveal>
-          ))}
-        </div>
+                  <div
+                    className={cn(
+                      "flex items-center justify-center rounded-xl border border-border bg-secondary transition-colors duration-300 group-hover/card:border-primary/40",
+                      isHero ? "size-14" : "size-11"
+                    )}
+                  >
+                    <feature.icon
+                      className={cn(
+                        "text-primary transition-transform duration-300 ease-out group-hover/card:-rotate-3 group-hover/card:scale-110",
+                        isHero ? "size-6" : "size-5"
+                      )}
+                    />
+                  </div>
+                  <h3
+                    className={cn(
+                      "mt-4 font-medium text-foreground",
+                      isHero && "text-lg"
+                    )}
+                  >
+                    {feature.title}
+                  </h3>
+                  <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                  {isHero && (
+                    <div className="mt-6 grid grid-cols-2 gap-2">
+                      {WORKSPACE_TILES.map((tile) => (
+                        <div
+                          className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/40 px-3 py-2.5"
+                          key={tile.label}
+                        >
+                          <tile.icon className="size-3.5 shrink-0 text-muted-foreground" />
+                          <span className="truncate text-muted-foreground text-xs">
+                            {tile.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <Link
+                    className="group/link mt-auto inline-flex items-center gap-1 pt-4 text-primary text-sm"
+                    href={feature.href}
+                  >
+                    Explore
+                    <ArrowRight className="size-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
+                  </Link>
+                </MagicBentoCard>
+              </Reveal>
+            );
+          })}
+        </MagicBentoGrid>
       </section>
 
       {/* ── Swarm section ── */}

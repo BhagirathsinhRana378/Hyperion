@@ -29,6 +29,8 @@ import {
   GlowCard,
 } from "../components/marketing-kit";
 import { ParallaxField } from "../components/parallax-field";
+import { MagicBentoCard, MagicBentoGrid } from "@workspace/ui/components/marketing/MagicBento";
+import { cn } from "@workspace/ui/lib/utils";
 
 /* ── Feature grid — every capability, one card each ───────── */
 
@@ -88,6 +90,16 @@ const features = [
       "Agents remember your conventions, past decisions, and project context across sessions.",
   },
 
+];
+
+/* Mini status chips inside the "AI Agent Swarm" hero cell — a quick
+   read of what the swarm is doing, in the same voice as the hero
+   ticker copy elsewhere on the site. */
+const SWARM_TILES = [
+  { icon: Bot, label: "Agents" },
+  { icon: SquareTerminal, label: "Terminals" },
+  { icon: GitBranch, label: "Branches" },
+  { icon: Network, label: "Sync" },
 ];
 
 /* ── 3D showcase cards — the three pillars, oversized ──────── */
@@ -199,23 +211,68 @@ export default function FeaturesPage() {
             </h2>
           </div>
         </Reveal>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature, i) => (
-            <Reveal direction="up" duration={280} index={i % 3} key={feature.title}>
-              <GlowCard className="h-full p-6">
-                <div className="flex size-11 items-center justify-center rounded-xl border border-border bg-secondary transition-colors duration-300 group-hover/card:border-primary/40">
-                  <feature.icon className="group-hover/card:-rotate-3 size-5 text-primary transition-transform duration-300 ease-out group-hover/card:scale-110" />
-                </div>
-                <h3 className="mt-4 font-medium text-foreground">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-              </GlowCard>
-            </Reveal>
-          ))}
-        </div>
+        <MagicBentoGrid className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature, i) => {
+            // Bento mosaic (lg+ only): the flagship first tile is a
+            // large 2x2 cell; the remaining eight stay standard size,
+            // filling out a clean 4-row x 3-col grid with no gaps.
+            const isHero = i === 0;
+            return (
+              <Reveal
+                className={cn(isHero && "lg:col-span-2 lg:row-span-2")}
+                direction="up"
+                duration={280}
+                index={i % 3}
+                key={feature.title}
+              >
+                <MagicBentoCard
+                  className={cn("flex h-full flex-col p-6", isHero && "lg:p-8")}
+                  enableMagnetism={false}
+                >
+                  <div
+                    className={cn(
+                      "flex items-center justify-center rounded-xl border border-border bg-secondary transition-colors duration-300 group-hover/card:border-primary/40",
+                      isHero ? "size-14" : "size-11"
+                    )}
+                  >
+                    <feature.icon
+                      className={cn(
+                        "group-hover/card:-rotate-3 text-primary transition-transform duration-300 ease-out group-hover/card:scale-110",
+                        isHero ? "size-6" : "size-5"
+                      )}
+                    />
+                  </div>
+                  <h3
+                    className={cn(
+                      "mt-4 font-medium text-foreground",
+                      isHero && "text-lg"
+                    )}
+                  >
+                    {feature.title}
+                  </h3>
+                  <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                  {isHero && (
+                    <div className="mt-6 grid grid-cols-2 gap-2">
+                      {SWARM_TILES.map((tile) => (
+                        <div
+                          className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/40 px-3 py-2.5"
+                          key={tile.label}
+                        >
+                          <tile.icon className="size-3.5 shrink-0 text-muted-foreground" />
+                          <span className="truncate text-muted-foreground text-xs">
+                            {tile.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </MagicBentoCard>
+              </Reveal>
+            );
+          })}
+        </MagicBentoGrid>
       </section>
 
       {/* Live demo terminal */}

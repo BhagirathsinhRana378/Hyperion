@@ -10,7 +10,7 @@
   --glow-x: 50%;
   --glow-y: 50%;
   --glow-intensity: 0;
-  --glow-radius: 200px;
+  --glow-radius: 160px;
 }
 
 .magic-bento-card--border-glow::after {
@@ -20,9 +20,9 @@
   padding: 1px;
   background: radial-gradient(
     var(--glow-radius) circle at var(--glow-x) var(--glow-y),
-    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.9)) 0%,
-    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.35)) 35%,
-    transparent 65%
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.5)) 0%,
+    rgba(var(--glow-color), calc(var(--glow-intensity) * 0.18)) 30%,
+    transparent 60%
   );
   border-radius: inherit;
   -webkit-mask:

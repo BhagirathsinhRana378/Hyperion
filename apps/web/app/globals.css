@@ -196,6 +196,27 @@
   animation: landing-hover-bob 7s ease-in-out infinite;
 }
 
+/* Stat-card float — vertical drift plus a hair of rotation, so the
+   card reads as tumbling gently rather than just bobbing on a
+   string. Amplitude/duration/delay are all tunable per instance via
+   custom properties so each card in a row can drift independently
+   without needing four separate keyframes. Paused on hover via the
+   consumer's own `hover:[animation-play-state:paused]` class. */
+@keyframes landing-card-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(var(--card-float-y, -4px)) rotate(var(--card-float-rot, 0.6deg));
+  }
+}
+
+.landing-card-float {
+  animation: landing-card-float var(--card-float-dur, 6s) ease-in-out infinite;
+  animation-delay: var(--card-float-delay, 0s);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-drift,
   .landing-shimmer,
@@ -203,7 +224,8 @@
   .landing-float,
   .landing-grid-flow,
   .landing-caret-blink,
-  .landing-hover-bob {
+  .landing-hover-bob,
+  .landing-card-float {
     animation: none;
   }
 }
