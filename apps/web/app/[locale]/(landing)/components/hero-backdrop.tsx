@@ -35,6 +35,7 @@ export function HeroBackdrop() {
           lineJitter={0.05}
           scanDirection="pingpong"
           scanOnClick={true}
+          sensitivity={0.01}
         />
       )}
 

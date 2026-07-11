@@ -29,7 +29,10 @@ import type { CSSProperties } from "react";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { HeroBackdrop } from "./hero-backdrop";
 import { CodeBlock, CtaLink, Eyebrow, GlowCard } from "./marketing-kit";
+import Shuffle from "@workspace/ui/components/marketing/shuffle";
+import ShinyText from "@workspace/ui/components/marketing/ShinyText";
 import { Counter, easeOut, Marquee } from "./motion-primitives";
+// Inline CountUp component defined below
 
 /* ── Copy ─────────────────────────────────────────────────── */
 
@@ -37,8 +40,62 @@ import { Counter, easeOut, Marquee } from "./motion-primitives";
 const HEADLINE = ["Your", "AI", "Engineering", "Workspace"];
 const HEADLINE_HIGHLIGHT_FROM = 3;
 
+/** Inline CountUp component */
+
+import { useMotionValue, animate } from "motion/react";
+
+type CountUpProps = {
+  from?: number;
+  to: number;
+  duration?: number;
+  separator?: string;
+  prefix?: string;
+  suffix?: string;
+  direction?: "up" | "down";
+  className?: string;
+  style?: React.CSSProperties;
+};
+
+function CountUp({
+  from = 0,
+  to,
+  duration = 2,
+  separator = ",",
+  prefix = "",
+  suffix = "",
+  direction = "up",
+  className = "",
+  style,
+}: CountUpProps) {
+  const reduceMotion = useReducedMotion();
+  const value = useMotionValue(from);
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      value.set(to);
+      return;
+    }
+    const animation = animate(value, direction === "down" ? from : to, { duration, easing: "ease-out" });
+    return () => animation.stop();
+  }, [from, to, duration, direction, reduceMotion, value]);
+
+  const format = (n: number) => {
+    const parts = Math.round(n).toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+    return `${prefix}${parts.join(".")}${suffix}`;
+  };
+
+  return (
+    <span className={className} style={style} ref={spanRef}>
+      {format(value.get())}
+    </span>
+  );
+}
+
+
 const SUBHEAD =
-  "Hyperion orchestrates a swarm of AI agents that plan, code, test, and ship in parallel — dozens of terminals, one workspace, all under your command.";
+  "One workspace, up to  8  AI agents—code, test, ship together.";
 
 /* Quiet glass pills in place of CTA buttons — interactive-feeling,
    not button-shaped. */
@@ -70,7 +127,7 @@ const CAPABILITIES = [
 ];
 
 const STATS = [
-  { value: 12, suffix: "+", label: "terminals in one workspace" },
+  { value: 8, suffix: "+", label: "terminals in one workspace" },
   { value: 24, suffix: "/7", label: "autonomous operation" },
   { value: 4, suffix: "×", label: "faster iteration loops" },
   { value: 100, suffix: "%", label: "under your command" },
@@ -333,7 +390,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <main className="overflow-hidden bg-background">
+    <main className="overflow-visible bg-background">
       {/* ── Hero — GridScan holographic backdrop ── */}
       <section className="relative flex min-h-[88svh] flex-col justify-center">
         <HeroBackdrop />
@@ -375,18 +432,35 @@ export default function HeroSection() {
               {/* Headline — per-word blur reveal, shimmer sweep on the payoff word.
                   Deliberately one size class down from a typical hero — the
                   content, not the type, should carry the section. */}
-              <h1 className="mx-auto mt-10 max-w-3xl text-balance font-display text-[2.75rem] leading-[1.08] tracking-tight max-md:font-semibold md:text-[3.75rem] lg:mt-12 lg:text-7xl xl:text-[5rem]">
-                {HEADLINE.map((word, i) => (
-                  <Fragment key={word}>
-                    <Word
-                      delay={0.15 + i * 0.1}
-                      highlight={i >= HEADLINE_HIGHLIGHT_FROM}
-                    >
-                      {word}
-                    </Word>{" "}
-                  </Fragment>
-                ))}
-              </h1>
+              <div className="mx-auto mt-10 max-w-3xl text-balance font-display text-[2.75rem] leading-[1.08] tracking-tight max-md:font-semibold md:text-[3.75rem] lg:mt-12 lg:text-7xl xl:text-[5rem]">
+   {/* First word */}
+   <span>{HEADLINE[0]}</span>{' '}
+   {/* Shiny AI word */}
+   <ShinyText
+     text={HEADLINE[1]}
+     className="inline-block"
+     speed={0.8}
+   />
+   {/* Remaining words before highlight */}
+   <span>{` ${HEADLINE[2]}`}</span>
+   <br />
+   {/* Animated "Workspace" word */}
+   <Shuffle
+     text={HEADLINE[HEADLINE_HIGHLIGHT_FROM]!}
+     className="inline-block"
+     shuffleDirection="right"
+     duration={0.9}
+     animationMode="evenodd"
+     shuffleTimes={1}
+     ease="expo.out"
+     stagger={0.03}
+     threshold={0.1}
+     triggerOnce={true}
+     triggerOnHover={true}
+     respectReducedMotion={true}
+     loop
+   />
+</div>
 
               <motion.p
                 animate={{ opacity: 1, y: 0 }}
@@ -495,7 +569,7 @@ export default function HeroSection() {
             <Reveal direction="up" duration={300} index={i} key={stat.label}>
               <div className="group flex flex-col items-center gap-1.5 px-4 py-10 text-center">
                 <span className="font-display text-4xl text-foreground transition-colors duration-300 group-hover:text-primary md:text-5xl">
-                  <Counter suffix={stat.suffix} target={stat.value} />
+                  <Counter target={stat.value} suffix={stat.suffix} duration={3} className="count-up-text" />
                 </span>
                 <span className="text-muted-foreground text-sm">
                   {stat.label}

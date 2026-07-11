@@ -87,24 +87,7 @@ const features = [
     description:
       "Agents remember your conventions, past decisions, and project context across sessions.",
   },
-  {
-    icon: Lock,
-    title: "Secure Local Execution",
-    description:
-      "Everything runs on your machine. Your code never leaves unless you push it.",
-  },
-  {
-    icon: SquareKanban,
-    title: "Live Task Board",
-    description:
-      "A kanban that updates itself as the swarm works — drag to dispatch, drop to reassign.",
-  },
-  {
-    icon: LayoutGrid,
-    title: "Workspace Tiling",
-    description:
-      "Terminals, editors, previews, and boards tiled into one adaptive canvas.",
-  },
+
 ];
 
 /* ── 3D showcase cards — the three pillars, oversized ──────── */
@@ -124,7 +107,7 @@ const pillars = [
     title: "Nothing happens off-screen",
     description:
       "Every agent action lands in a real terminal pane. Scroll back, interrupt, or take over the shell at any moment.",
-    beam: false,
+    beam: true,
   },
   {
     icon: GitBranch,
@@ -132,7 +115,7 @@ const pillars = [
     title: "From task to merged PR",
     description:
       "Agents work isolated worktrees, run the tests, and open reviewable pull requests. You keep the merge button.",
-    beam: false,
+    beam: true,
   },
 ];
 

@@ -28,7 +28,7 @@ export function CodeBlock({
     <Reveal direction="up" duration={350} offset={32}>
       <div
         className={cn(
-          "overflow-hidden rounded-md bg-mistral-surface-code",
+          "overflow-visible rounded-md bg-mistral-surface-code",
           className
         )}
         data-slot="code-block"
@@ -50,7 +50,7 @@ export function CodeBlock({
           </span>
         </div>
         {/* Code content */}
-        <div className="overflow-x-auto p-4">
+        <div className="overflow-x-auto overflow-y-visible p-4 overscroll-auto">
           {children ?? (
             <pre className="font-code text-code-md text-mistral-on-dark leading-relaxed">
               <code>{defaultCode}</code>

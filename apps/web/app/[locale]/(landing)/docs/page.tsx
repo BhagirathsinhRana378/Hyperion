@@ -217,18 +217,18 @@ export default function DocsPage() {
       {/* Hero */}
       <section className="relative z-10 pt-36 pb-10">
         <div className="mx-auto max-w-7xl px-6">
-          <Eyebrow>Documentation</Eyebrow>
-          <h1 className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl">
+          {/* <Eyebrow>Documentation</Eyebrow> */}
+          {/* <h1 className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl">
             Learn Hyperion.
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
             From first install to a running agent swarm — everything you need,
             on one page.
-          </p>
+          </p> */}
         </div>
       </section>
 
-      <div className="relative z-10 mx-auto flex max-w-7xl gap-12 px-6 pb-24 md:pb-32">
+      <div className="relative z-10 mx-auto flex max-w-7xl gap-12 px-15 mt-0 pb-24 md:pb-32">
         {/* Sidebar */}
         <aside className="hidden w-52 shrink-0 lg:block">
           <nav className="sticky top-32 space-y-0.5">

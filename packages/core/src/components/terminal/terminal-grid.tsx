@@ -62,7 +62,7 @@ export function TerminalGrid() {
   }
 
   return (
-    <div className="relative flex-1 overflow-hidden bg-background">
+    <div className="flex h-full flex-col overflow-visible rounded-lg border border-border/30 bg-[#08080a] shadow-md">
       {workspaces.map((ws) => {
         const isActive = ws.id === activeWorkspaceId;
         const gridClass = getGridClass(ws.panes.length);
