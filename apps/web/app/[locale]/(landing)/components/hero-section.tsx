@@ -10,7 +10,6 @@ import {
 } from "@workspace/ui/components/marketing/MagicBento";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
 import ShinyText from "@workspace/ui/components/marketing/ShinyText";
-import { StarBorder } from "@workspace/ui/components/marketing/StarBorder";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   ArrowRight,
@@ -34,9 +33,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HeroBackdrop } from "./hero-backdrop";
-import { CtaLink, Eyebrow, GlowCard } from "./marketing-kit";
+import { CtaLink, Eyebrow, GlowCard, StatCard } from "./marketing-kit";
 import { easeOut, Marquee } from "./motion-primitives";
 import { Terminal, type TerminalLineInput } from "./terminal";
 
@@ -186,71 +185,26 @@ function HeroStatCard({
   description: string;
   index: number;
 }) {
-  const reduceMotion = useReducedMotion();
-  const [floating, setFloating] = useState(false);
-  const onCountEnd = useCallback(() => setFloating(true), []);
-
   return (
     <Reveal className="h-full" direction="up" duration={340} index={index}>
-      <div
-        className={cn(
-          "h-full",
-          floating &&
-            !reduceMotion &&
-            "landing-card-float hover:[animation-play-state:paused]"
-        )}
-        style={
-          {
-            "--card-float-y": "-4px",
-            "--card-float-rot": index % 2 === 0 ? "0.7deg" : "-0.7deg",
-            "--card-float-dur": `${5.5 + index * 0.4}s`,
-            "--card-float-delay": `${index * 0.3}s`,
-          } as CSSProperties
-        }
-      >
-        <StarBorder className="h-full rounded-3xl" thickness={1.5}>
-          <div
-            className="group relative flex h-full flex-col items-center justify-center gap-1 rounded-3xl border border-white/[0.08] bg-card/30 px-6 py-8 text-center shadow-[0_8px_30px_-14px_rgba(0,0,0,0.5)] backdrop-blur-sm transition-[transform,border-color,box-shadow] duration-300 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] hover:border-primary/25 hover:shadow-[0_20px_48px_-16px_rgba(0,0,0,0.6)]"
-            onMouseEnter={(e) => {
-              if (reduceMotion) {
-                return;
-              }
-              e.currentTarget.style.transform =
-                "perspective(700px) rotateX(0deg) rotateY(0deg) translateY(-7px) scale(1.025)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "";
-            }}
-            onMouseMove={(e) => {
-              if (reduceMotion) {
-                return;
-              }
-              const rect = e.currentTarget.getBoundingClientRect();
-              const px = (e.clientX - rect.left) / rect.width - 0.5;
-              const py = (e.clientY - rect.top) / rect.height - 0.5;
-              e.currentTarget.style.transform = `perspective(700px) rotateX(${py * -4}deg) rotateY(${px * 4}deg) translateY(-7px) scale(1.025)`;
-            }}
-          >
-            <span className="font-display text-4xl text-foreground transition-colors duration-300 group-hover:text-primary md:text-5xl">
-              <CountUp
-                className="count-up-text"
-                delay={index * 0.12}
-                duration={1.3}
-                onEnd={onCountEnd}
-                separator=","
-                to={value}
-              />
-              {suffix}
-            </span>
-            <span className="mt-1 font-medium text-[11px] text-muted-foreground uppercase tracking-[0.16em]">
-              {label}
-            </span>
-            <span className="mt-0.5 flex min-h-[2.25rem] items-center text-muted-foreground/70 text-xs leading-relaxed">
-              {description}
-            </span>
-          </div>
-        </StarBorder>
-      </div>
+      <StatCard>
+        <span className="font-display text-4xl text-foreground md:text-5xl">
+          <CountUp
+            className="count-up-text"
+            delay={index * 0.12}
+            duration={1.3}
+            separator=","
+            to={value}
+          />
+          {suffix}
+        </span>
+        <span className="mt-1.5 font-medium text-[11px] text-muted-foreground uppercase tracking-[0.16em]">
+          {label}
+        </span>
+        <span className="mt-2 flex min-h-[2.25rem] items-center justify-center text-muted-foreground/70 text-xs leading-relaxed">
+          {description}
+        </span>
+      </StatCard>
     </Reveal>
   );
 }

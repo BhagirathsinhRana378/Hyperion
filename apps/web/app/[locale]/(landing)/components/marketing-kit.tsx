@@ -2,6 +2,7 @@
 
 import { BorderBeam } from "@workspace/ui/components/landing/border-beam";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
+import { StarBorder } from "@workspace/ui/components/marketing/StarBorder";
 import { cn } from "@workspace/ui/lib/utils";
 import { Check, Copy, Minus, Plus } from "lucide-react";
 import { motion, useScroll } from "motion/react";
@@ -453,5 +454,32 @@ export function CodeBlock({
     >
       {children}
     </Terminal>
+  );
+}
+
+export function StatCard({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <StarBorder
+      className={cn(
+        "h-full rounded-2xl shadow-[0_8px_30px_-14px_rgba(0,0,0,0.6)] transition-[border-color,box-shadow] duration-300 ease-out hover:shadow-[0_0_24px_1px_rgba(124,58,237,0.08)]",
+        className
+      )}
+      color="124, 58, 237"
+      hoverOpacity={0.25}
+      idleOpacity={0.06}
+      speed="7s"
+      thickness={1.5}
+    >
+      <div
+        className="group/stat relative flex h-full flex-col justify-between rounded-2xl border border-white/[0.05] bg-black px-6 py-8 text-center transition-[background-color,border-color] duration-300 hover:border-primary/20 hover:bg-white/[0.02]"
+        {...props}
+      >
+        {children}
+      </div>
+    </StarBorder>
   );
 }
