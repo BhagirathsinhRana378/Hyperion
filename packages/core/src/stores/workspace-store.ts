@@ -1,5 +1,6 @@
 "use client";
 
+import { safeUUID } from "@workspace/core/lib/uuid";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -28,6 +29,7 @@ interface WorkspaceState {
     autoCommand?: string
   ) => Workspace;
   deleteWorkspace: (id: string) => void;
+  duplicateWorkspace: (id: string) => void;
   renameWorkspace: (id: string, name: string) => void;
   setActiveWorkspace: (id: string) => void;
   togglePinWorkspace: (id: string) => void;
@@ -35,7 +37,7 @@ interface WorkspaceState {
 }
 
 function generateId(): string {
-  return crypto.randomUUID();
+  return safeUUID();
 }
 
 function createPanes(count: number): TerminalPane[] {
@@ -99,6 +101,26 @@ export const useWorkspaceStore = create<WorkspaceState>()(
                 ? (remaining[0]?.id ?? null)
                 : state.activeWorkspaceId,
             workspaces: remaining,
+          };
+        });
+      },
+      duplicateWorkspace: (id: string) => {
+        set((state) => {
+          const workspace = state.workspaces.find((w) => w.id === id);
+          if (!workspace) {
+            return {};
+          }
+          const duplicated: Workspace = {
+            ...workspace,
+            id: generateId(),
+            createdAt: Date.now(),
+            name: `${workspace.name} (Copy)`,
+            panes: createPanes(workspace.terminalCount),
+            isPinned: false,
+          };
+          return {
+            workspaces: [...state.workspaces, duplicated],
+            activeWorkspaceId: duplicated.id,
           };
         });
       },

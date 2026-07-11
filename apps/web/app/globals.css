@@ -218,6 +218,6 @@
 
 @media (hover: hover) and (pointer: fine) {
   .wordmark-base {
-    opacity: 0.10; /* slightly higher than before (was 0.025) */
+    opacity: 0.1; /* slightly higher than before (was 0.025) */
   }
 }
