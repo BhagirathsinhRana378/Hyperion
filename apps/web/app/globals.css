@@ -240,7 +240,7 @@
    manual/programmatic jumps, never fights the per-character pin. */
 .landing-terminal-scroll {
   scroll-behavior: smooth;
-  scrollbar-color: var(--color-border) transparent;
+  scrollbar-color: var(--border) transparent;
   scrollbar-width: thin;
 }
 
@@ -253,12 +253,12 @@
 }
 
 .landing-terminal-scroll::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: var(--border);
   border-radius: 999px;
 }
 
 .landing-terminal-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--color-muted-foreground);
+  background: var(--muted-foreground);
 }
 
 /* Footer wordmark watermark — near-invisible at rest (2–5%) on
