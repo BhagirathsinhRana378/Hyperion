@@ -110,12 +110,6 @@ export default function DownloadContent({ release }: DownloadContentProps) {
       <DownloadBackdrop />
       <section className="relative z-10 pt-24 md:pt-36">
         <div className="mx-auto max-w-6xl px-6 text-center">
-          <AnimatedGroup variants={transitionVariants}>
-            <div className="flex justify-center">
-              <Eyebrow>Download</Eyebrow>
-            </div>
-          </AnimatedGroup>
-
           <TextEffect
             as="h1"
             className="mx-auto mt-4 max-w-4xl text-balance font-display text-5xl tracking-tighter max-md:font-semibold md:text-7xl lg:mt-6 xl:text-[5.25rem]"

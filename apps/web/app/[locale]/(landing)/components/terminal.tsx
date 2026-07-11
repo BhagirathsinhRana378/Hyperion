@@ -95,7 +95,7 @@ export function TerminalContent({
   return (
     <div
       className={cn(
-        "landing-terminal-scroll flex-1 overflow-hidden p-4",
+        "landing-terminal-scroll flex-1 overflow-y-auto p-4",
         className
       )}
       ref={bodyRef}

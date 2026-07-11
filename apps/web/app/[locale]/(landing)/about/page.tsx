@@ -51,8 +51,8 @@ const beliefs = [
 ];
 
 const stats = [
-  { value: 16, suffix: "", label: "terminal panes per grid" },
-  { value: 6, suffix: "", label: "agents per swarm" },
+  { value: 8, suffix: "", label: "terminal panes per grid" },
+  { value: 8, suffix: "", label: "agents per swarm" },
   { value: 40, suffix: "+", label: "OKLCh themes shipped" },
   { value: 100, suffix: "%", label: "open source" },
 ];
@@ -95,9 +95,6 @@ export default function AboutPage() {
           initial="hidden"
           variants={staggerContainer}
         >
-          <motion.div variants={revealVariants}>
-            <Eyebrow className="justify-center">About</Eyebrow>
-          </motion.div>
           <motion.h1
             className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl"
             variants={revealVariants}
