@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 interface TerminalPaneProps {
   id: string;
+  isActiveWorkspace?: boolean;
   title: string;
 }
 
@@ -42,28 +43,43 @@ function loadXterm() {
 }
 
 function TerminalPlaceholder({ shellType }: { shellType: string }) {
-  const isWin = shellType.includes("Command") || shellType.includes("Prompt");
+  const isWin =
+    shellType.toLowerCase().includes("cmd") ||
+    shellType.toLowerCase().includes("prompt") ||
+    shellType.toLowerCase().includes("command");
   const prompt = isWin ? "C:\\Users\\hyperion> " : "hyperion@dev:~$ ";
-  const promptColor = isWin ? "text-blue-500/50" : "text-emerald-500/50";
+  const promptColor = isWin ? "text-blue-500/30" : "text-emerald-500/30";
 
   return (
-    <div className="terminal-shimmer-sweep pointer-events-none absolute inset-0 z-10 flex select-none flex-col gap-2.5 bg-[#08080a] p-4 font-mono text-xs">
-      <div className="flex animate-pulse items-center gap-1.5 opacity-60">
-        <span className={`${promptColor} font-bold`}>{prompt}</span>
-        <div className="h-3.5 w-20 rounded bg-muted-foreground/15" />
+    <div className="terminal-shimmer-sweep pointer-events-none absolute inset-0 z-10 flex select-none flex-col gap-3 border border-border/10 bg-[#08080a] p-5 font-mono text-xs">
+      <div className="flex items-center gap-2 opacity-35">
+        <span className="size-2.5 rounded-full bg-red-500/30" />
+        <span className="size-2.5 rounded-full bg-yellow-500/30" />
+        <span className="size-2.5 rounded-full bg-green-500/30" />
       </div>
-      <div className="h-3.5 w-[85%] animate-pulse rounded bg-muted-foreground/10 [animation-delay:150ms]" />
-      <div className="h-3.5 w-[65%] animate-pulse rounded bg-muted-foreground/10 [animation-delay:300ms]" />
-      <div className="h-3.5 w-[75%] animate-pulse rounded bg-muted-foreground/10 [animation-delay:450ms]" />
-      <div className="mt-1 flex animate-pulse items-center gap-1.5 opacity-60 [animation-delay:600ms]">
+      <div className="mt-2 flex animate-pulse items-center gap-2 opacity-50">
         <span className={`${promptColor} font-bold`}>{prompt}</span>
-        <span className="h-3.5 w-1.5 animate-pulse bg-muted-foreground/45" />
+        <div className="h-4 w-32 rounded bg-muted-foreground/10" />
+      </div>
+      <div className="mt-1 space-y-2 opacity-30">
+        <div className="h-3.5 w-[90%] animate-pulse rounded bg-muted-foreground/5 [animation-delay:100ms]" />
+        <div className="h-3.5 w-[75%] animate-pulse rounded bg-muted-foreground/5 [animation-delay:200ms]" />
+        <div className="h-3.5 w-[80%] animate-pulse rounded bg-muted-foreground/5 [animation-delay:300ms]" />
+        <div className="h-3.5 w-[45%] animate-pulse rounded bg-muted-foreground/5 [animation-delay:400ms]" />
+      </div>
+      <div className="mt-3 flex animate-pulse items-center gap-2 opacity-45 [animation-delay:500ms]">
+        <span className={`${promptColor} font-bold`}>{prompt}</span>
+        <span className="h-4 w-1.5 animate-pulse bg-muted-foreground/30" />
       </div>
     </div>
   );
 }
 
-export function TerminalPane({ id, title }: TerminalPaneProps) {
+export function TerminalPane({
+  id,
+  title,
+  isActiveWorkspace = true,
+}: TerminalPaneProps) {
   const mounted = useMounted();
   const containerRef = useRef<HTMLDivElement>(null);
   const termRef = useRef<TerminalInstance>(null);
@@ -355,6 +371,27 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
     };
   }, [id, mounted, setupMockShell]);
 
+  // Fit terminal when workspace becomes active to adapt to container layout
+  useEffect(() => {
+    if (isActiveWorkspace && termRef.current && fitAddonRef.current) {
+      const timer = setTimeout(() => {
+        if (fitAddonRef.current) {
+          fitAddonRef.current.fit();
+          const cols = termRef.current.cols;
+          const rows = termRef.current.rows;
+          import("@tauri-apps/api/core").then(({ isTauri, invoke }) => {
+            if (isTauri()) {
+              invoke("resize_terminal", { id, cols, rows }).catch(() => {
+                // ignore resize errors on workspace switch
+              });
+            }
+          });
+        }
+      }, 80);
+      return () => clearTimeout(timer);
+    }
+  }, [isActiveWorkspace, id]);
+
   const handleClear = async () => {
     if (termRef.current) {
       termRef.current.clear();
@@ -471,10 +508,18 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
           {!isTerminalReady && (
             <motion.div
               className="absolute inset-0 z-10"
-              exit={{ opacity: 0 }}
+              exit={{
+                opacity: 0,
+                scale: 0.99,
+                y: -4,
+              }}
               initial={{ opacity: 1 }}
               key="placeholder"
-              transition={{ duration: 0.18, ease: "easeInOut" }}
+              transition={{
+                type: "spring",
+                stiffness: 300,
+                damping: 25,
+              }}
             >
               <TerminalPlaceholder shellType={shellType} />
             </motion.div>
@@ -483,11 +528,17 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
         <motion.div
           animate={{
             opacity: isTerminalReady ? 1 : 0,
-            y: isTerminalReady ? 0 : 4,
+            y: isTerminalReady ? 0 : 8,
+            scale: isTerminalReady ? 1 : 0.99,
           }}
           className="h-full w-full"
-          initial={{ opacity: 0, y: 4 }}
-          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 8, scale: 0.99 }}
+          transition={{
+            type: "spring",
+            stiffness: 280,
+            damping: 24,
+            delay: 0.05,
+          }}
         >
           {/* biome-ignore lint/a11y/useSemanticElements: xterm.js container is non-semantic */}
           <div

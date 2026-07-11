@@ -9,8 +9,12 @@ export interface TerminalPane {
 }
 
 export interface Workspace {
+  aiModel?: string;
   createdAt: number;
+  directory?: string;
+  gitEnabled?: boolean;
   id: string;
+  isPinned?: boolean;
   name: string;
   panes: TerminalPane[];
   terminalCount: number;
@@ -18,10 +22,17 @@ export interface Workspace {
 
 interface WorkspaceState {
   activeWorkspaceId: string | null;
-  createWorkspace: (name: string, terminalCount: number) => Workspace;
+  createWorkspace: (
+    name: string,
+    terminalCount: number,
+    directory?: string,
+    gitEnabled?: boolean,
+    aiModel?: string
+  ) => Workspace;
   deleteWorkspace: (id: string) => void;
   renameWorkspace: (id: string, name: string) => void;
   setActiveWorkspace: (id: string) => void;
+  togglePinWorkspace: (id: string) => void;
   workspaces: Workspace[];
 }
 
@@ -41,7 +52,13 @@ export const useWorkspaceStore = create<WorkspaceState>()(
     (set) => ({
       activeWorkspaceId: null,
       workspaces: [],
-      createWorkspace: (name: string, terminalCount: number) => {
+      createWorkspace: (
+        name: string,
+        terminalCount: number,
+        directory?: string,
+        gitEnabled?: boolean,
+        aiModel?: string
+      ) => {
         const clamped = Math.min(8, Math.max(1, terminalCount));
         const workspace: Workspace = {
           createdAt: Date.now(),
@@ -49,6 +66,10 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           name,
           terminalCount: clamped,
           panes: createPanes(clamped),
+          directory,
+          gitEnabled,
+          aiModel,
+          isPinned: false,
         };
         set((state) => ({
           activeWorkspaceId: workspace.id,
@@ -77,6 +98,13 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       },
       setActiveWorkspace: (id: string) => {
         set({ activeWorkspaceId: id });
+      },
+      togglePinWorkspace: (id: string) => {
+        set((state) => ({
+          workspaces: state.workspaces.map((w) =>
+            w.id === id ? { ...w, isPinned: !w.isPinned } : w
+          ),
+        }));
       },
     }),
     {

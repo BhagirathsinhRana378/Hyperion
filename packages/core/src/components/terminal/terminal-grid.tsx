@@ -3,6 +3,7 @@
 import { TerminalPane } from "@workspace/core/components/terminal/terminal-pane";
 import { useMounted } from "@workspace/core/hooks/use-mounted";
 import { useWorkspaceStore } from "@workspace/core/stores/workspace-store";
+import { cn } from "@workspace/ui/lib/utils";
 
 function getGridClass(count: number): string {
   switch (count) {
@@ -32,8 +33,6 @@ export function TerminalGrid() {
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
   const workspaces = useWorkspaceStore((s) => s.workspaces);
 
-  const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId);
-
   if (!mounted) {
     return (
       <div className="flex flex-1 items-center justify-center">
@@ -42,30 +41,47 @@ export function TerminalGrid() {
     );
   }
 
-  if (!activeWorkspace) {
+  if (workspaces.length === 0) {
     return (
       <div className="flex flex-1 items-center justify-center bg-background/50">
         <p className="text-muted-foreground text-sm">
-          No active workspace selected
+          No workspaces yet. Create one to begin.
         </p>
       </div>
     );
   }
 
-  const { panes } = activeWorkspace;
-  const gridClass = getGridClass(panes.length);
-
   return (
-    <div
-      className={`grid flex-1 gap-1.5 overflow-hidden bg-background p-1.5 ${gridClass}`}
-    >
-      {panes.map((pane, index) => (
-        <TerminalPane
-          id={pane.id}
-          key={`${activeWorkspace.id}-${pane.id}`}
-          title={`Terminal ${index + 1}`}
-        />
-      ))}
+    <div className="relative flex-1 overflow-hidden bg-background">
+      {workspaces.map((ws) => {
+        const isActive = ws.id === activeWorkspaceId;
+        const gridClass = getGridClass(ws.panes.length);
+
+        return (
+          <div
+            className={cn(
+              "absolute inset-0 grid gap-1.5 p-1.5 transition-all duration-300",
+              gridClass,
+              isActive
+                ? "pointer-events-auto z-10 scale-100 opacity-100"
+                : "pointer-events-none z-0 scale-[0.985] opacity-0"
+            )}
+            key={ws.id}
+            style={{
+              display: isActive ? "grid" : "none",
+            }}
+          >
+            {ws.panes.map((pane, index) => (
+              <TerminalPane
+                id={pane.id}
+                isActiveWorkspace={isActive}
+                key={pane.id}
+                title={`Terminal ${index + 1}`}
+              />
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
