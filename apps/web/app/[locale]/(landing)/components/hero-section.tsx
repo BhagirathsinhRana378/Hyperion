@@ -29,69 +29,15 @@ import type { CSSProperties } from "react";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { HeroBackdrop } from "./hero-backdrop";
 import { CodeBlock, CtaLink, Eyebrow, GlowCard } from "./marketing-kit";
+import CountUp from "@workspace/ui/components/marketing/CountUp";
 import ShinyText from "@workspace/ui/components/marketing/ShinyText";
-import { Counter, easeOut, Marquee } from "./motion-primitives";
-// Inline CountUp component defined below
+import { easeOut, Marquee } from "./motion-primitives";
 
 /* ── Copy ─────────────────────────────────────────────────── */
 
 /* Words from HEADLINE_HIGHLIGHT_FROM onward get the shimmer sweep. */
 const HEADLINE = ["Your", "AI", "Engineering", "Workspace"];
 const HEADLINE_HIGHLIGHT_FROM = 3;
-
-/** Inline CountUp component */
-
-import { useMotionValue, animate } from "motion/react";
-
-type CountUpProps = {
-  from?: number;
-  to: number;
-  duration?: number;
-  separator?: string;
-  prefix?: string;
-  suffix?: string;
-  direction?: "up" | "down";
-  className?: string;
-  style?: React.CSSProperties;
-};
-
-function CountUp({
-  from = 0,
-  to,
-  duration = 2,
-  separator = ",",
-  prefix = "",
-  suffix = "",
-  direction = "up",
-  className = "",
-  style,
-}: CountUpProps) {
-  const reduceMotion = useReducedMotion();
-  const value = useMotionValue(from);
-  const spanRef = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    if (reduceMotion) {
-      value.set(to);
-      return;
-    }
-    const animation = animate(value, direction === "down" ? from : to, { duration, easing: "ease-out" });
-    return () => animation.stop();
-  }, [from, to, duration, direction, reduceMotion, value]);
-
-  const format = (n: number) => {
-    const parts = Math.round(n).toString().split(".");
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, separator);
-    return `${prefix}${parts.join(".")}${suffix}`;
-  };
-
-  return (
-    <span className={className} style={style} ref={spanRef}>
-      {format(value.get())}
-    </span>
-  );
-}
-
 
 const SUBHEAD =
   "One workspace, up to  8  AI agents—code, test, ship together.";
@@ -126,9 +72,9 @@ const CAPABILITIES = [
 ];
 
 const STATS = [
-  { value: 8, suffix: "+", label: "terminals in one workspace" },
+  { value: 8, suffix: "", label: "terminals in one workspace" },
   { value: 24, suffix: "/7", label: "autonomous operation" },
-  { value: 4, suffix: "×", label: "faster iteration loops" },
+  { value: 100, suffix: "%", label: "faster iteration loops" },
   { value: 100, suffix: "%", label: "under your command" },
 ];
 
@@ -406,7 +352,7 @@ export default function HeroSection() {
    <span>{HEADLINE[0]}</span>{' '}
    {/* Shiny AI word */}
    <ShinyText
-     text={HEADLINE[1]}
+     text={HEADLINE[1]!}
      className="inline-block"
      speed={0.8}
    />
@@ -523,7 +469,8 @@ export default function HeroSection() {
             <Reveal direction="up" duration={300} index={i} key={stat.label}>
               <div className="group flex flex-col items-center gap-1.5 px-4 py-10 text-center">
                 <span className="font-display text-4xl text-foreground transition-colors duration-300 group-hover:text-primary md:text-5xl">
-                  <Counter target={stat.value} suffix={stat.suffix} duration={3} className="count-up-text" />
+                  <CountUp className="count-up-text" duration={2} separator="," to={stat.value} />
+                  {stat.suffix}
                 </span>
                 <span className="text-muted-foreground text-sm">
                   {stat.label}
