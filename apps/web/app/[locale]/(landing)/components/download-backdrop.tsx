@@ -31,10 +31,10 @@ export function DownloadBackdrop() {
           density={1.2}
           glowIntensity={0.25}
           mouseRepulsion={true}
-          repulsionStrength={1.6}
-          rotationSpeed={0.05}
+          repulsionStrength={0.45}
+          rotationSpeed={0.015}
           saturation={0}
-          starSpeed={0.4}
+          starSpeed={0.15}
           twinkleIntensity={0.35}
         />
       )}

@@ -156,7 +156,6 @@ export default function FeaturesPage() {
           initial="hidden"
           variants={staggerContainer}
         >
-          
           <motion.h1
             className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl"
             variants={revealVariants}

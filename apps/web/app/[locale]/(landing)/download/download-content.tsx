@@ -4,9 +4,8 @@ import { siteConfig } from "@workspace/core/config/site";
 import { AnimatedGroup } from "@workspace/ui/components/landing/animated-group";
 import { TextEffect } from "@workspace/ui/components/landing/text-effect";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
-import { ArrowDown, Check, Minus } from "lucide-react";
-import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { Check, Github, Minus } from "lucide-react";
+import { useEffect, useState } from "react";
 import { transitionVariants } from "@/lib/animations";
 import { detectPlatform, type Platform } from "@/lib/detect-platform";
 import type { ReleaseData } from "@/lib/github-releases";
@@ -99,13 +98,6 @@ export default function DownloadContent({ release }: DownloadContentProps) {
     setPlatform(detectPlatform());
   }, []);
 
-  const scrollToPlatforms = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    document
-      .getElementById("platforms")
-      ?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
   const { label, icon, primaryAssetKey } = platformConfig[platform];
 
   const primaryUrl =
@@ -179,13 +171,14 @@ export default function DownloadContent({ release }: DownloadContentProps) {
               <span className="text-nowrap">{label}</span>
             </CtaLink>
             <CtaLink
-              className="cursor-pointer text-base"
-              href="#platforms"
-              onClick={scrollToPlatforms}
+              className="text-base"
+              href={siteConfig.links.releases}
+              rel="noopener noreferrer"
+              target="_blank"
               variant="ghost"
             >
-              <ArrowDown className="size-4" />
-              <span className="text-nowrap">Other Platforms</span>
+              <Github className="size-4" />
+              <span className="text-nowrap">GitHub Releases</span>
             </CtaLink>
           </AnimatedGroup>
         </div>
