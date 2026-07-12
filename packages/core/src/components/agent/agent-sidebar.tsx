@@ -1,7 +1,7 @@
 "use client";
 
-import { safeUUID } from "@workspace/core/lib/uuid";
 import { ProviderFactory } from "@workspace/core/lib/providers/provider-factory";
+import { safeUUID } from "@workspace/core/lib/uuid";
 import {
   type AgentMessage,
   useAgentStore,
@@ -9,7 +9,6 @@ import {
 import { useWorkspaceStore } from "@workspace/core/stores/workspace-store";
 import { Button } from "@workspace/ui/components/button";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
-import { Textarea } from "@workspace/ui/components/textarea";
 import {
   Select,
   SelectContent,
@@ -17,19 +16,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
+import { Textarea } from "@workspace/ui/components/textarea";
 import { cn } from "@workspace/ui/lib/utils";
 import {
+  Check,
+  Edit2,
   Loader2,
+  Play,
   Send,
   Sparkles,
   Square,
   TerminalSquare,
   User,
   X,
-  Check,
-  Edit2,
-  Play,
-  RotateCcw,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -84,7 +83,9 @@ function resolveAgentPanes(
   return [];
 }
 
-function buildPlanningSystemPrompt(panes: { id: string; title: string }[]): string {
+function buildPlanningSystemPrompt(
+  panes: { id: string; title: string }[]
+): string {
   const agentList = panes
     .map((p, i) => `  - Agent ${i + 1}: id="${p.id}" (${p.title})`)
     .join("\n");
@@ -149,11 +150,13 @@ const TOOLS_DEFINITION = [
         properties: {
           agent_id: {
             type: "string",
-            description: "The agent ID from the list, or 'all' to prompt every agent.",
+            description:
+              "The agent ID from the list, or 'all' to prompt every agent.",
           },
           prompt: {
             type: "string",
-            description: "A short, single-line natural language instruction (under 200 chars, no newlines).",
+            description:
+              "A short, single-line natural language instruction (under 200 chars, no newlines).",
           },
         },
         required: ["agent_id", "prompt"],
@@ -171,7 +174,8 @@ const TOOLS_DEFINITION = [
         properties: {
           agent_id: {
             type: "string",
-            description: "The agent ID to press Enter on, or 'all' to submit on all agents.",
+            description:
+              "The agent ID to press Enter on, or 'all' to submit on all agents.",
           },
         },
         required: ["agent_id"],
@@ -240,7 +244,9 @@ export function AgentSidebar() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Planner states
-  const [plannerState, setPlannerState] = useState<"idle" | "planning" | "executing">("idle");
+  const [plannerState, setPlannerState] = useState<
+    "idle" | "planning" | "executing"
+  >("idle");
   const [currentPlan, setCurrentPlan] = useState("");
   const [isEditingPlan, setIsEditingPlan] = useState(false);
   const [editedPlanText, setEditedPlanText] = useState("");
@@ -262,26 +268,35 @@ export function AgentSidebar() {
     }
   }, [workspaceMessages.length, isTyping, plannerState]);
 
-  const handleDetailedError = (error: any, source: "frontend" | "backend" | "ipc" | "api" | "planner" | "terminal", requestId: string) => {
+  const handleDetailedError = (
+    error: any,
+    source: "frontend" | "backend" | "ipc" | "api" | "planner" | "terminal",
+    requestId: string
+  ) => {
     const msg = error.message || String(error);
     let reason = "Unknown error";
     let suggestion = "Please try again or check the system status.";
 
     if (msg.includes("401") || msg.includes("Unauthorized")) {
       reason = "Authentication failed (API key is invalid or missing)";
-      suggestion = "Go to Settings and check your AI Provider API Key and Base URL.";
+      suggestion =
+        "Go to Settings and check your AI Provider API Key and Base URL.";
     } else if (msg.includes("404") || msg.includes("Not Found")) {
       reason = "Endpoint or model not found";
-      suggestion = "Check that your Base URL is correct and the selected model exists.";
+      suggestion =
+        "Check that your Base URL is correct and the selected model exists.";
     } else if (msg.includes("Failed to fetch") || msg.includes("network")) {
       reason = "Network connection issue";
-      suggestion = "Verify your internet connection and verify if the API provider is online.";
+      suggestion =
+        "Verify your internet connection and verify if the API provider is online.";
     } else if (msg.includes("timeout")) {
       reason = "Request timed out";
-      suggestion = "The provider is taking too long to respond. Try again or select a faster model.";
+      suggestion =
+        "The provider is taking too long to respond. Try again or select a faster model.";
     } else if (msg.includes("Tauri") || msg.includes("invoke")) {
       reason = "IPC bridge communication failure";
-      suggestion = "Restart the application and ensure Tauri services are running.";
+      suggestion =
+        "Restart the application and ensure Tauri services are running.";
     }
 
     const fullErrorMessage = `Error Source: ${source.toUpperCase()}\nReason: ${reason}\nDetails: ${msg}\n\nRecovery Suggestion: ${suggestion}`;
@@ -314,7 +329,12 @@ export function AgentSidebar() {
     setInput("");
     setIsTyping(true);
     setPlannerState("planning");
-    addLog("planner", "info", `Initializing task analysis for prompt: "${userPrompt}"`, requestId);
+    addLog(
+      "planner",
+      "info",
+      `Initializing task analysis for prompt: "${userPrompt}"`,
+      requestId
+    );
 
     // Initialize Plan message slot
     const planMsgId = safeUUID();
@@ -328,7 +348,12 @@ export function AgentSidebar() {
           : activeWorkspace.panes.filter((p) => p.id === targetTerminalId);
 
       // Generate Plan
-      addLog("api", "info", "Requesting complexity analysis and execution plan from provider", requestId);
+      addLog(
+        "api",
+        "info",
+        "Requesting complexity analysis and execution plan from provider",
+        requestId
+      );
       const providerInstance = ProviderFactory.getProvider(provider);
       providerInstance.initialize(apiKey, baseUrl, selectedModel);
 
@@ -339,7 +364,7 @@ export function AgentSidebar() {
       const streamPromise = providerInstance.stream(
         [
           { role: "system", content: planningPrompt },
-          { role: "user", content: userPrompt }
+          { role: "user", content: userPrompt },
         ],
         [],
         (delta) => {
@@ -360,14 +385,26 @@ export function AgentSidebar() {
 
       setCurrentPlan(planContent);
       setEditedPlanText(planContent);
-      addLog("planner", "info", "Orchestration plan generated successfully", requestId);
+      addLog(
+        "planner",
+        "info",
+        "Orchestration plan generated successfully",
+        requestId
+      );
     } catch (error: any) {
-      if (error.name === "AbortError" || abortControllerRef.current?.signal.aborted) {
+      if (
+        error.name === "AbortError" ||
+        abortControllerRef.current?.signal.aborted
+      ) {
         addLog("planner", "warn", "Planning cancelled by user", requestId);
         toast.info("Planning cancelled.");
         setPlannerState("idle");
       } else {
-        const { fullErrorMessage } = handleDetailedError(error, "planner", requestId);
+        const { fullErrorMessage } = handleDetailedError(
+          error,
+          "planner",
+          requestId
+        );
         upsertMessage(workspaceId, {
           id: planMsgId,
           role: "agent",
@@ -382,12 +419,19 @@ export function AgentSidebar() {
 
   const executePlan = async (approvedPlan?: string) => {
     const workspaceId = activeWorkspaceId;
-    if (!workspaceId || !activeWorkspace) return;
+    if (!(workspaceId && activeWorkspace)) {
+      return;
+    }
     const requestId = `req-${safeUUID().slice(0, 8)}`;
     setPlannerState("executing");
     setIsTyping(true);
     setIterationCount(0);
-    addLog("planner", "info", "Starting execution of the approved orchestration loop", requestId);
+    addLog(
+      "planner",
+      "info",
+      "Starting execution of the approved orchestration loop",
+      requestId
+    );
 
     // Set targeted terminal states to Planning initially
     const targetedPanes =
@@ -404,7 +448,10 @@ export function AgentSidebar() {
 
     try {
       abortControllerRef.current = new AbortController();
-      const systemPrompt = buildExecutionSystemPrompt(targetedPanes, approvedPlan);
+      const systemPrompt = buildExecutionSystemPrompt(
+        targetedPanes,
+        approvedPlan
+      );
 
       const currentMessages: any[] = [
         { role: "system", content: systemPrompt },
@@ -417,7 +464,8 @@ export function AgentSidebar() {
       let isFinished = false;
       let iterations = 0;
       const lastObservedOutput: Record<string, string> = {};
-      const isTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+      const isTauri =
+        typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
       const providerInstance = ProviderFactory.getProvider(provider);
       providerInstance.initialize(apiKey, baseUrl, selectedModel);
@@ -436,7 +484,12 @@ export function AgentSidebar() {
           setTerminalState(p.id, "Running");
         }
 
-        addLog("api", "info", `Step ${iterations}: Requesting orchestration delta from provider`, requestId);
+        addLog(
+          "api",
+          "info",
+          `Step ${iterations}: Requesting orchestration delta from provider`,
+          requestId
+        );
 
         let stepContent = "";
         let accumulatedDelta: any = null;
@@ -470,7 +523,8 @@ export function AgentSidebar() {
         };
 
         if (message.content) {
-          accumulatedAgentContent += (accumulatedAgentContent ? "\n" : "") + message.content;
+          accumulatedAgentContent +=
+            (accumulatedAgentContent ? "\n" : "") + message.content;
         }
 
         if (message.tool_calls && message.tool_calls.length > 0) {
@@ -483,7 +537,12 @@ export function AgentSidebar() {
               const fnName = toolCall.function.name;
               const args = JSON.parse(toolCall.function.arguments);
 
-              addLog("ipc", "info", `Executing tool call: ${fnName} (${JSON.stringify(args)})`, requestId);
+              addLog(
+                "ipc",
+                "info",
+                `Executing tool call: ${fnName} (${JSON.stringify(args)})`,
+                requestId
+              );
 
               if (fnName === "prompt_agent") {
                 const agentId = args.agent_id;
@@ -499,7 +558,10 @@ export function AgentSidebar() {
                   continue;
                 }
 
-                const cleanPrompt = promptContent.replace(/[\n\r]/g, " ").trim().slice(0, 500);
+                const cleanPrompt = promptContent
+                  .replace(/[\n\r]/g, " ")
+                  .trim()
+                  .slice(0, 500);
 
                 for (const pane of panesToRun) {
                   setTerminalState(pane.id, "Running");
@@ -507,13 +569,28 @@ export function AgentSidebar() {
                   let success = false;
                   while (retries > 0 && !success) {
                     try {
-                      await invoke("write_terminal", { id: pane.id, data: cleanPrompt });
+                      await invoke("write_terminal", {
+                        id: pane.id,
+                        data: cleanPrompt,
+                      });
                       success = true;
-                      addLog("terminal", "info", `Prompt typed into terminal: ${pane.title}`, requestId);
+                      addLog(
+                        "terminal",
+                        "info",
+                        `Prompt typed into terminal: ${pane.title}`,
+                        requestId
+                      );
                     } catch (err) {
                       retries--;
-                      addLog("terminal", "warn", `Retrying write_terminal: ${pane.title} (${retries} attempts left)`, requestId);
-                      if (retries === 0) throw err;
+                      addLog(
+                        "terminal",
+                        "warn",
+                        `Retrying write_terminal: ${pane.title} (${retries} attempts left)`,
+                        requestId
+                      );
+                      if (retries === 0) {
+                        throw err;
+                      }
                       await sleep(500);
                     }
                   }
@@ -542,17 +619,26 @@ export function AgentSidebar() {
                 for (const pane of panesToSend) {
                   setTerminalState(pane.id, "Running");
                   await invoke("write_terminal", { id: pane.id, data: "\r" });
-                  addLog("terminal", "info", `Submitted prompt (pressed enter) on terminal: ${pane.title}`, requestId);
+                  addLog(
+                    "terminal",
+                    "info",
+                    `Submitted prompt (pressed enter) on terminal: ${pane.title}`,
+                    requestId
+                  );
                 }
 
                 currentMessages.push({
                   role: "tool",
                   tool_call_id: toolCall.id,
-                  content: `Submit action complete. Wait and observe output using observe_agent.`,
+                  content:
+                    "Submit action complete. Wait and observe output using observe_agent.",
                 });
               } else if (fnName === "observe_agent") {
                 const agentId = args.agent_id;
-                const panesToObserve = resolveAgentPanes(agentId, targetedPanes);
+                const panesToObserve = resolveAgentPanes(
+                  agentId,
+                  targetedPanes
+                );
                 const pane = panesToObserve[0];
 
                 if (!pane) {
@@ -566,14 +652,18 @@ export function AgentSidebar() {
 
                 setTerminalState(pane.id, "Streaming");
                 try {
-                  const info: { history: string } = await invoke("get_terminal_history", { id: pane.id });
+                  const info: { history: string } = await invoke(
+                    "get_terminal_history",
+                    { id: pane.id }
+                  );
                   const rawOutput = info.history.trim();
 
                   if (!rawOutput) {
                     currentMessages.push({
                       role: "tool",
                       tool_call_id: toolCall.id,
-                      content: "[Terminal output is empty. Try waiting longer.]",
+                      content:
+                        "[Terminal output is empty. Try waiting longer.]",
                     });
                     continue;
                   }
@@ -595,7 +685,12 @@ export function AgentSidebar() {
                       content: truncatedOutput,
                     });
                   }
-                  addLog("terminal", "info", `Observed output from terminal: ${pane.title}`, requestId);
+                  addLog(
+                    "terminal",
+                    "info",
+                    `Observed output from terminal: ${pane.title}`,
+                    requestId
+                  );
                 } catch (e: any) {
                   currentMessages.push({
                     role: "tool",
@@ -604,8 +699,16 @@ export function AgentSidebar() {
                   });
                 }
               } else if (fnName === "wait") {
-                const seconds = Math.min(30, Math.max(1, Number(args.seconds) || 5));
-                addLog("planner", "info", `Waiting for ${seconds} seconds...`, requestId);
+                const seconds = Math.min(
+                  30,
+                  Math.max(1, Number(args.seconds) || 5)
+                );
+                addLog(
+                  "planner",
+                  "info",
+                  `Waiting for ${seconds} seconds...`,
+                  requestId
+                );
                 for (const p of targetedPanes) {
                   setTerminalState(p.id, "Waiting");
                 }
@@ -629,7 +732,8 @@ export function AgentSidebar() {
               currentMessages.push({
                 role: "tool",
                 tool_call_id: toolCall.id,
-                content: "Simulated execution success (Native terminals unavailable in browser)",
+                content:
+                  "Simulated execution success (Native terminals unavailable in browser)",
               });
             }
             isFinished = true;
@@ -640,7 +744,8 @@ export function AgentSidebar() {
       }
 
       if (iterations >= MAX_ITERATIONS) {
-        accumulatedAgentContent += "\n\n⚠️ Reached maximum loop iteration limit. Stopping execution.";
+        accumulatedAgentContent +=
+          "\n\n⚠️ Reached maximum loop iteration limit. Stopping execution.";
         upsertMessage(workspaceId, {
           id: execMsgId,
           role: "agent",
@@ -653,16 +758,33 @@ export function AgentSidebar() {
       for (const p of targetedPanes) {
         setTerminalState(p.id, "Completed");
       }
-      addLog("planner", "info", "Autonomous loop executed successfully", requestId);
+      addLog(
+        "planner",
+        "info",
+        "Autonomous loop executed successfully",
+        requestId
+      );
     } catch (error: any) {
-      if (error.name === "AbortError" || abortControllerRef.current?.signal.aborted) {
-        addLog("planner", "warn", "Execution loop cancelled by user", requestId);
+      if (
+        error.name === "AbortError" ||
+        abortControllerRef.current?.signal.aborted
+      ) {
+        addLog(
+          "planner",
+          "warn",
+          "Execution loop cancelled by user",
+          requestId
+        );
         toast.info("Execution cancelled.");
         for (const p of targetedPanes) {
           setTerminalState(p.id, "Cancelled");
         }
       } else {
-        const { fullErrorMessage } = handleDetailedError(error, "planner", requestId);
+        const { fullErrorMessage } = handleDetailedError(
+          error,
+          "planner",
+          requestId
+        );
         accumulatedAgentContent += `\n\n⚠️ Execution Error:\n${fullErrorMessage}`;
         upsertMessage(workspaceId, {
           id: execMsgId,
@@ -692,7 +814,9 @@ export function AgentSidebar() {
 
   const saveEditedPlan = () => {
     const workspaceId = activeWorkspaceId;
-    if (!workspaceId) return;
+    if (!workspaceId) {
+      return;
+    }
     setIsEditingPlan(false);
     setCurrentPlan(editedPlanText);
     upsertMessage(workspaceId, {
@@ -744,7 +868,8 @@ export function AgentSidebar() {
                     <p className="text-sm">
                       I'm your Main Agent.
                       <br />
-                      Ask me to plan and execute tasks across your AI terminal agents.
+                      Ask me to plan and execute tasks across your AI terminal
+                      agents.
                     </p>
                   </div>
                 ) : (
@@ -770,7 +895,7 @@ export function AgentSidebar() {
                           <Sparkles className="size-4" />
                         )}
                       </div>
-                      <div className="flex flex-col gap-1.5 max-w-[80%]">
+                      <div className="flex max-w-[80%] flex-col gap-1.5">
                         <div
                           className={cn(
                             "flex flex-col gap-1 rounded-2xl px-4 py-3",
@@ -782,8 +907,10 @@ export function AgentSidebar() {
                           {msg.id === planMessageId && isEditingPlan ? (
                             <div className="flex flex-col gap-2">
                               <Textarea
-                                className="min-h-[140px] w-[260px] text-xs font-mono"
-                                onChange={(e) => setEditedPlanText(e.target.value)}
+                                className="min-h-[140px] w-[260px] font-mono text-xs"
+                                onChange={(e) =>
+                                  setEditedPlanText(e.target.value)
+                                }
                                 value={editedPlanText}
                               />
                               <div className="flex items-center gap-2 self-end">
@@ -806,40 +933,42 @@ export function AgentSidebar() {
                               </div>
                             </div>
                           ) : (
-                            <p className="whitespace-pre-wrap leading-relaxed text-xs">
+                            <p className="whitespace-pre-wrap text-xs leading-relaxed">
                               {msg.content}
                             </p>
                           )}
                         </div>
 
                         {/* Interactive Buttons for Planning Mode */}
-                        {msg.id === planMessageId && plannerState === "planning" && !isTyping && (
-                          <div className="flex flex-wrap gap-1.5 pt-1">
-                            <Button
-                              className="h-6.5 text-[10px] gap-1"
-                              onClick={() => executePlan(currentPlan)}
-                              size="sm"
-                            >
-                              <Check className="size-3" /> Approve Plan
-                            </Button>
-                            <Button
-                              className="h-6.5 text-[10px] gap-1"
-                              onClick={() => setIsEditingPlan(true)}
-                              size="sm"
-                              variant="secondary"
-                            >
-                              <Edit2 className="size-3" /> Edit Plan
-                            </Button>
-                            <Button
-                              className="h-6.5 text-[10px] gap-1"
-                              onClick={() => executePlan()}
-                              size="sm"
-                              variant="outline"
-                            >
-                              <Play className="size-3" /> Skip Planning
-                            </Button>
-                          </div>
-                        )}
+                        {msg.id === planMessageId &&
+                          plannerState === "planning" &&
+                          !isTyping && (
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              <Button
+                                className="h-6.5 gap-1 text-[10px]"
+                                onClick={() => executePlan(currentPlan)}
+                                size="sm"
+                              >
+                                <Check className="size-3" /> Approve Plan
+                              </Button>
+                              <Button
+                                className="h-6.5 gap-1 text-[10px]"
+                                onClick={() => setIsEditingPlan(true)}
+                                size="sm"
+                                variant="secondary"
+                              >
+                                <Edit2 className="size-3" /> Edit Plan
+                              </Button>
+                              <Button
+                                className="h-6.5 gap-1 text-[10px]"
+                                onClick={() => executePlan()}
+                                size="sm"
+                                variant="outline"
+                              >
+                                <Play className="size-3" /> Skip Planning
+                              </Button>
+                            </div>
+                          )}
                       </div>
                     </div>
                   ))
@@ -851,7 +980,7 @@ export function AgentSidebar() {
                     </div>
                     <div className="flex items-center gap-2 rounded-2xl rounded-tl-sm border border-border/40 bg-muted/60 px-4 py-3 text-foreground">
                       <Loader2 className="size-4 animate-spin opacity-70" />
-                      <span className="text-xs opacity-70 font-medium">
+                      <span className="font-medium text-xs opacity-70">
                         {plannerState === "planning"
                           ? "Analyzing request & generating plan..."
                           : iterationCount > 0

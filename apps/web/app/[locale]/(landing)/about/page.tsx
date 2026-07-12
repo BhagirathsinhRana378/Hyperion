@@ -84,24 +84,20 @@ const timeline = [
 export default function AboutPage() {
   return (
     <div className="relative">
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[600px] select-none overflow-hidden opacity-30">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[600px] select-none overflow-hidden opacity-80">
         <Beams
           beamHeight={15}
           beamNumber={12}
           beamWidth={2}
           lightColor="#ffffff"
           noiseIntensity={1.75}
-          rotation={0}
+          rotation={30}
           scale={0.2}
           speed={2}
         />
       </div>
       {/* Hero */}
       <section className="relative z-10 pt-36 pb-14">
-        <div
-          aria-hidden={true}
-          className="landing-glow-breathe pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px] [background:radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_0%,transparent_70%)]"
-        />
         <motion.div
           animate="visible"
           className="mx-auto max-w-3xl px-6 text-center"

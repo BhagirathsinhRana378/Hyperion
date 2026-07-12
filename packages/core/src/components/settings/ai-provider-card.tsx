@@ -31,8 +31,8 @@ import {
   Server,
   Sparkles,
   Terminal,
-  XCircle,
   Trash2,
+  XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -92,7 +92,7 @@ export function AiProviderCard() {
         const geminiModels = [
           "gemini-1.5-flash",
           "gemini-1.5-pro",
-          "gemini-1.0-pro"
+          "gemini-1.0-pro",
         ];
         setAvailableModels(geminiModels);
         if (!geminiModels.includes(selectedModel)) {
@@ -187,7 +187,9 @@ export function AiProviderCard() {
           if (isOk) {
             setProviderError(null);
           } else {
-            setProviderError((window as any).__lastProviderError || "Authentication failed.");
+            setProviderError(
+              (window as any).__lastProviderError || "Authentication failed."
+            );
           }
         } catch (err: any) {
           setHealth("provider", false);
@@ -245,7 +247,9 @@ export function AiProviderCard() {
                 } else if (val === "anthropic") {
                   setBaseUrl("https://api.anthropic.com/v1");
                 } else if (val === "google") {
-                  setBaseUrl("https://generativelanguage.googleapis.com/v1beta/openai/");
+                  setBaseUrl(
+                    "https://generativelanguage.googleapis.com/v1beta/openai/"
+                  );
                 }
               }}
               value={provider}
@@ -261,7 +265,9 @@ export function AiProviderCard() {
                   OpenAI Compatible (OpenRouter, LMStudio, etc)
                 </SelectItem>
                 <SelectItem value="anthropic">Anthropic (Direct)</SelectItem>
-                <SelectItem value="google">Google Gemini (AI Studio)</SelectItem>
+                <SelectItem value="google">
+                  Google Gemini (AI Studio)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -333,15 +339,17 @@ export function AiProviderCard() {
             </Select>
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-border/20 mt-6">
+          <div className="mt-6 flex justify-end border-border/20 border-t pt-4">
             <Button
-              variant="destructive"
-              size="sm"
               className="h-8 gap-1.5"
               onClick={() => {
                 clearProviderConfig();
-                toast.success("All AI Provider config and message data cleared!");
+                toast.success(
+                  "All AI Provider config and message data cleared!"
+                );
               }}
+              size="sm"
+              variant="destructive"
             >
               <Trash2 className="size-3.5" />
               Clear Config & Chat Data
@@ -372,7 +380,10 @@ export function AiProviderCard() {
               variant="outline"
             >
               <RefreshCcw
-                className={cn("mr-1.5 size-3.5", checkingHealth && "animate-spin")}
+                className={cn(
+                  "mr-1.5 size-3.5",
+                  checkingHealth && "animate-spin"
+                )}
               />
               Check Status
             </Button>
@@ -382,9 +393,11 @@ export function AiProviderCard() {
           {/* Backend Status */}
           <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-muted/10 p-3">
             <Server className="size-5 text-muted-foreground" />
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="font-medium text-xs">Tauri Backend</p>
-              <p className="text-[10px] text-muted-foreground">Shell PTY service</p>
+              <p className="text-[10px] text-muted-foreground">
+                Shell PTY service
+              </p>
             </div>
             {health.backend ? (
               <CheckCircle2 className="size-5 text-emerald-500" />
@@ -396,10 +409,15 @@ export function AiProviderCard() {
           {/* Provider Status */}
           <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-muted/10 p-3">
             <Sparkles className="size-5 text-muted-foreground" />
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="font-medium text-xs">AI Provider</p>
-              <p className="text-[10px] text-muted-foreground truncate" title={providerError || "LLM completion endpoint"}>
-                {providerError ? `Error: ${providerError}` : "LLM completion endpoint"}
+              <p
+                className="truncate text-[10px] text-muted-foreground"
+                title={providerError || "LLM completion endpoint"}
+              >
+                {providerError
+                  ? `Error: ${providerError}`
+                  : "LLM completion endpoint"}
               </p>
             </div>
             {health.provider ? (
@@ -412,9 +430,11 @@ export function AiProviderCard() {
           {/* Supabase Status */}
           <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-muted/10 p-3">
             <Database className="size-5 text-muted-foreground" />
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="font-medium text-xs">Supabase DB</p>
-              <p className="text-[10px] text-muted-foreground">Cloud persistence</p>
+              <p className="text-[10px] text-muted-foreground">
+                Cloud persistence
+              </p>
             </div>
             <CheckCircle2 className="size-5 text-emerald-500" />
           </div>
@@ -422,10 +442,12 @@ export function AiProviderCard() {
           {/* Active Terminals Status */}
           <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-muted/10 p-3">
             <Terminal className="size-5 text-muted-foreground" />
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="font-medium text-xs">Active Terminals</p>
               <p className="text-[10px] text-muted-foreground">
-                {activeWorkspace ? `${activeWorkspace.panes.length} PTY panes active` : "0 active"}
+                {activeWorkspace
+                  ? `${activeWorkspace.panes.length} PTY panes active`
+                  : "0 active"}
               </p>
             </div>
             {activeWorkspace ? (
@@ -438,9 +460,11 @@ export function AiProviderCard() {
           {/* Planner Status */}
           <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-muted/10 p-3">
             <Activity className="size-5 text-muted-foreground" />
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="font-medium text-xs">Main Planner</p>
-              <p className="text-[10px] text-muted-foreground">Orchestration engine</p>
+              <p className="text-[10px] text-muted-foreground">
+                Orchestration engine
+              </p>
             </div>
             {health.planner ? (
               <CheckCircle2 className="size-5 text-emerald-500" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { CtaLink, Eyebrow } from "./marketing-kit";
+import { CtaLink } from "./marketing-kit";
 
 /**
  * ImpactBase — the single large rounded panel the LaserFlow beam lands

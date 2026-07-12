@@ -63,7 +63,7 @@ export default function ContactPage() {
           initial={initialState}
           variants={staggerContainer}
         >
-          <motion.div variants={revealVariants}></motion.div>
+          <motion.div variants={revealVariants} />
           <motion.h1
             className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl"
             variants={revealVariants}

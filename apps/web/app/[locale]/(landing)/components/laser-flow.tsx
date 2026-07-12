@@ -1,7 +1,7 @@
 "use client";
 
-import * as THREE from "three";
 import { useEffect, useRef } from "react";
+import * as THREE from "three";
 
 /**
  * LaserFlow — adapted from ReactBits (reactbits.dev, MIT).
@@ -25,12 +25,12 @@ export interface LaserFlowProps {
   color?: string;
   decay?: number;
   dpr?: number;
-  fogFallSpeed?: number;
-  fogIntensity?: number;
-  fogScale?: number;
   falloffStart?: number;
   flowSpeed?: number;
   flowStrength?: number;
+  fogFallSpeed?: number;
+  fogIntensity?: number;
+  fogScale?: number;
   horizontalBeamOffset?: number;
   horizontalSizing?: number;
   /** Overall brightness multiplier for the beam, wisps, and (at half
@@ -303,8 +303,8 @@ interface LaserFlowUniforms {
   uTiltScale: { value: number };
   uVLenFactor: { value: number };
   uWIntensity: { value: number };
-  uWSpeed: { value: number };
   uWispDensity: { value: number };
+  uWSpeed: { value: number };
 }
 
 const hexToRgb = (hex: string) => {
@@ -318,7 +318,7 @@ const hexToRgb = (hex: string) => {
       .map((x) => x + x)
       .join("");
   }
-  const n = Number.parseInt(c, 16) || 0xeeeeed;
+  const n = Number.parseInt(c, 16) || 0xee_ee_ed;
   return {
     r: ((n >> 16) & 255) / 255,
     g: ((n >> 8) & 255) / 255,
@@ -400,7 +400,7 @@ export default function LaserFlow({
     renderer.setPixelRatio(currentDprRef.current);
     renderer.shadowMap.enabled = false;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.setClearColor(0x000000, 1);
+    renderer.setClearColor(0x00_00_00, 1);
     const canvas = renderer.domElement;
     canvas.style.width = "100%";
     canvas.style.height = "100%";
@@ -650,7 +650,10 @@ export default function LaserFlow({
       canvas.removeEventListener("pointerdown", onMove);
       canvas.removeEventListener("pointerenter", onMove);
       canvas.removeEventListener("pointerleave", onLeave);
-      canvas.removeEventListener("webglcontextlost", onCtxLost as EventListener);
+      canvas.removeEventListener(
+        "webglcontextlost",
+        onCtxLost as EventListener
+      );
       canvas.removeEventListener("webglcontextrestored", onCtxRestored);
       geometry.dispose();
       material.dispose();
