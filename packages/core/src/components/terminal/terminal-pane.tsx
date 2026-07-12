@@ -2,9 +2,12 @@
 
 import { useMounted } from "@workspace/core/hooks/use-mounted";
 import "@xterm/xterm/css/xterm.css";
+import type { Task } from "@workspace/core/lib/task-dispatcher";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
+
+const EXIT_CODE_REGEX = /^(\d+)/;
 
 interface TerminalPaneProps {
   autoCommand?: string;
@@ -133,6 +136,173 @@ function executeMockAutoCommand(
     handleMockCommand(autoCommand, term);
     term.write("\x1b[1;32mhyperion-demo@web:~$\x1b[0m ");
   }
+}
+
+async function processTaskOutput(
+  data: string,
+  taskInfo: { id: string; command: string; output: string },
+  activeTaskRef: {
+    current: { id: string; command: string; output: string } | null;
+  }
+) {
+  taskInfo.output += data;
+
+  const { invoke: inv } = await import("@tauri-apps/api/core");
+  await inv("report_task_status", {
+    taskId: taskInfo.id,
+    status: "Streaming",
+    data,
+  });
+
+  const marker = `TASK_FINISHED_${taskInfo.id}_`;
+  const markerIdx = taskInfo.output.lastIndexOf(marker);
+  if (markerIdx !== -1) {
+    const suffix = taskInfo.output.slice(markerIdx + marker.length);
+    const exitCodeMatch = suffix.match(EXIT_CODE_REGEX);
+    if (exitCodeMatch) {
+      const exitCode = Number.parseInt(exitCodeMatch[1] || "0", 10);
+      if (exitCode === 0) {
+        await inv("report_task_status", {
+          taskId: taskInfo.id,
+          status: "Completed",
+        });
+      } else {
+        await inv("report_task_status", {
+          taskId: taskInfo.id,
+          status: "Failed",
+          error: `Command exited with non-zero code: ${exitCode}`,
+        });
+      }
+      activeTaskRef.current = null;
+    }
+  }
+}
+
+async function runTaskExecution(
+  id: string,
+  task: Task,
+  activeTaskRef: {
+    current: { id: string; command: string; output: string } | null;
+  },
+  termRef: React.RefObject<TerminalInstance>,
+  disposed: boolean
+) {
+  const { emitEvent } = await import("@workspace/core/lib/task-dispatcher");
+
+  // 1. Send ACK
+  try {
+    const { isTauri: checkTauri } = await import("@tauri-apps/api/core");
+    if (checkTauri()) {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("ack_task", { taskId: task.id, terminalId: id });
+    } else {
+      await emitEvent(`task-ack-${task.id}`, {
+        taskId: task.id,
+        terminalId: id,
+      });
+    }
+  } catch {
+    await emitEvent(`task-ack-${task.id}`, { taskId: task.id, terminalId: id });
+  }
+
+  // 2. Set task to Running and report status
+  try {
+    const { isTauri: checkTauri } = await import("@tauri-apps/api/core");
+    if (checkTauri()) {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("report_task_status", {
+        taskId: task.id,
+        status: "Running",
+      });
+    } else {
+      await emitEvent(`task-status-${task.id}`, {
+        taskId: task.id,
+        status: "Running",
+      });
+    }
+  } catch {
+    await emitEvent(`task-status-${task.id}`, {
+      taskId: task.id,
+      status: "Running",
+    });
+  }
+
+  activeTaskRef.current = {
+    id: task.id,
+    command: task.payload.command,
+    output: "",
+  };
+
+  // 3. Execute command
+  let checkTauriActive = false;
+  try {
+    const { isTauri: checkTauri } = await import("@tauri-apps/api/core");
+    checkTauriActive = checkTauri();
+  } catch {
+    checkTauriActive = false;
+  }
+
+  if (checkTauriActive) {
+    const { invoke } = await import("@tauri-apps/api/core");
+    const isWin = navigator.userAgent.includes("Windows");
+    const commandWithSuffix = isWin
+      ? `${task.payload.command} & echo TASK_FINISHED_${task.id}_%ERRORLEVEL%\r`
+      : `${task.payload.command}; echo TASK_FINISHED_${task.id}_$?\r`;
+
+    await invoke("write_terminal", { id, data: commandWithSuffix });
+  } else {
+    const term = termRef.current;
+    if (term) {
+      term.write(`${task.payload.command}\r\n`);
+      simulateMockStreaming(task, activeTaskRef, term, disposed);
+    }
+  }
+}
+
+function simulateMockStreaming(
+  task: Task,
+  activeTaskRef: {
+    current: { id: string; command: string; output: string } | null;
+  },
+  term: TerminalInstance,
+  disposed: boolean
+) {
+  let count = 0;
+  const interval = setInterval(async () => {
+    if (disposed || !activeTaskRef.current) {
+      clearInterval(interval);
+      return;
+    }
+    count++;
+    const mockData = `Chunk ${count} of mock output for command "${task.payload.command}"\r\n`;
+    term.write(mockData);
+
+    const { emitEvent } = await import("@workspace/core/lib/task-dispatcher");
+    await emitEvent(`task-status-${task.id}`, {
+      taskId: task.id,
+      status: "Streaming",
+      data: mockData,
+    });
+
+    if (count >= 3) {
+      clearInterval(interval);
+      const isFail = task.payload.command.toLowerCase().includes("fail");
+      const exitCode = isFail ? 1 : 0;
+      term.write(`\r\nTASK_FINISHED_${task.id}_${exitCode}\r\n`);
+      term.write("\x1b[1;32mhyperion-demo@web:~$\x1b[0m ");
+
+      await emitEvent(`task-status-${task.id}`, {
+        taskId: task.id,
+        status: exitCode === 0 ? "Completed" : "Failed",
+        error:
+          exitCode === 0
+            ? undefined
+            : `Command exited with non-zero code: ${exitCode}`,
+        data: `\r\nTASK_FINISHED_${task.id}_${exitCode}\r\n`,
+      });
+      activeTaskRef.current = null;
+    }
+  }, 500);
 }
 
 function TerminalPlaceholder({ shellType }: { shellType: string }) {
@@ -331,7 +501,7 @@ export function TerminalPane({
       // 1. Listen for stdout events first to avoid race conditions and lost bytes
       unlistenStdout = await listen<TerminalEventPayload>(
         `terminal-stdout-${id}`,
-        (event) => {
+        async (event) => {
           if (disposed) {
             return;
           }
@@ -342,6 +512,23 @@ export function TerminalPane({
           } else {
             // Buffer events received while history is loading
             pendingEventsRef.current.push(payload);
+          }
+
+          // Process task execution tracking
+          const activeTaskRef = (
+            window as unknown as Record<
+              string,
+              {
+                current: { id: string; command: string; output: string } | null;
+              }
+            >
+          )[`activeTask_${id}`];
+          if (activeTaskRef?.current) {
+            await processTaskOutput(
+              payload.data,
+              activeTaskRef.current,
+              activeTaskRef
+            );
           }
         }
       );
@@ -548,6 +735,50 @@ export function TerminalPane({
     handleMockCommand,
     index,
   ]);
+
+  // Terminal Agent Task Runner
+  useEffect(() => {
+    let disposed = false;
+    let unlistenTask: (() => void) | undefined;
+    const activeTaskRef = {
+      current: null as { id: string; command: string; output: string } | null,
+    };
+
+    if (typeof window !== "undefined") {
+      (window as unknown as Record<string, unknown>)[`activeTask_${id}`] =
+        activeTaskRef;
+    }
+
+    async function setupTaskListener() {
+      const { listenToEvent } = await import(
+        "@workspace/core/lib/task-dispatcher"
+      );
+
+      unlistenTask = await listenToEvent<Task>(
+        `dispatch-task-${id}`,
+        async (task) => {
+          if (disposed) {
+            return;
+          }
+          await runTaskExecution(id, task, activeTaskRef, termRef, disposed);
+        }
+      );
+    }
+
+    setupTaskListener();
+
+    return () => {
+      disposed = true;
+      if (unlistenTask) {
+        unlistenTask();
+      }
+      if (typeof window !== "undefined") {
+        delete (window as unknown as Record<string, unknown>)[
+          `activeTask_${id}`
+        ];
+      }
+    };
+  }, [id]);
 
   // Fit terminal when workspace becomes active to adapt to container layout
   useEffect(() => {

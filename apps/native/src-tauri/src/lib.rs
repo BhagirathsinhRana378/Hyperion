@@ -33,6 +33,9 @@ pub fn run() {
       terminal::resize_terminal,
       terminal::get_terminal_history,
       terminal::close_terminal,
+      terminal::dispatch_task,
+      terminal::ack_task,
+      terminal::report_task_status,
       ai::call_llm_stream
     ])
     .run(tauri::generate_context!())

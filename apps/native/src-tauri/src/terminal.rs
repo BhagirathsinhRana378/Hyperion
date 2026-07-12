@@ -228,3 +228,62 @@ pub fn close_terminal(id: String) -> Result<(), String> {
         Err("Terminal session not found".to_string())
     }
 }
+
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct TaskPayload {
+    pub id: String,
+    pub terminal_id: String,
+    pub workspace_id: String,
+    pub agent_id: String,
+    pub parent_request_id: String,
+    pub status: String,
+    pub timestamp: u64,
+    pub retry_count: u32,
+    pub payload: serde_json::Value,
+}
+
+#[tauri::command]
+pub fn dispatch_task<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    task: TaskPayload,
+) -> Result<(), String> {
+    println!("[RUST] dispatch_task: terminal_id={}, task_id={}", task.terminal_id, task.id);
+    let event_name = format!("dispatch-task-{}", task.terminal_id);
+    app.emit(&event_name, task).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+pub fn ack_task<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    task_id: String,
+    terminal_id: String,
+) -> Result<(), String> {
+    println!("[RUST] ack_task: terminal_id={}, task_id={}", terminal_id, task_id);
+    let event_name = format!("task-ack-{}", task_id);
+    app.emit(&event_name, serde_json::json!({ "taskId": task_id, "terminalId": terminal_id })).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+pub fn report_task_status<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    task_id: String,
+    status: String,
+    progress: Option<f64>,
+    data: Option<String>,
+    error: Option<String>,
+) -> Result<(), String> {
+    println!("[RUST] report_task_status: task_id={}, status={}", task_id, status);
+    let event_name = format!("task-status-{}", task_id);
+    app.emit(&event_name, serde_json::json!({
+        "taskId": task_id,
+        "status": status,
+        "progress": progress,
+        "data": data,
+        "error": error
+    })).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
