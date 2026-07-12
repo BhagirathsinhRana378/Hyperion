@@ -22,11 +22,11 @@ export function ImpactBase({ members = [] }: { members?: string[] }) {
           className="pointer-events-none absolute inset-0"
         >
           {/* wash bleeding down into the interior from the strike */}
-          <div className="absolute inset-0 [background:radial-gradient(80%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_7%,transparent),transparent_60%)] sm:[background:radial-gradient(70%_60%_at_71%_0%,color-mix(in_oklab,var(--color-primary)_8%,transparent),transparent_60%)]" />
+          <div className="absolute inset-0 [background:radial-gradient(80%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_7%,transparent),transparent_60%)] sm:[background:radial-gradient(70%_60%_at_60%_0%,color-mix(in_oklab,var(--color-primary)_8%,transparent),transparent_60%)]" />
 
           {/* dotted futuristic floor, densest under the beam, fading out */}
           <div
-            className="absolute inset-0 opacity-50 [mask-image:radial-gradient(110%_100%_at_50%_0%,#000_18%,transparent_72%)] sm:[mask-image:radial-gradient(95%_100%_at_71%_0%,#000_18%,transparent_72%)]"
+            className="absolute inset-0 opacity-50 [mask-image:radial-gradient(110%_100%_at_50%_0%,#000_18%,transparent_72%)] sm:[mask-image:radial-gradient(95%_100%_at_60%_0%,#000_18%,transparent_72%)]"
             style={{
               backgroundImage:
                 "radial-gradient(circle, color-mix(in oklab, var(--color-border) 65%, transparent) 1px, transparent 1.6px)",

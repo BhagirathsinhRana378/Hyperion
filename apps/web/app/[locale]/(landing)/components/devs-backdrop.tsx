@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@workspace/ui/lib/utils";
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
 import type { CSSProperties } from "react";
@@ -34,19 +35,26 @@ const LaserFlow = dynamic(() => import("./laser-flow"), { ssr: false });
  * come from this WebGL layer; the earlier CSS beam column was removed.
  */
 const BEAM_IMPACT_OFFSET = -0.5;
-const BEAM_X_ANCHOR = 0.18;
+const BEAM_X_ANCHOR = 0.1;
 
 export interface DevsBackdropProps {
   boosted?: boolean;
+  dimmed?: boolean;
 }
 
-export function DevsBackdrop({ boosted = false }: DevsBackdropProps) {
+export function DevsBackdrop({
+  boosted = false,
+  dimmed = false,
+}: DevsBackdropProps) {
   const reduceMotion = useReducedMotion();
 
   return (
     <div
       aria-hidden={true}
-      className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+      className={cn(
+        "pointer-events-none absolute inset-0 z-20 overflow-hidden transition-opacity duration-500 ease-in-out",
+        dimmed ? "opacity-15" : "opacity-100"
+      )}
     >
       {/* hairline grid + grain — a surface for the beam to blend into
           instead of floating on flat black */}
@@ -82,19 +90,21 @@ export function DevsBackdrop({ boosted = false }: DevsBackdropProps) {
       </div>
 
       {!reduceMotion && (
-        <LaserFlow
-          className="absolute inset-0"
-          color="#EEEEED"
-          decay={1.15}
-          fogIntensity={0.6}
-          horizontalBeamOffset={BEAM_X_ANCHOR}
-          horizontalSizing={0.55}
-          intensity={boosted ? 1.7 : 1.35}
-          style={{ mixBlendMode: "screen" }}
-          verticalBeamOffset={BEAM_IMPACT_OFFSET}
-          verticalSizing={3.6}
-          wispIntensity={6.5}
-        />
+        <div className="relative mx-auto h-full w-full max-w-screen-2xl px-6">
+          <LaserFlow
+            className="absolute inset-0"
+            color="#EEEEED"
+            decay={1.15}
+            fogIntensity={0.6}
+            horizontalBeamOffset={BEAM_X_ANCHOR}
+            horizontalSizing={0.55}
+            intensity={boosted ? 1.7 : 1.35}
+            style={{ mixBlendMode: "screen" }}
+            verticalBeamOffset={BEAM_IMPACT_OFFSET}
+            verticalSizing={3.6}
+            wispIntensity={6.5}
+          />
+        </div>
       )}
     </div>
   );

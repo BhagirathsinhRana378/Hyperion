@@ -8,55 +8,65 @@ import { ImpactBase } from "../components/impact-platform";
 
 const devs: Dev[] = [
   {
-    initials: "AK",
-    name: "Aarav Kapoor",
-    role: "Founding Engineer — Core",
-    bio: "Builds the agent orchestration engine and the dependency resolution graph that keeps parallel tasks from stepping on each other.",
+    initials: "KS",
+    name: "Karm Sorathiya",
+    role: "Founding Engineer — Frontend Architect",
+    bio: "Crafts high-fidelity layouts, micro-animations, and cross-platform native wrapper layouts for web, macOS, and Windows.",
     contribution:
-      "Designed the task-graph scheduler that lets independent agents claim work without stepping on each other's diffs.",
-    skills: ["TypeScript", "Distributed Systems", "Rust"],
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
+      "Engineered the hybrid React shell architecture, fluid Framer Motion states, and native Tauri window pipelines.",
+    skills: ["React", "Tauri", "TailwindCSS"],
+    github: "https://github.com/KarmSorathiya378",
+    linkedin: "https://www.linkedin.com/in/karm-sorathiya-b66214377",
   },
   {
-    initials: "SM",
-    name: "Sara Mehta",
-    role: "Founding Engineer — Terminal",
-    bio: "Owns the 16-pane terminal multiplexer — xterm.js, node-pty, and the WebSocket layer that streams every shell in real time.",
+    initials: "MR",
+    name: "Meghraj Ravani",
+    role: "Founding Engineer — Frontend & 3D Systems",
+    bio: "Shapes immersive user experiences, interactive WebGL landing environments, volumetric lighting, and layout aesthetics.",
     contribution:
-      "Built the 16-pane grid engine and the WebSocket protocol that keeps every pane in sync under 50ms.",
-    skills: ["xterm.js", "WebSockets", "Node.js"],
-    github: "https://github.com",
-    twitter: "https://twitter.com",
+      "Shipped the LaserFlow rendering pipeline, grid repulsion physics, and custom visual theme controllers.",
+    skills: ["WebGL", "Three.js", "Creative Design"],
+    github: "https://github.com/Meghraj-6093",
+    linkedin: "https://www.linkedin.com/in/meghraj-ravani",
   },
   {
-    initials: "RV",
-    name: "Rohan Varma",
-    role: "Founding Engineer — Platform",
-    bio: "Runs the container-native execution layer and the git worktree isolation that keeps every agent's changes clean and reviewable.",
+    initials: "BR",
+    name: "Bhagirathsinh Rana",
+    role: "Founding Engineer — Core Engine & DevOps",
+    bio: "Maintains containerized virtualization layers, secure sandboxed task execution, and worktree isolation systems.",
     contribution:
-      "Shipped the per-agent worktree isolation model that makes every agent's diff independently reviewable.",
-    skills: ["Docker", "Git Internals", "Go"],
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    portfolio: "https://example.com",
+      "Architected the secure multi-container orchestration system that executes background agent code safely.",
+    skills: ["Docker", "Linux Core", "Go"],
+    github: "https://github.com/BhagirathsinhRana378",
+    linkedin: "https://www.linkedin.com/in/bhagirathsinh-rana",
   },
   {
-    initials: "NI",
-    name: "Naina Iyer",
-    role: "Founding Engineer — Design Systems",
-    bio: "Designs the canvas overlay and the theme engine — 40+ OKLCh themes, one consistent interaction language across all of them.",
+    initials: "MR",
+    name: "Malay Raval",
+    role: "Founding Engineer — Backend Systems & Terminal",
+    bio: "Scales real-time terminal streaming, low-latency WebSocket streaming, and stateful session sync databases.",
     contribution:
-      "Built the OKLCh theme engine and the canvas overlay's live execution traces.",
-    skills: ["Design Systems", "WebGL", "React"],
-    linkedin: "https://linkedin.com",
-    twitter: "https://twitter.com",
-    portfolio: "https://example.com",
+      "Shipped the zero-latency multi-terminal shell multiplexer using xterm.js and custom stream serialization.",
+    skills: ["WebSockets", "NodeJS", "xterm.js"],
+    github: "https://github.com/Malaybhai11",
+    linkedin: "https://www.linkedin.com/in/malay-raval-2708b8307",
+  },
+  {
+    initials: "PT",
+    name: "Parv Thakar",
+    role: "Founding Engineer — Design Systems Lead",
+    bio: "Packages modular UI primitive packages, type-safe multi-locale translations, and automated code quality gates.",
+    contribution:
+      "Unified the cross-platform styling engine and structural localization routes using Next-intl.",
+    skills: ["Design Systems", "i18n", "CSS Modules"],
+    github: "https://github.com/ParvThakar",
+    linkedin: "https://www.linkedin.com/in/parv-thakar",
   },
 ];
 
 export default function DevsPage() {
   const [anyCardHovered, setAnyCardHovered] = useState(false);
+  const [isCardOpen, setIsCardOpen] = useState(false);
 
   return (
     <div className="relative">
@@ -68,7 +78,7 @@ export default function DevsPage() {
       <section className="relative min-h-[82vh] overflow-hidden pb-40">
         {/* The LaserFlow shader IS the beam — a volumetric platinum shaft
             offset to the 3rd/4th card seam, falling onto ImpactBase. */}
-        <DevsBackdrop boosted={anyCardHovered} />
+        <DevsBackdrop boosted={anyCardHovered} dimmed={isCardOpen} />
 
         {/* { <motion.div
           animate="visible"
@@ -94,8 +104,12 @@ export default function DevsPage() {
           </motion.p>
         </motion.div> } */}
 
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-40 md:pt-48">
-          <DevGrid devs={devs} onHoverChange={setAnyCardHovered} />
+        <div className="relative z-10 mx-auto w-full max-w-screen-2xl px-6 pt-40 md:pt-48">
+          <DevGrid
+            devs={devs}
+            onHoverChange={setAnyCardHovered}
+            onOpenChange={setIsCardOpen}
+          />
         </div>
       </section>
 

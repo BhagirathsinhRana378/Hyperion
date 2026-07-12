@@ -78,6 +78,7 @@ function DevCard({
     <motion.button
       aria-label={`${dev.name}, ${dev.role} — view details`}
       className="group/devcard relative z-0 flex h-64 w-full flex-col items-center justify-center overflow-hidden text-center hover:z-30 focus-visible:z-30 focus-visible:outline-none sm:h-80"
+      layoutId={`dev-card-${dev.name}`}
       onBlur={() => onHoverChange(false)}
       onClick={onOpen}
       onFocus={() => onHoverChange(true)}
@@ -89,7 +90,7 @@ function DevCard({
       {/* idle silhouette — the only thing visible before interaction */}
       <span
         aria-hidden={true}
-        className="pointer-events-none absolute select-none font-display text-7xl text-foreground/[0.04] transition-opacity duration-500 ease-out group-hover/devcard:opacity-0 group-focus-visible/devcard:opacity-0 sm:text-8xl"
+        className="pointer-events-none absolute select-none font-display text-7xl text-foreground/[0.18] transition-opacity duration-200 ease-out group-hover/devcard:opacity-0 group-focus-visible/devcard:opacity-0 sm:text-8xl"
       >
         {dev.initials}
       </span>
@@ -97,11 +98,11 @@ function DevCard({
       {/* glass overlay — only exists once hovered/focused */}
       <span
         aria-hidden={true}
-        className="pointer-events-none absolute inset-3 rounded-3xl bg-white/[0.025] opacity-0 shadow-[inset_0_1px_0_0] shadow-white/10 backdrop-blur-md transition-opacity duration-500 ease-out group-hover/devcard:opacity-100 group-focus-visible/devcard:opacity-100"
+        className="pointer-events-none absolute inset-3 rounded-3xl bg-white/[0.025] opacity-0 shadow-[inset_0_1px_0_0] shadow-white/10 backdrop-blur-md transition-opacity duration-200 ease-out group-hover/devcard:opacity-100 group-focus-visible/devcard:opacity-100"
       />
 
       {/* revealed identity — fade, lift, and un-blur together */}
-      <div className="relative flex translate-y-3 flex-col items-center px-6 opacity-0 blur-[3px] transition-all duration-500 ease-out group-hover/devcard:translate-y-0 group-hover/devcard:opacity-100 group-hover/devcard:blur-none group-focus-visible/devcard:translate-y-0 group-focus-visible/devcard:opacity-100 group-focus-visible/devcard:blur-none">
+      <div className="relative flex translate-y-3 flex-col items-center px-6 opacity-0 blur-[3px] transition-all duration-200 ease-out group-hover/devcard:translate-y-0 group-hover/devcard:opacity-100 group-hover/devcard:blur-none group-focus-visible/devcard:translate-y-0 group-focus-visible/devcard:opacity-100 group-focus-visible/devcard:blur-none">
         <DevAvatar
           className="border-primary/30"
           dev={dev}
@@ -172,21 +173,23 @@ function DevModal({ dev, onClose }: { dev: Dev | null; onClose: () => void }) {
           exit={{ opacity: 0 }}
           initial={{ opacity: 0 }}
           onClick={onClose}
-          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.div
-            animate={{ opacity: 1, scale: 1, y: 0 }}
             aria-labelledby="dev-modal-title"
             aria-modal={true}
             className={cn(
-              "relative w-full max-w-sm rounded-[28px] border border-white/10 bg-card/50 p-8 text-center shadow-[0_0_80px_-15px] shadow-primary/20 backdrop-blur-xl",
+              "relative w-full max-w-md rounded-[28px] border border-zinc-800 bg-card/50 p-8 text-center shadow-[0_0_80px_-15px] shadow-primary/20 backdrop-blur-xl",
               "shadow-[inset_0_1px_0_0] shadow-white/10 supports-backdrop-filter:bg-card/30"
             )}
-            exit={{ opacity: 0, scale: 0.96, y: 8 }}
-            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            layoutId={`dev-card-${dev.name}`}
             onClick={(e) => e.stopPropagation()}
             role="dialog"
-            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            transition={{
+              type: "spring",
+              stiffness: 260,
+              damping: 28,
+            }}
           >
             <button
               aria-label="Close"
@@ -262,12 +265,18 @@ function DevModal({ dev, onClose }: { dev: Dev | null; onClose: () => void }) {
 export function DevGrid({
   devs,
   onHoverChange,
+  onOpenChange,
 }: {
   devs: Dev[];
   onHoverChange?: (hovering: boolean) => void;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const [activeDev, setActiveDev] = useState<Dev | null>(null);
   const hoveredRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    onOpenChange?.(activeDev !== null);
+  }, [activeDev, onOpenChange]);
 
   const updateHover = (name: string, hovering: boolean) => {
     const set = hoveredRef.current;
@@ -288,7 +297,7 @@ export function DevGrid({
           context. */}
       <motion.div
         animate="visible"
-        className="relative grid grid-cols-2 sm:grid-cols-4 sm:divide-x sm:divide-white/[0.04]"
+        className="relative grid grid-cols-2 sm:grid-cols-5 sm:divide-x sm:divide-white/[0.04]"
         initial="hidden"
         variants={staggerContainer}
       >
