@@ -13,7 +13,7 @@ import {
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useState } from "react";
-import { Badge, CtaLink, Eyebrow } from "../components/marketing-kit";
+import { Badge, CtaLink } from "../components/marketing-kit";
 
 const FloatingLines = dynamic(() => import("../components/FloatingLines"), {
   ssr: false,
@@ -96,87 +96,87 @@ export default function NewsPage() {
         className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[550px] w-full overflow-hidden"
       >
         <FloatingLines
-          enabledWaves={["top", "middle", "bottom"]}
-          lineCount={7}
-          lineDistance={9}
           bendRadius={5.0}
           bendStrength={-8.5}
+          enabledWaves={["top", "middle", "bottom"]}
           interactive={true}
-          parallax={true}
+          lineCount={7}
+          lineDistance={9}
           linesGradient={["#e8e8e8", "#6f6f6f", "#6a6a6a"]}
+          parallax={true}
         />
         {/* Soft wash to blend it in */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
       </div>
       <section className="relative mx-auto max-w-4xl px-6 pt-36 pb-24 md:pb-32">
-      <h1 className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl">
-        Notes from the build.
-      </h1>
-      <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-        Release notes, engineering deep dives, and product updates from the
-        Hyperion team.
-      </p>
+        <h1 className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl">
+          Notes from the build.
+        </h1>
+        <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+          Release notes, engineering deep dives, and product updates from the
+          Hyperion team.
+        </p>
 
-      <div className="mt-14 space-y-5">
-        {shown.map((entry, i) => (
-          <Reveal
-            direction="up"
-            duration={280}
-            index={i % PAGE_SIZE}
-            key={entry.slug}
-          >
-            <Link
-              className="group flex flex-col gap-6 overflow-hidden rounded-2xl border border-border bg-card/40 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-black/40 hover:shadow-lg sm:flex-row md:p-7"
-              href={`/news/${entry.slug}`}
+        <div className="mt-14 space-y-5">
+          {shown.map((entry, i) => (
+            <Reveal
+              direction="up"
+              duration={280}
+              index={i % PAGE_SIZE}
+              key={entry.slug}
             >
-              {/* Image placeholder — monochrome glyph tile */}
-              <div className="relative flex h-36 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-secondary via-card to-background sm:h-auto sm:w-44">
-                <div
-                  aria-hidden={true}
-                  className="absolute inset-0 opacity-40 [background-size:20px_20px] [background:linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)]"
-                />
-                <entry.icon className="relative size-9 text-muted-foreground transition-all duration-300 group-hover:-rotate-3 group-hover:scale-110 group-hover:text-primary" />
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  {entry.tags.map((tag) => (
-                    <Badge key={tag}>{tag}</Badge>
-                  ))}
-                  <span className="ml-auto text-muted-foreground text-xs">
-                    {entry.date} · {entry.readTime} read
-                  </span>
+              <Link
+                className="group flex flex-col gap-6 overflow-hidden rounded-2xl border border-border bg-card/40 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-black/40 hover:shadow-lg sm:flex-row md:p-7"
+                href={`/news/${entry.slug}`}
+              >
+                {/* Image placeholder — monochrome glyph tile */}
+                <div className="relative flex h-36 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-secondary via-card to-background sm:h-auto sm:w-44">
+                  <div
+                    aria-hidden={true}
+                    className="absolute inset-0 opacity-40 [background-size:20px_20px] [background:linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)]"
+                  />
+                  <entry.icon className="relative size-9 text-muted-foreground transition-all duration-300 group-hover:-rotate-3 group-hover:scale-110 group-hover:text-primary" />
                 </div>
-                <div className="mt-3 flex items-start justify-between gap-4">
-                  <h2 className="font-display text-foreground text-xl tracking-tight transition-colors duration-200 group-hover:text-primary md:text-2xl">
-                    {entry.title}
-                  </h2>
-                  <ArrowUpRight className="mt-1 size-5 shrink-0 text-muted-foreground transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-primary" />
-                </div>
-                <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-                  {entry.excerpt}
-                </p>
-              </div>
-            </Link>
-          </Reveal>
-        ))}
-      </div>
 
-      {hasMore && (
-        <div className="mt-10 flex justify-center">
-          <CtaLink
-            className="h-10 cursor-pointer px-6"
-            onClick={(e) => {
-              e.preventDefault();
-              setVisible((v) => v + PAGE_SIZE);
-            }}
-            variant="ghost"
-          >
-            Load more
-          </CtaLink>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {entry.tags.map((tag) => (
+                      <Badge key={tag}>{tag}</Badge>
+                    ))}
+                    <span className="ml-auto text-muted-foreground text-xs">
+                      {entry.date} · {entry.readTime} read
+                    </span>
+                  </div>
+                  <div className="mt-3 flex items-start justify-between gap-4">
+                    <h2 className="font-display text-foreground text-xl tracking-tight transition-colors duration-200 group-hover:text-primary md:text-2xl">
+                      {entry.title}
+                    </h2>
+                    <ArrowUpRight className="mt-1 size-5 shrink-0 text-muted-foreground transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-primary" />
+                  </div>
+                  <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
+                    {entry.excerpt}
+                  </p>
+                </div>
+              </Link>
+            </Reveal>
+          ))}
         </div>
-      )}
-    </section>
+
+        {hasMore && (
+          <div className="mt-10 flex justify-center">
+            <CtaLink
+              className="h-10 cursor-pointer px-6"
+              onClick={(e) => {
+                e.preventDefault();
+                setVisible((v) => v + PAGE_SIZE);
+              }}
+              variant="ghost"
+            >
+              Load more
+            </CtaLink>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

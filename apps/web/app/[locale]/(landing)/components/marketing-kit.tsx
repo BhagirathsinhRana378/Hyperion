@@ -305,7 +305,7 @@ const fieldShellClasses = (invalid?: boolean, valid?: boolean) =>
     "peer w-full rounded-lg border bg-background/60 px-4 text-foreground text-sm placeholder:text-transparent",
     "transition-[border-color,background-color,box-shadow] duration-200 ease-out",
     "hover:border-border/80 hover:bg-background/70 hover:shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-border)_60%,transparent)]",
-    "focus:border-primary/60 focus:bg-background/70 focus:outline-none focus:shadow-[0_0_0_3px_color-mix(in_oklab,var(--color-primary)_16%,transparent)]",
+    "focus:border-primary/60 focus:bg-background/70 focus:shadow-[0_0_0_3px_color-mix(in_oklab,var(--color-primary)_16%,transparent)] focus:outline-none",
     invalid
       ? "border-[#c98a7f]/70 focus:border-[#c98a7f]/70 focus:shadow-[0_0_0_3px_color-mix(in_oklab,#c98a7f_16%,transparent)]"
       : "border-border",
@@ -335,7 +335,7 @@ function FloatingLabel({
       className={cn(
         "pointer-events-none absolute left-3.5 origin-left whitespace-nowrap font-medium transition-[transform,color,top] duration-[220ms] ease-in-out",
         floated
-          ? "-translate-y-1/2 rounded bg-background px-1 text-primary/90 text-[0.8125rem]"
+          ? "-translate-y-1/2 rounded bg-background px-1 text-[0.8125rem] text-primary/90"
           : "-translate-y-1/2 text-foreground/80 text-sm peer-hover:text-foreground/90"
       )}
       htmlFor={htmlFor}
@@ -347,7 +347,13 @@ function FloatingLabel({
 }
 
 /** Small inline validation message — fades/slides in once. */
-function FieldMessage({ invalid, message }: { invalid?: boolean; message?: string }) {
+function FieldMessage({
+  invalid,
+  message,
+}: {
+  invalid?: boolean;
+  message?: string;
+}) {
   if (!message) {
     return null;
   }
@@ -432,10 +438,10 @@ export function Input({
           </FloatingLabel>
         )}
         {invalid && (
-          <AlertCircle className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-3.5 size-4 text-[#c98a7f]" />
+          <AlertCircle className="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-[#c98a7f]" />
         )}
         {valid && !invalid && (
-          <Check className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-3.5 size-4 text-[#8bbf93]" />
+          <Check className="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-[#8bbf93]" />
         )}
       </div>
       <FieldMessage invalid={invalid} message={message} />

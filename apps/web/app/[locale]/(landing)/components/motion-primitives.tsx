@@ -82,7 +82,7 @@ export function Counter({
   }, [isInView, target, duration]);
 
   return (
-    <span ref={ref} className={className}>
+    <span className={className} ref={ref}>
       {prefix}
       {count.toLocaleString()}
       {suffix}

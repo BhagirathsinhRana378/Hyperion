@@ -63,8 +63,7 @@ export default function ContactPage() {
           initial={initialState}
           variants={staggerContainer}
         >
-          <motion.div variants={revealVariants}>
-          </motion.div>
+          <motion.div variants={revealVariants}></motion.div>
           <motion.h1
             className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl"
             variants={revealVariants}
@@ -137,7 +136,7 @@ export default function ContactPage() {
               </motion.div>
               <motion.div variants={fieldReveal}>
                 <button
-                  className="landing-ease-emphasized inline-flex h-11 w-full items-center justify-center rounded-full bg-primary px-5 font-medium text-primary-foreground text-sm transition-[filter,transform,box-shadow] duration-200 hover:scale-[1.015] hover:shadow-[0_0_28px_-6px] hover:shadow-primary/50 hover:brightness-110 active:scale-[0.98] active:duration-100 active:brightness-100"
+                  className="landing-ease-emphasized inline-flex h-11 w-full items-center justify-center rounded-full bg-primary px-5 font-medium text-primary-foreground text-sm transition-[filter,transform,box-shadow] duration-200 hover:scale-[1.015] hover:shadow-[0_0_28px_-6px] hover:shadow-primary/50 hover:brightness-110 active:scale-[0.98] active:brightness-100 active:duration-100"
                   type="submit"
                 >
                   Request access
@@ -166,7 +165,7 @@ export default function ContactPage() {
                       affects the card's own box geometry/spacing. */}
                   <div
                     aria-hidden={true}
-                    className="-inset-3 pointer-events-none absolute rounded-xl border border-transparent transition-[border-color,background-color] duration-200 ease-out group-hover/sidecard:border-border/60 group-hover/sidecard:bg-secondary/40"
+                    className="pointer-events-none absolute -inset-3 rounded-xl border border-transparent transition-[border-color,background-color] duration-200 ease-out group-hover/sidecard:border-border/60 group-hover/sidecard:bg-secondary/40"
                   />
                   <div className="relative flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-secondary transition-[transform,border-color,box-shadow] duration-200 ease-out group-hover/sidecard:-rotate-2 group-hover/sidecard:scale-[1.03] group-hover/sidecard:border-primary/40 group-hover/sidecard:shadow-[0_0_16px_-4px] group-hover/sidecard:shadow-primary/40">
                     <Icon className="size-4 text-primary" />

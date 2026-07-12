@@ -307,7 +307,11 @@ export default function LightRays({
       uniformsRef.current = uniforms;
 
       const geometry = new Triangle(gl);
-      const program = new Program(gl, { vertex: vert, fragment: frag, uniforms });
+      const program = new Program(gl, {
+        vertex: vert,
+        fragment: frag,
+        uniforms,
+      });
       const mesh = new Mesh(gl, { geometry, program });
       meshRef.current = mesh;
 

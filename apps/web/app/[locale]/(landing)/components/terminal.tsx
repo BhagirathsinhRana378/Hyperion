@@ -95,7 +95,7 @@ export function TerminalContent({
   return (
     <div
       className={cn(
-        "landing-terminal-scroll flex-1 overflow-x-hidden overflow-y-auto p-4",
+        "landing-terminal-scroll flex-1 overflow-y-auto overflow-x-hidden p-4",
         className
       )}
       ref={bodyRef}
@@ -135,7 +135,7 @@ export function TerminalTyping({
       loop={loop}
       pauseDuration={1000}
       showCursor={showCursor}
-      startOnVisible={true}
+      startOnVisible={false}
       text={text}
       typingSpeed={45}
       variableSpeed={{ min: 25, max: 70 }}
