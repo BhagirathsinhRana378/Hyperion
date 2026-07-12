@@ -289,6 +289,38 @@
   transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
 }
 
+/* Ambient grid + film-grain noise — a CSS-only texture (no second
+   WebGL context) so a beam layer like LaserFlow has something to
+   blend into instead of floating on flat black. Both the hairline
+   grid and the grain are intentionally faint; they read as surface
+   texture, not decoration, and only become obvious once something
+   bright (the beam) passes over them. Needs a positioned ancestor —
+   applied to an already `absolute`/`relative` element. */
+.landing-grid-noise {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--border) 40%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--border) 40%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 64px 64px;
+  opacity: 0.3;
+}
+
+.landing-grid-noise::after {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  content: "";
+  inset: 0;
+  mix-blend-mode: overlay;
+  opacity: 0.05;
+  position: absolute;
+}
+
 /* Terminal scroll — thin, theme-matched scrollbar for the terminal
    window's internal viewport, both Firefox (scrollbar-color/width)
    and Chromium/WebKit (::-webkit-scrollbar). scroll-behavior:smooth

@@ -33,6 +33,12 @@ export interface LaserFlowProps {
   flowStrength?: number;
   horizontalBeamOffset?: number;
   horizontalSizing?: number;
+  /** Overall brightness multiplier for the beam, wisps, and (at half
+   *  weight) fog. Smoothly lerps toward new values at runtime instead
+   *  of popping, so it can be driven by e.g. a hover state for a
+   *  "power up" feel. Default 1.0. */
+  intensity?: number;
+  intensitySmoothTime?: number;
   mouseSmoothTime?: number;
   mouseTiltStrength?: number;
   style?: React.CSSProperties;
@@ -80,6 +86,7 @@ uniform float uFalloffStart;
 uniform float uFogFallSpeed;
 uniform vec3 uColor;
 uniform float uFade;
+uniform float uBrightness;
 
 #define PI 3.14159265359
 #define TWO_PI 6.28318530718
@@ -220,8 +227,8 @@ void mainImage(out vec4 fc,in vec2 frag){
         b+=wt*bsa(uvc,p,mask*env,sig);
     }
     float sPix=clamp(yPix/R_V,0.0,1.0),topA=pow(1.0-smoothstep(TOP_FADE_START,1.0,sPix),TOP_FADE_EXP);
-    float L=a+b*topA;
-    float w=vWisps(vec2(uvc.x,yPix),topA);
+    float L=(a+b*topA)*uBrightness;
+    float w=vWisps(vec2(uvc.x,yPix),topA)*uBrightness;
     float fog=0.0;
 #if FOG_ON
     vec2 fuv=uvc*uFogScale;
@@ -252,7 +259,7 @@ void mainImage(out vec4 fc,in vec2 frag){
     browserFogIntensity *= 1.8;
     float radialFade = 1.0 - smoothstep(0.0, 0.7, length(uvc) / 120.0);
     float safariFog = n * browserFogIntensity * bBias * bm * hW * radialFade;
-    fog = safariFog;
+    fog = safariFog * mix(1.0, uBrightness, 0.5);
 #endif
     float LF=L+fog;
     float dith=(h21(frag)-0.5)*(DITHER_STRENGTH/255.0);
@@ -280,6 +287,7 @@ interface LaserFlowUniforms {
   iTime: { value: number };
   uBeamXFrac: { value: number };
   uBeamYFrac: { value: number };
+  uBrightness: { value: number };
   uColor: { value: THREE.Vector3 };
   uDecay: { value: number };
   uFade: { value: number };
@@ -339,10 +347,13 @@ export default function LaserFlow({
   falloffStart = 1.2,
   fogFallSpeed = 0.6,
   color = "#EEEEED",
+  intensity = 1.0,
+  intensitySmoothTime = 0.5,
 }: LaserFlowProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const uniformsRef = useRef<LaserFlowUniforms | null>(null);
+  const intensityTargetRef = useRef(intensity);
   const hasFadedRef = useRef(false);
   const rectRef = useRef<DOMRect | null>(null);
   const baseDprRef = useRef(1);
@@ -360,6 +371,14 @@ export default function LaserFlow({
       return;
     }
 
+    // Reset size-tracking so a fresh mount always performs its
+    // initial resize — without this, React Strict Mode's dev-only
+    // double-invoke (mount → cleanup → mount again) leaves this ref
+    // holding the FIRST mount's dimensions, so the second (real,
+    // surviving) mount's setSizeNow() sees "no change" and skips
+    // calling renderer.setSize() entirely, leaving the canvas stuck
+    // at the browser's 300×150 default.
+    lastSizeRef.current = { width: 0, height: 0, dpr: 0 };
     lastFpsCheckRef.current = performance.now();
 
     const renderer = new THREE.WebGLRenderer({
@@ -423,6 +442,7 @@ export default function LaserFlow({
       uFogFallSpeed: { value: fogFallSpeed },
       uColor: { value: new THREE.Vector3(1, 1, 1) },
       uFade: { value: hasFadedRef.current ? 1 : 0 },
+      uBrightness: { value: intensity },
     };
     uniformsRef.current = uniforms;
 
@@ -608,6 +628,11 @@ export default function LaserFlow({
       const alpha = 1 - Math.exp(-cdt / tau);
       mouseSmooth.lerp(mouseTarget, alpha);
       uniforms.iMouse.value.set(mouseSmooth.x, mouseSmooth.y, 0, 0);
+
+      const bTau = Math.max(1e-3, intensitySmoothTime);
+      const bAlpha = 1 - Math.exp(-cdt / bTau);
+      uniforms.uBrightness.value +=
+        (intensityTargetRef.current - uniforms.uBrightness.value) * bAlpha;
 
       renderer.render(scene, camera);
 
