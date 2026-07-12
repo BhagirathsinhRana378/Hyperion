@@ -1,67 +1,67 @@
-import React from "react";
+"use client";
 
-type StarBorderProps<T extends React.ElementType> =
-  React.ComponentPropsWithoutRef<T> & {
-    as?: T;
-    className?: string;
-    children?: React.ReactNode;
-    color?: string;
-    speed?: React.CSSProperties["animationDuration"];
-    thickness?: number;
-    hoverOpacity?: number;
-    idleOpacity?: number;
-  };
+import { cn } from "@workspace/ui/lib/utils";
+import type * as React from "react";
+import "./StarBorder.css";
 
-export const StarBorder = <T extends React.ElementType = "button">({
-  as,
-  className = "",
-  color = "white",
-  speed = "6s",
-  thickness = 1,
-  hoverOpacity,
-  idleOpacity,
+interface StarBorderProps extends React.ComponentProps<"div"> {
+  /** RGB triplet, no rgba() wrapper — e.g. "238, 238, 237". */
+  color?: string;
+  hoverOpacity?: number;
+  idleOpacity?: number;
+  /** One slide cycle, e.g. "7s". Keep slow (6-8s) — ambient, not busy. */
+  speed?: string;
+  /** Border-ring thickness in px — how much of each comet peeks out. */
+  thickness?: number;
+}
+
+/**
+ * StarBorder — adapted from ReactBits (reactbits.dev, MIT).
+ *
+ * Two large blurred comets slide along the top/bottom edges. The
+ * glow layer is masked to the border ring itself (content-box
+ * exclude), so it's physically confined to a thin `thickness`-px
+ * sliver and can never bleed into the card face — even when the
+ * card behind it is translucent glass, brightening on hover.
+ *
+ * Wrap any panel: `<StarBorder className="rounded-3xl"><Card /></StarBorder>`.
+ * Pass the same rounded-* class the wrapped card uses so the clip
+ * shape matches.
+ *
+ * Color defaults to platinum, not the indigo/violet common in
+ * ReactBits demos — Hyperion's palette has no hue anywhere.
+ */
+export function StarBorder({
+  className,
   children,
-  ...rest
-}: StarBorderProps<T>) => {
-  const Component = as || "button";
-  const [hovered, setHovered] = React.useState(false);
-
-  const currentOpacity = hovered
-    ? (hoverOpacity ?? 0.7)
-    : (idleOpacity ?? 0.7);
-
+  color = "238, 238, 237",
+  speed = "7s",
+  thickness = 1.5,
+  idleOpacity = 0.25,
+  hoverOpacity = 0.9,
+  style,
+  ...props
+}: StarBorderProps) {
   return (
-    <Component
-      className={`relative inline-block overflow-hidden rounded-[20px] ${className}`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      {...(rest as any)}
-      style={{
-        padding: `${thickness}px 0`,
-        ...(rest as any).style,
-      }}
+    <div
+      className={cn("star-border-container", className)}
+      style={
+        {
+          "--star-color": color,
+          "--star-speed": speed,
+          "--star-thickness": `${thickness}px`,
+          "--star-idle-opacity": idleOpacity,
+          "--star-hover-opacity": hoverOpacity,
+          ...style,
+        } as React.CSSProperties
+      }
+      {...props}
     >
-      <div
-        className="absolute z-0 h-[50%] w-[300%] animate-star-movement-bottom right-[-250%] bottom-[-11px] rounded-full"
-        style={{
-          background: `radial-gradient(circle, ${color}, transparent 10%)`,
-          animationDuration: speed,
-          opacity: currentOpacity,
-        }}
-      />
-      <div
-        className="absolute z-0 h-[50%] w-[300%] animate-star-movement-top left-[-250%] top-[-10px] rounded-full"
-        style={{
-          background: `radial-gradient(circle, ${color}, transparent 10%)`,
-          animationDuration: speed,
-          opacity: currentOpacity,
-        }}
-      />
-      <div className="relative z-1 rounded-[20px] border border-gray-800 bg-gradient-to-b from-black to-gray-900 px-[26px] py-[16px] text-center text-[16px] text-white">
-        {children}
+      <div aria-hidden={true} className="star-border-glow">
+        <span className="star-border-comet star-border-comet--top" />
+        <span className="star-border-comet star-border-comet--bottom" />
       </div>
-    </Component>
+      <div className="star-border-inner">{children}</div>
+    </div>
   );
-};
-
-export default StarBorder;
+}

@@ -1,0 +1,107 @@
+/* StarBorder.css — adapted from ReactBits (reactbits.dev, MIT).
+   Two large blurred comets slide back and forth along the top and
+   bottom edges. Rather than relying on the card content to visually
+   hide the glow (which fails when that content is translucent glass,
+   as it is throughout this site), the glow layer is physically
+   confined to the border ring via a content-box-exclude mask — the
+   same ring technique already used by border-trace.tsx and
+   MagicBento's border-glow. The masked pixels outside the ring are
+   fully transparent, so the comet can never bleed into the card face
+   no matter how blurred or how translucent the card behind it is.
+   Color comes entirely from --star-color (an RGB triplet set
+   inline), so nothing here bakes in a hue. */
+
+.star-border-container {
+  position: relative;
+  display: block;
+}
+
+.star-border-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  padding: var(--star-thickness, 1.5px);
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.star-border-comet {
+  position: absolute;
+  width: 300%;
+  height: 50%;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: var(--star-idle-opacity, 0.25);
+  filter: blur(2px);
+  transition: opacity 0.4s ease-out;
+  will-change: transform;
+}
+
+.star-border-container:hover .star-border-glow .star-border-comet {
+  opacity: var(--star-hover-opacity, 0.9);
+}
+
+.star-border-comet--top {
+  top: -25%;
+  left: -250%;
+  background: radial-gradient(
+    circle,
+    rgba(var(--star-color), 0.9),
+    transparent 70%
+  );
+  animation: star-border-slide-top var(--star-speed, 7s) ease-in-out infinite
+    alternate;
+}
+
+.star-border-comet--bottom {
+  right: -250%;
+  bottom: -25%;
+  background: radial-gradient(
+    circle,
+    rgba(var(--star-color), 0.9),
+    transparent 70%
+  );
+  animation: star-border-slide-bottom var(--star-speed, 7s) ease-in-out infinite
+    alternate;
+}
+
+@keyframes star-border-slide-top {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(62%);
+  }
+}
+
+@keyframes star-border-slide-bottom {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-62%);
+  }
+}
+
+.star-border-inner {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  height: 100%;
+  padding: var(--star-thickness, 1.5px);
+}
+
+@media (prefers-reduced-motion: reduce), (max-width: 768px) {
+  .star-border-comet {
+    animation: none;
+  }
+}

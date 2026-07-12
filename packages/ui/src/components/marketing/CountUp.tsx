@@ -2,16 +2,16 @@ import { useInView, useMotionValue, useSpring } from "motion/react";
 import { useCallback, useEffect, useRef } from "react";
 
 interface CountUpProps {
-  to: number;
-  from?: number;
-  direction?: "up" | "down";
-  delay?: number;
-  duration?: number;
   className?: string;
-  startWhen?: boolean;
-  separator?: string;
-  onStart?: () => void;
+  delay?: number;
+  direction?: "up" | "down";
+  duration?: number;
+  from?: number;
   onEnd?: () => void;
+  onStart?: () => void;
+  separator?: string;
+  startWhen?: boolean;
+  to: number;
 }
 
 export default function CountUp({
@@ -62,13 +62,15 @@ export default function CountUp({
         maximumFractionDigits: hasDecimals ? maxDecimals : 0,
       };
 
-      const formattedNumber = Intl.NumberFormat("en-US", options).format(latest);
+      const formattedNumber = Intl.NumberFormat("en-US", options).format(
+        latest
+      );
 
       return separator
         ? formattedNumber.replace(/,/g, separator)
         : formattedNumber;
     },
-    [maxDecimals, separator],
+    [maxDecimals, separator]
   );
 
   useEffect(() => {
@@ -93,7 +95,7 @@ export default function CountUp({
             onEnd();
           }
         },
-        delay * 1000 + duration * 1000,
+        delay * 1000 + duration * 1000
       );
 
       return () => {

@@ -9,6 +9,7 @@
     "clean": "rimraf .turbo"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -16,6 +17,7 @@
     "lucide-react": "^0.577.0",
     "motion": "^12.40.0",
     "next-themes": "^0.4.6",
+    "ogl": "^1.0.11",
     "radix-ui": "^1.6.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

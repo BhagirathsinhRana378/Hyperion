@@ -1,4 +1,5 @@
 import { siteConfig } from "@workspace/core/config/site";
+import { themeInitScript } from "@workspace/core/scripts/theme-init";
 import { hasLocale, NextIntlClientProvider } from "@workspace/i18n";
 import { routing } from "@workspace/i18n/routing";
 import type { Metadata, Viewport } from "next";
@@ -110,6 +111,14 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning={true}>
+      <head>
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted script
+          dangerouslySetInnerHTML={{
+            __html: themeInitScript,
+          }}
+        />
+      </head>
       <body
         className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} ${fontBody.variable} ${fontCode.variable} font-sans antialiased`}
       >

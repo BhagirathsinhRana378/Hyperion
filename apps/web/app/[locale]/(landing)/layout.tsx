@@ -1,4 +1,4 @@
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "@workspace/core/providers/theme-provider";
 import { GradientBand } from "./components/gradient-band";
 import { HyperionFooter } from "./components/hyperion-footer";
 import { HyperionNav } from "./components/hyperion-nav";
