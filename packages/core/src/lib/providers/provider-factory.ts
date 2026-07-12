@@ -11,23 +11,28 @@ export interface StreamDelta {
 }
 
 export function combineUrl(baseUrl: string, path: string): string {
-  const cleanBase = baseUrl.trim().endsWith("/") ? baseUrl.trim().slice(0, -1) : baseUrl.trim();
+  const cleanBase = baseUrl.trim().endsWith("/")
+    ? baseUrl.trim().slice(0, -1)
+    : baseUrl.trim();
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   return `${cleanBase}${cleanPath}`;
 }
 
 export interface AIProvider {
-  initialize(apiKey: string, baseUrl: string, model: string): void;
   authenticate(): Promise<boolean>;
-  sendPrompt(messages: any[], tools?: any[]): Promise<{ content: string; tool_calls?: any[] }>;
+  disconnect(): void;
+  healthCheck(): Promise<boolean>;
+  initialize(apiKey: string, baseUrl: string, model: string): void;
+  sendPrompt(
+    messages: any[],
+    tools?: any[]
+  ): Promise<{ content: string; tool_calls?: any[] }>;
   stream(
     messages: any[],
     tools: any[],
     onDelta: (delta: StreamDelta) => void,
     signal?: AbortSignal
   ): Promise<{ content: string; tool_calls?: any[] }>;
-  healthCheck(): Promise<boolean>;
-  disconnect(): void;
 }
 
 export class OpenAICompatibleProvider implements AIProvider {
@@ -42,7 +47,8 @@ export class OpenAICompatibleProvider implements AIProvider {
   }
 
   private getFetchFn() {
-    const isTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+    const isTauri =
+      typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
     return async (url: string, init?: RequestInit) => {
       if (isTauri) {
         const { fetch: tauriFetch } = await import("@tauri-apps/plugin-http");
@@ -70,24 +76,30 @@ export class OpenAICompatibleProvider implements AIProvider {
         this.baseUrl.includes("google") ||
         this.baseUrl.includes("gemini")
       ) {
-        const res = await fetchFn(combineUrl(this.baseUrl, "chat/completions"), {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${this.apiKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: this.model || "gemini-1.5-flash",
-            messages: [{ role: "user", content: "Ping" }],
-            max_tokens: 1,
-          }),
-        });
-        if (!res.ok) {
-          const bodyText = await res.text().catch(() => "");
-          console.error(`Gemini Auth Fail: Status ${res.status}, Body: ${bodyText}`);
-          (window as any).__lastProviderError = `Status ${res.status}: ${bodyText || "Empty response"}`;
-        } else {
+        const res = await fetchFn(
+          combineUrl(this.baseUrl, "chat/completions"),
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${this.apiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: this.model || "gemini-1.5-flash",
+              messages: [{ role: "user", content: "Ping" }],
+              max_tokens: 1,
+            }),
+          }
+        );
+        if (res.ok) {
           (window as any).__lastProviderError = null;
+        } else {
+          const bodyText = await res.text().catch(() => "");
+          console.error(
+            `Gemini Auth Fail: Status ${res.status}, Body: ${bodyText}`
+          );
+          (window as any).__lastProviderError =
+            `Status ${res.status}: ${bodyText || "Empty response"}`;
         }
         return res.ok;
       }
@@ -98,11 +110,12 @@ export class OpenAICompatibleProvider implements AIProvider {
           "Content-Type": "application/json",
         },
       });
-      if (!res.ok) {
-        const bodyText = await res.text().catch(() => "");
-        (window as any).__lastProviderError = `Status ${res.status}: ${bodyText || "Empty response"}`;
-      } else {
+      if (res.ok) {
         (window as any).__lastProviderError = null;
+      } else {
+        const bodyText = await res.text().catch(() => "");
+        (window as any).__lastProviderError =
+          `Status ${res.status}: ${bodyText || "Empty response"}`;
       }
       return res.ok;
     } catch (err: any) {
@@ -111,19 +124,25 @@ export class OpenAICompatibleProvider implements AIProvider {
     }
   }
 
-  async sendPrompt(messages: any[], tools?: any[]): Promise<{ content: string; tool_calls?: any[] }> {
-    const isTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+  async sendPrompt(
+    messages: any[],
+    tools?: any[]
+  ): Promise<{ content: string; tool_calls?: any[] }> {
+    const isTauri =
+      typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
     if (isTauri) {
       const { invoke } = await import("@tauri-apps/api/core");
       try {
         const fullContent = await invoke<string>("call_llm_stream", {
           payload: {
-            provider: this.baseUrl.includes("generativelanguage.googleapis.com") ? "google" : "openai",
+            provider: this.baseUrl.includes("generativelanguage.googleapis.com")
+              ? "google"
+              : "openai",
             apiKey: this.apiKey,
             baseUrl: this.baseUrl,
             model: this.model,
             messages,
-          }
+          },
         });
         return { content: fullContent };
       } catch (err: any) {
@@ -168,7 +187,8 @@ export class OpenAICompatibleProvider implements AIProvider {
     onDelta: (delta: StreamDelta) => void,
     signal?: AbortSignal
   ): Promise<{ content: string; tool_calls?: any[] }> {
-    const isTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+    const isTauri =
+      typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
     if (isTauri) {
       const { invoke } = await import("@tauri-apps/api/core");
       const { listen } = await import("@tauri-apps/api/event");
@@ -180,12 +200,14 @@ export class OpenAICompatibleProvider implements AIProvider {
       try {
         const fullContent = await invoke<string>("call_llm_stream", {
           payload: {
-            provider: this.baseUrl.includes("generativelanguage.googleapis.com") ? "google" : "openai",
+            provider: this.baseUrl.includes("generativelanguage.googleapis.com")
+              ? "google"
+              : "openai",
             apiKey: this.apiKey,
             baseUrl: this.baseUrl,
             model: this.model,
             messages,
-          }
+          },
         });
         unlisten();
         return { content: fullContent };
@@ -230,21 +252,29 @@ export class OpenAICompatibleProvider implements AIProvider {
     try {
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          break;
+        }
 
         const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split("\n").map((line) => line.trim());
 
         for (const line of lines) {
-          if (!line || line === "data: [DONE]") continue;
+          if (!line || line === "data: [DONE]") {
+            continue;
+          }
           if (line.startsWith("data: ")) {
             try {
               const data = JSON.parse(line.slice(6));
               const choice = data.choices?.[0];
-              if (!choice) continue;
+              if (!choice) {
+                continue;
+              }
 
               const delta = choice.delta;
-              if (!delta) continue;
+              if (!delta) {
+                continue;
+              }
 
               if (delta.content) {
                 accumulatedContent += delta.content;
@@ -256,14 +286,23 @@ export class OpenAICompatibleProvider implements AIProvider {
                   const idx = tc.index;
                   if (toolCallsMap[idx] === undefined) {
                     toolCallsMap[idx] = {
-                      id: tc.id || `tc-${idx}-${Math.random().toString(36).slice(2, 6)}`,
+                      id:
+                        tc.id ||
+                        `tc-${idx}-${Math.random().toString(36).slice(2, 6)}`,
                       type: "function",
                       function: { name: "", arguments: "" },
                     };
                   }
-                  if (tc.id) toolCallsMap[idx].id = tc.id;
-                  if (tc.function?.name) toolCallsMap[idx].function.name += tc.function.name;
-                  if (tc.function?.arguments) toolCallsMap[idx].function.arguments += tc.function.arguments;
+                  if (tc.id) {
+                    toolCallsMap[idx].id = tc.id;
+                  }
+                  if (tc.function?.name) {
+                    toolCallsMap[idx].function.name += tc.function.name;
+                  }
+                  if (tc.function?.arguments) {
+                    toolCallsMap[idx].function.arguments +=
+                      tc.function.arguments;
+                  }
 
                   onDelta({
                     toolCalls: [toolCallsMap[idx]],
@@ -280,9 +319,10 @@ export class OpenAICompatibleProvider implements AIProvider {
       reader.releaseLock();
     }
 
-    const finalToolCalls = Object.keys(toolCallsMap).length > 0
-      ? Object.values(toolCallsMap)
-      : undefined;
+    const finalToolCalls =
+      Object.keys(toolCallsMap).length > 0
+        ? Object.values(toolCallsMap)
+        : undefined;
 
     return {
       content: accumulatedContent,
@@ -309,7 +349,8 @@ export class AnthropicDirectProvider implements AIProvider {
   }
 
   private getFetchFn() {
-    const isTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+    const isTauri =
+      typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
     return async (url: string, init?: RequestInit) => {
       if (isTauri) {
         const { fetch: tauriFetch } = await import("@tauri-apps/plugin-http");
@@ -396,7 +437,9 @@ export class AnthropicDirectProvider implements AIProvider {
   }
 
   private convertTools(openaiTools: any[]) {
-    if (!openaiTools || openaiTools.length === 0) return undefined;
+    if (!openaiTools || openaiTools.length === 0) {
+      return;
+    }
     return openaiTools.map((t) => ({
       name: t.function.name,
       description: t.function.description,
@@ -404,8 +447,12 @@ export class AnthropicDirectProvider implements AIProvider {
     }));
   }
 
-  async sendPrompt(messages: any[], tools?: any[]): Promise<{ content: string; tool_calls?: any[] }> {
-    const isTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+  async sendPrompt(
+    messages: any[],
+    tools?: any[]
+  ): Promise<{ content: string; tool_calls?: any[] }> {
+    const isTauri =
+      typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
     if (isTauri) {
       const { invoke } = await import("@tauri-apps/api/core");
       try {
@@ -416,7 +463,7 @@ export class AnthropicDirectProvider implements AIProvider {
             baseUrl: this.baseUrl,
             model: this.model,
             messages,
-          }
+          },
         });
         return { content: fullContent };
       } catch (err: any) {
@@ -425,7 +472,8 @@ export class AnthropicDirectProvider implements AIProvider {
     }
 
     const fetchFn = this.getFetchFn();
-    const { system, messages: anthropicMessages } = this.convertMessages(messages);
+    const { system, messages: anthropicMessages } =
+      this.convertMessages(messages);
     const anthropicTools = this.convertTools(tools || []);
 
     const requestBody = {
@@ -484,7 +532,8 @@ export class AnthropicDirectProvider implements AIProvider {
     onDelta: (delta: StreamDelta) => void,
     signal?: AbortSignal
   ): Promise<{ content: string; tool_calls?: any[] }> {
-    const isTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+    const isTauri =
+      typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
     if (isTauri) {
       const { invoke } = await import("@tauri-apps/api/core");
       const { listen } = await import("@tauri-apps/api/event");
@@ -501,7 +550,7 @@ export class AnthropicDirectProvider implements AIProvider {
             baseUrl: this.baseUrl,
             model: this.model,
             messages,
-          }
+          },
         });
         unlisten();
         return { content: fullContent };
@@ -511,7 +560,8 @@ export class AnthropicDirectProvider implements AIProvider {
       }
     }
 
-    const { system, messages: anthropicMessages } = this.convertMessages(messages);
+    const { system, messages: anthropicMessages } =
+      this.convertMessages(messages);
     const anthropicTools = this.convertTools(tools || []);
 
     const requestBody = {
@@ -557,13 +607,17 @@ export class AnthropicDirectProvider implements AIProvider {
     try {
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          break;
+        }
 
         const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split("\n").map((line) => line.trim());
 
         for (const line of lines) {
-          if (!line) continue;
+          if (!line) {
+            continue;
+          }
           if (line.startsWith("event: ")) {
             currentEvent = line.slice(7);
           } else if (line.startsWith("data: ")) {
@@ -573,25 +627,31 @@ export class AnthropicDirectProvider implements AIProvider {
                 if (data.delta.type === "text_delta" && data.delta.text) {
                   accumulatedContent += data.delta.text;
                   onDelta({ content: data.delta.text });
-                } else if (data.delta.type === "input_json_delta" && data.delta.partial_json) {
+                } else if (
+                  data.delta.type === "input_json_delta" &&
+                  data.delta.partial_json
+                ) {
                   const idx = data.index;
                   if (toolCallsMap[idx]) {
-                    toolCallsMap[idx].function.arguments += data.delta.partial_json;
+                    toolCallsMap[idx].function.arguments +=
+                      data.delta.partial_json;
                     onDelta({ toolCalls: [toolCallsMap[idx]] });
                   }
                 }
-              } else if (currentEvent === "content_block_start" && data.content_block) {
-                if (data.content_block.type === "tool_use") {
-                  const idx = data.index;
-                  toolCallsMap[idx] = {
-                    id: data.content_block.id,
-                    type: "function",
-                    function: {
-                      name: data.content_block.name,
-                      arguments: "",
-                    },
-                  };
-                }
+              } else if (
+                currentEvent === "content_block_start" &&
+                data.content_block &&
+                data.content_block.type === "tool_use"
+              ) {
+                const idx = data.index;
+                toolCallsMap[idx] = {
+                  id: data.content_block.id,
+                  type: "function",
+                  function: {
+                    name: data.content_block.name,
+                    arguments: "",
+                  },
+                };
               }
             } catch {
               // Ignore line parse errors
@@ -603,9 +663,10 @@ export class AnthropicDirectProvider implements AIProvider {
       reader.releaseLock();
     }
 
-    const finalToolCalls = Object.keys(toolCallsMap).length > 0
-      ? Object.values(toolCallsMap)
-      : undefined;
+    const finalToolCalls =
+      Object.keys(toolCallsMap).length > 0
+        ? Object.values(toolCallsMap)
+        : undefined;
 
     return {
       content: accumulatedContent,
