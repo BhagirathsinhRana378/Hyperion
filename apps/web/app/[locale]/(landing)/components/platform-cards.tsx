@@ -146,7 +146,7 @@ export default function PlatformCards({
 }
 
 const CardDecorator = ({ children }: { children: ReactNode }) => (
-  <div className="mask-radial-from-40% mask-radial-to-60% relative mx-auto size-36 duration-200 [--color-border:color-mix(in_oklab,var(--color-foreground)15%,transparent)] group-hover/card:[--color-border:color-mix(in_oklab,var(--color-foreground)25%,transparent)]">
+  <div className="[-webkit-mask-image:radial-gradient(circle,black_40%,transparent_60%)] [mask-image:radial-gradient(circle,black_40%,transparent_60%)] relative mx-auto size-36 duration-200 [--color-border:color-mix(in_oklab,var(--color-foreground)15%,transparent)] group-hover/card:[--color-border:color-mix(in_oklab,var(--color-foreground)25%,transparent)]">
     <div
       aria-hidden={true}
       className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-size-[24px_24px] opacity-50"

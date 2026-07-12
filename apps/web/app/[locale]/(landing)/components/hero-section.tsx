@@ -3,12 +3,19 @@
 import { siteConfig } from "@workspace/core/config/site";
 import { fetchLatestGithubVersion } from "@workspace/core/lib/utils";
 import { BorderBeam } from "@workspace/ui/components/landing/border-beam";
+import CountUp from "@workspace/ui/components/marketing/CountUp";
+import {
+  MagicBentoCard,
+  MagicBentoGrid,
+} from "@workspace/ui/components/marketing/MagicBento";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
+import ShinyText from "@workspace/ui/components/marketing/ShinyText";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   ArrowRight,
   Bot,
   Check,
+  Eye,
   Github,
   LayoutGrid,
   SquareKanban,
@@ -26,10 +33,11 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HeroBackdrop } from "./hero-backdrop";
-import { CodeBlock, CtaLink, Eyebrow, GlowCard } from "./marketing-kit";
-import { Counter, easeOut, Marquee } from "./motion-primitives";
+import { CtaLink, Eyebrow, GlowCard, StatCard } from "./marketing-kit";
+import { easeOut, Marquee } from "./motion-primitives";
+import { Terminal, type TerminalLineInput } from "./terminal";
 
 /* ── Copy ─────────────────────────────────────────────────── */
 
@@ -37,8 +45,7 @@ import { Counter, easeOut, Marquee } from "./motion-primitives";
 const HEADLINE = ["Your", "AI", "Engineering", "Workspace"];
 const HEADLINE_HIGHLIGHT_FROM = 3;
 
-const SUBHEAD =
-  "Hyperion orchestrates a swarm of AI agents that plan, code, test, and ship in parallel — dozens of terminals, one workspace, all under your command.";
+const SUBHEAD = "One workspace, up to  8  AI agents—code, test, ship together.";
 
 /* Quiet glass pills in place of CTA buttons — interactive-feeling,
    not button-shaped. */
@@ -70,10 +77,30 @@ const CAPABILITIES = [
 ];
 
 const STATS = [
-  { value: 12, suffix: "+", label: "terminals in one workspace" },
-  { value: 24, suffix: "/7", label: "autonomous operation" },
-  { value: 4, suffix: "×", label: "faster iteration loops" },
-  { value: 100, suffix: "%", label: "under your command" },
+  {
+    value: 8,
+    suffix: "",
+    label: "Terminals",
+    description: "Tiled into one adaptive workspace.",
+  },
+  {
+    value: 99.9,
+    suffix: "%",
+    label: "Agent Uptime",
+    description: "Autonomous agents that keep working.",
+  },
+  {
+    value: 10,
+    suffix: "×",
+    label: "Faster Delivery",
+    description: "Parallel agents cut iteration time.",
+  },
+  {
+    value: 100,
+    suffix: "%",
+    label: "Under Command",
+    description: "You approve every merge, always.",
+  },
 ];
 
 const FEATURES = [
@@ -107,6 +134,15 @@ const FEATURES = [
   },
 ];
 
+/* Mini tile preview inside the "Workspace System" hero cell — a
+   literal small tiling of what the sentence above describes. */
+const WORKSPACE_TILES = [
+  { icon: SquareTerminal, label: "Terminal" },
+  { icon: LayoutGrid, label: "Editor" },
+  { icon: Eye, label: "Preview" },
+  { icon: SquareKanban, label: "Task board" },
+];
+
 const SWARM_CHECKLIST = [
   "Agents plan, code, test, and review in parallel",
   "Every action lands in a terminal you can inspect",
@@ -114,17 +150,64 @@ const SWARM_CHECKLIST = [
   "Interrupt, redirect, or take over at any moment",
 ];
 
-const TERMINAL_CODE = `$ hyperion swarm start --agents 4
-
-✓ workspace attached — 4 terminals tiled
-● agent-01  planning   → roadmap.md
-● agent-02  coding     → src/auth/session.ts
-● agent-03  testing    → 148 passed, 0 failed
-● agent-04  reviewing  → PR #214 approved
-
-swarm active · 4 agents · you are in command`;
+const TERMINAL_LINES: TerminalLineInput[] = [
+  { text: "$ hyperion swarm start --agents 4" },
+  { text: "" },
+  { text: "workspace attached — 4 terminals tiled", status: "success" },
+  { text: "agent-01  planning   → roadmap.md", status: "info" },
+  { text: "agent-02  coding     → src/auth/session.ts", status: "info" },
+  { text: "agent-03  testing    → 148 passed, 0 failed", status: "info" },
+  { text: "agent-04  reviewing  → PR #214 approved", status: "success" },
+  { text: "" },
+  { text: "swarm active · 4 agents · you are in command" },
+];
 
 /* ── Micro components ─────────────────────────────────────── */
+
+/** One floating glass stat card — counts up once on entry, then eases
+ *  into an independent slow float+rotate drift (paused on hover).
+ *  Lift + tilt + scale are cursor-driven (same recipe as GlowCard) on
+ *  an inner element, kept separate from the float wrapper so the two
+ *  transforms never fight over the same node. Every card is the same
+ *  fixed height via grid stretch + h-full all the way down, and the
+ *  description reserves a fixed two-line slot so no card's content
+ *  shifts the number/label baseline relative to its neighbors. */
+function HeroStatCard({
+  value,
+  suffix,
+  label,
+  description,
+  index,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  description: string;
+  index: number;
+}) {
+  return (
+    <Reveal className="h-full" direction="up" duration={340} index={index}>
+      <StatCard>
+        <span className="font-display text-4xl text-foreground md:text-5xl">
+          <CountUp
+            className="count-up-text"
+            delay={index * 0.12}
+            duration={1.3}
+            separator=","
+            to={value}
+          />
+          {suffix}
+        </span>
+        <span className="mt-1.5 font-medium text-[11px] text-muted-foreground uppercase tracking-[0.16em]">
+          {label}
+        </span>
+        <span className="mt-2 flex min-h-[2.25rem] items-center justify-center text-muted-foreground/70 text-xs leading-relaxed">
+          {description}
+        </span>
+      </StatCard>
+    </Reveal>
+  );
+}
 
 /** One headline word — blur-to-sharp rise, staggered by index. */
 function Word({
@@ -263,36 +346,6 @@ function SwarmOrbit() {
   );
 }
 
-const PARTICLES = [
-  { left: "10%", top: "15%", size: "4px", dur: "14s", delay: "0s", x: "20px" },
-  {
-    left: "30%",
-    top: "25%",
-    size: "6px",
-    dur: "18s",
-    delay: "-2s",
-    x: "-30px",
-  },
-  { left: "55%", top: "45%", size: "3px", dur: "12s", delay: "-4s", x: "15px" },
-  {
-    left: "75%",
-    top: "20%",
-    size: "5px",
-    dur: "16s",
-    delay: "-1s",
-    x: "-25px",
-  },
-  { left: "85%", top: "60%", size: "4px", dur: "15s", delay: "-5s", x: "20px" },
-  {
-    left: "20%",
-    top: "75%",
-    size: "5px",
-    dur: "17s",
-    delay: "-3s",
-    x: "-15px",
-  },
-];
-
 /* ── Page ─────────────────────────────────────────────────── */
 
 export default function HeroSection() {
@@ -333,7 +386,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <main className="overflow-hidden bg-background">
+    <main className="overflow-visible bg-background">
       {/* ── Hero — GridScan holographic backdrop ── */}
       <section className="relative flex min-h-[88svh] flex-col justify-center">
         <HeroBackdrop />
@@ -375,18 +428,19 @@ export default function HeroSection() {
               {/* Headline — per-word blur reveal, shimmer sweep on the payoff word.
                   Deliberately one size class down from a typical hero — the
                   content, not the type, should carry the section. */}
-              <h1 className="mx-auto mt-10 max-w-3xl text-balance font-display text-[2.75rem] leading-[1.08] tracking-tight max-md:font-semibold md:text-[3.75rem] lg:mt-12 lg:text-7xl xl:text-[5rem]">
-                {HEADLINE.map((word, i) => (
-                  <Fragment key={word}>
-                    <Word
-                      delay={0.15 + i * 0.1}
-                      highlight={i >= HEADLINE_HIGHLIGHT_FROM}
-                    >
-                      {word}
-                    </Word>{" "}
-                  </Fragment>
-                ))}
-              </h1>
+              <div className="mx-auto mt-10 max-w-3xl text-balance font-display text-[2.75rem] leading-[1.08] tracking-tight max-md:font-semibold md:text-[3.75rem] lg:mt-12 lg:text-7xl xl:text-[5rem]">
+                {/* First word */}
+                <span>{HEADLINE[0]}</span> {/* Shiny AI word */}
+                <ShinyText
+                  className="inline-block"
+                  speed={0.8}
+                  text={HEADLINE[1]!}
+                />
+                {/* Remaining words before highlight */}
+                <span>{` ${HEADLINE[2]}`}</span>
+                <br />
+                <span>{HEADLINE[HEADLINE_HIGHLIGHT_FROM]}</span>
+              </div>
 
               <motion.p
                 animate={{ opacity: 1, y: 0 }}
@@ -471,7 +525,7 @@ export default function HeroSection() {
       </section>
 
       {/* ── Capability ticker ── */}
-      <section className="border-border/60 border-y py-5">
+      <section className="py-5">
         <Marquee speed={38}>
           {CAPABILITIES.map((cap) => (
             <span
@@ -489,19 +543,17 @@ export default function HeroSection() {
       </section>
 
       {/* ── Stats ── */}
-      <section className="bg-card/20">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 md:grid-cols-4 md:divide-x md:divide-border/60">
+      <section className="py-16 md:py-24">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 px-6 sm:grid-cols-2 lg:grid-cols-4">
           {STATS.map((stat, i) => (
-            <Reveal direction="up" duration={300} index={i} key={stat.label}>
-              <div className="group flex flex-col items-center gap-1.5 px-4 py-10 text-center">
-                <span className="font-display text-4xl text-foreground transition-colors duration-300 group-hover:text-primary md:text-5xl">
-                  <Counter suffix={stat.suffix} target={stat.value} />
-                </span>
-                <span className="text-muted-foreground text-sm">
-                  {stat.label}
-                </span>
-              </div>
-            </Reveal>
+            <HeroStatCard
+              description={stat.description}
+              index={i}
+              key={stat.label}
+              label={stat.label}
+              suffix={stat.suffix}
+              value={stat.value}
+            />
           ))}
         </div>
       </section>
@@ -516,34 +568,83 @@ export default function HeroSection() {
             </h2>
           </div>
         </Reveal>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map((feature, i) => (
-            <Reveal direction="up" duration={280} index={i} key={feature.title}>
-              <GlowCard className="h-full p-6">
-                <div className="flex size-11 items-center justify-center rounded-xl border border-border bg-secondary transition-colors duration-300 group-hover/card:border-primary/40">
-                  <feature.icon className="size-5 text-primary transition-transform duration-300 ease-out group-hover/card:-rotate-3 group-hover/card:scale-110" />
-                </div>
-                <h3 className="mt-4 font-medium text-foreground">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-                <Link
-                  className="group/link mt-4 inline-flex items-center gap-1 text-primary text-sm"
-                  href={feature.href}
+        <MagicBentoGrid className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {FEATURES.map((feature, i) => {
+            // Bento mosaic (lg+ only): first tile is the large hero cell,
+            // the last spans wide beneath it; the two in between stay
+            // standard size. Below lg everything stacks as a plain grid.
+            const isHero = i === 0;
+            const isWide = i === FEATURES.length - 1;
+            return (
+              <Reveal
+                className={cn(
+                  isHero && "lg:col-span-2 lg:row-span-2",
+                  isWide && "lg:col-span-2"
+                )}
+                direction="up"
+                duration={280}
+                index={i}
+                key={feature.title}
+              >
+                <MagicBentoCard
+                  className={cn("flex h-full flex-col p-6", isHero && "lg:p-8")}
+                  enableMagnetism={false}
                 >
-                  Explore
-                  <ArrowRight className="size-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
-                </Link>
-              </GlowCard>
-            </Reveal>
-          ))}
-        </div>
+                  <div
+                    className={cn(
+                      "flex items-center justify-center rounded-xl border border-border bg-secondary transition-colors duration-300 group-hover/card:border-primary/40",
+                      isHero ? "size-14" : "size-11"
+                    )}
+                  >
+                    <feature.icon
+                      className={cn(
+                        "text-primary transition-transform duration-300 ease-out group-hover/card:-rotate-3 group-hover/card:scale-110",
+                        isHero ? "size-6" : "size-5"
+                      )}
+                    />
+                  </div>
+                  <h3
+                    className={cn(
+                      "mt-4 font-medium text-foreground",
+                      isHero && "text-lg"
+                    )}
+                  >
+                    {feature.title}
+                  </h3>
+                  <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                  {isHero && (
+                    <div className="mt-6 grid grid-cols-2 gap-2">
+                      {WORKSPACE_TILES.map((tile) => (
+                        <div
+                          className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/40 px-3 py-2.5"
+                          key={tile.label}
+                        >
+                          <tile.icon className="size-3.5 shrink-0 text-muted-foreground" />
+                          <span className="truncate text-muted-foreground text-xs">
+                            {tile.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <Link
+                    className="group/link mt-auto inline-flex items-center gap-1 pt-4 text-primary text-sm"
+                    href={feature.href}
+                  >
+                    Explore
+                    <ArrowRight className="size-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
+                  </Link>
+                </MagicBentoCard>
+              </Reveal>
+            );
+          })}
+        </MagicBentoGrid>
       </section>
 
       {/* ── Swarm section ── */}
-      <section className="border-border/60 border-t bg-card/20">
+      <section className="landing-band-fade bg-card/20">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 md:py-24 lg:grid-cols-2">
           <div>
             <Reveal direction="up" duration={250}>
@@ -603,10 +704,10 @@ export default function HeroSection() {
           </div>
         </Reveal>
         <div className="mx-auto mt-10 max-w-[1000px]">
-          <CodeBlock
-            code={TERMINAL_CODE}
-            header="hyperion — swarm"
-            language="shell"
+          <Terminal
+            lines={TERMINAL_LINES}
+            shell="zsh"
+            title="hyperion — swarm"
             typing={true}
           />
         </div>

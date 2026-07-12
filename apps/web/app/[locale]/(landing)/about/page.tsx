@@ -51,8 +51,8 @@ const beliefs = [
 ];
 
 const stats = [
-  { value: 16, suffix: "", label: "terminal panes per grid" },
-  { value: 6, suffix: "", label: "agents per swarm" },
+  { value: 8, suffix: "", label: "terminal panes per grid" },
+  { value: 8, suffix: "", label: "agents per swarm" },
   { value: 40, suffix: "+", label: "OKLCh themes shipped" },
   { value: 100, suffix: "%", label: "open source" },
 ];
@@ -95,9 +95,6 @@ export default function AboutPage() {
           initial="hidden"
           variants={staggerContainer}
         >
-          <motion.div variants={revealVariants}>
-            <Eyebrow className="justify-center">About</Eyebrow>
-          </motion.div>
           <motion.h1
             className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl"
             variants={revealVariants}
@@ -136,7 +133,7 @@ export default function AboutPage() {
       </section>
 
       {/* Animated stats */}
-      <section className="border-border/60 border-y bg-card/20">
+      <section className="landing-band-fade bg-card/20">
         <div className="mx-auto grid max-w-6xl grid-cols-2 md:grid-cols-4 md:divide-x md:divide-border/60">
           {stats.map((stat, i) => (
             <Reveal direction="up" duration={300} index={i} key={stat.label}>

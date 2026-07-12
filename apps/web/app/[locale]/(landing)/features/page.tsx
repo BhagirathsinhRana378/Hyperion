@@ -1,34 +1,32 @@
 "use client";
 
+import {
+  MagicBentoCard,
+  MagicBentoGrid,
+} from "@workspace/ui/components/marketing/MagicBento";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
+import { cn } from "@workspace/ui/lib/utils";
 import {
   ArrowRight,
   Bot,
   Brain,
   Eye,
   GitBranch,
-  LayoutGrid,
   ListChecks,
-  Lock,
   Network,
-  SquareKanban,
   SquareTerminal,
   Workflow,
   Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
-import {
-  Badge,
-  CodeBlock,
-  CtaLink,
-  Eyebrow,
-  GlowCard,
-} from "../components/marketing-kit";
+import { FeaturesBackdrop } from "../components/features-backdrop";
+import { Badge, CtaLink, Eyebrow, GlowCard } from "../components/marketing-kit";
 import {
   revealVariants,
   staggerContainer,
 } from "../components/motion-primitives";
 import { ParallaxField } from "../components/parallax-field";
+import { Terminal, type TerminalLineInput } from "../components/terminal";
 
 /* ── Feature grid — every capability, one card each ───────── */
 
@@ -87,24 +85,16 @@ const features = [
     description:
       "Agents remember your conventions, past decisions, and project context across sessions.",
   },
-  {
-    icon: Lock,
-    title: "Secure Local Execution",
-    description:
-      "Everything runs on your machine. Your code never leaves unless you push it.",
-  },
-  {
-    icon: SquareKanban,
-    title: "Live Task Board",
-    description:
-      "A kanban that updates itself as the swarm works — drag to dispatch, drop to reassign.",
-  },
-  {
-    icon: LayoutGrid,
-    title: "Workspace Tiling",
-    description:
-      "Terminals, editors, previews, and boards tiled into one adaptive canvas.",
-  },
+];
+
+/* Mini status chips inside the "AI Agent Swarm" hero cell — a quick
+   read of what the swarm is doing, in the same voice as the hero
+   ticker copy elsewhere on the site. */
+const SWARM_TILES = [
+  { icon: Bot, label: "Agents" },
+  { icon: SquareTerminal, label: "Terminals" },
+  { icon: GitBranch, label: "Branches" },
+  { icon: Network, label: "Sync" },
 ];
 
 /* ── 3D showcase cards — the three pillars, oversized ──────── */
@@ -124,7 +114,7 @@ const pillars = [
     title: "Nothing happens off-screen",
     description:
       "Every agent action lands in a real terminal pane. Scroll back, interrupt, or take over the shell at any moment.",
-    beam: false,
+    beam: true,
   },
   {
     icon: GitBranch,
@@ -132,42 +122,42 @@ const pillars = [
     title: "From task to merged PR",
     description:
       "Agents work isolated worktrees, run the tests, and open reviewable pull requests. You keep the merge button.",
-    beam: false,
+    beam: true,
   },
 ];
 
-const DEMO_CODE = `$ hyperion agents plan "add rate limiting to the API"
-
-▸ planning     4 tasks · 2 can run in parallel
-  01  design limiter middleware        agent-01
-  02  implement token bucket           agent-02
-  03  wire into router  (needs 01,02)  agent-01
-  04  integration tests (needs 03)     agent-03
-
-▸ dispatching  3 agents · 3 terminals attached
-
-agent-02 › src/middleware/bucket.ts    +214 −0
-agent-01 › src/middleware/limiter.ts   +96 −4
-agent-03 › tests/rate-limit.test.ts    48 passed
-
-✓ PR #219 ready for review · 22 min end to end`;
+const DEMO_LINES: TerminalLineInput[] = [
+  { text: '$ hyperion agents plan "add rate limiting to the API"' },
+  { text: "" },
+  { text: "planning     4 tasks · 2 can run in parallel", status: "info" },
+  { text: "01  design limiter middleware        agent-01" },
+  { text: "02  implement token bucket           agent-02" },
+  { text: "03  wire into router  (needs 01,02)  agent-01" },
+  { text: "04  integration tests (needs 03)     agent-03" },
+  { text: "" },
+  { text: "dispatching  3 agents · 3 terminals attached", status: "info" },
+  { text: "" },
+  { text: "agent-02 › src/middleware/bucket.ts    +214 −0" },
+  { text: "agent-01 › src/middleware/limiter.ts   +96 −4" },
+  { text: "agent-03 › tests/rate-limit.test.ts    48 passed" },
+  { text: "" },
+  { text: "PR #219 ready for review · 22 min end to end", status: "success" },
+];
 
 export default function FeaturesPage() {
   return (
     <div className="relative">
       <ParallaxField />
+      <FeaturesBackdrop />
 
       {/* Hero */}
-      <section className="relative pt-36 pb-12">
+      <section className="relative z-10 pt-36 pb-12">
         <motion.div
           animate="visible"
           className="relative mx-auto max-w-3xl px-6 text-center"
           initial="hidden"
           variants={staggerContainer}
         >
-          <motion.div variants={revealVariants}>
-            <Eyebrow className="justify-center">Features</Eyebrow>
-          </motion.div>
           <motion.h1
             className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl"
             variants={revealVariants}
@@ -216,28 +206,68 @@ export default function FeaturesPage() {
             </h2>
           </div>
         </Reveal>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature, i) => (
-            <Reveal
-              direction="up"
-              duration={280}
-              index={i % 3}
-              key={feature.title}
-            >
-              <GlowCard className="h-full p-6">
-                <div className="flex size-11 items-center justify-center rounded-xl border border-border bg-secondary transition-colors duration-300 group-hover/card:border-primary/40">
-                  <feature.icon className="size-5 text-primary transition-transform duration-300 ease-out group-hover/card:-rotate-3 group-hover/card:scale-110" />
-                </div>
-                <h3 className="mt-4 font-medium text-foreground">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-              </GlowCard>
-            </Reveal>
-          ))}
-        </div>
+        <MagicBentoGrid className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature, i) => {
+            // Bento mosaic (lg+ only): the flagship first tile is a
+            // large 2x2 cell; the remaining eight stay standard size,
+            // filling out a clean 4-row x 3-col grid with no gaps.
+            const isHero = i === 0;
+            return (
+              <Reveal
+                className={cn(isHero && "lg:col-span-2 lg:row-span-2")}
+                direction="up"
+                duration={280}
+                index={i % 3}
+                key={feature.title}
+              >
+                <MagicBentoCard
+                  className={cn("flex h-full flex-col p-6", isHero && "lg:p-8")}
+                  enableMagnetism={false}
+                >
+                  <div
+                    className={cn(
+                      "flex items-center justify-center rounded-xl border border-border bg-secondary transition-colors duration-300 group-hover/card:border-primary/40",
+                      isHero ? "size-14" : "size-11"
+                    )}
+                  >
+                    <feature.icon
+                      className={cn(
+                        "text-primary transition-transform duration-300 ease-out group-hover/card:-rotate-3 group-hover/card:scale-110",
+                        isHero ? "size-6" : "size-5"
+                      )}
+                    />
+                  </div>
+                  <h3
+                    className={cn(
+                      "mt-4 font-medium text-foreground",
+                      isHero && "text-lg"
+                    )}
+                  >
+                    {feature.title}
+                  </h3>
+                  <p className="mt-2 text-muted-foreground text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                  {isHero && (
+                    <div className="mt-6 grid grid-cols-2 gap-2">
+                      {SWARM_TILES.map((tile) => (
+                        <div
+                          className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/40 px-3 py-2.5"
+                          key={tile.label}
+                        >
+                          <tile.icon className="size-3.5 shrink-0 text-muted-foreground" />
+                          <span className="truncate text-muted-foreground text-xs">
+                            {tile.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </MagicBentoCard>
+              </Reveal>
+            );
+          })}
+        </MagicBentoGrid>
       </section>
 
       {/* Live demo terminal */}
@@ -251,10 +281,10 @@ export default function FeaturesPage() {
           </div>
         </Reveal>
         <div className="mt-10">
-          <CodeBlock
-            code={DEMO_CODE}
-            header="hyperion — agents"
-            language="shell"
+          <Terminal
+            lines={DEMO_LINES}
+            shell="zsh"
+            title="hyperion — agents"
             typing={true}
           />
         </div>

@@ -1,9 +1,8 @@
-import { siteConfig } from "@workspace/core/config/site";
 import { Android } from "@workspace/ui/components/svgs/android";
 import { Apple } from "@workspace/ui/components/svgs/apple";
 import { Linux } from "@workspace/ui/components/svgs/linux";
 import { Windows } from "@workspace/ui/components/svgs/windows";
-import { Download, Github } from "lucide-react";
+import { Download } from "lucide-react";
 import type React from "react";
 import type { Platform } from "@/lib/detect-platform";
 
@@ -88,32 +87,6 @@ export const platformCards: PlatformCardData[] = [
         assetKey: "linux_amd64_appimage",
         label: "Universal",
         ext: ".AppImage",
-      },
-    ],
-  },
-  {
-    name: "Android",
-    icon: <Android aria-hidden={true} className="size-6" />,
-    matchKey: "android",
-    downloads: [
-      { assetKey: "android_universal_apk", label: "Universal", ext: ".apk" },
-      { assetKey: "android_arm64_apk", label: "ARM64", ext: ".apk" },
-    ],
-  },
-  {
-    name: "Other Platforms",
-    icon: <Github aria-hidden={true} className="size-6" />,
-    matchKey: "ios",
-    downloads: [
-      {
-        assetKey: siteConfig.links.releases,
-        label: "iOS App",
-        ext: "Coming soon",
-      },
-      {
-        assetKey: siteConfig.links.releases,
-        label: "View all releases",
-        ext: "GitHub",
       },
     ],
   },

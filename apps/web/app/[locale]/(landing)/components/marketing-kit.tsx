@@ -2,12 +2,13 @@
 
 import { BorderBeam } from "@workspace/ui/components/landing/border-beam";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
+import { StarBorder } from "@workspace/ui/components/marketing/StarBorder";
 import { cn } from "@workspace/ui/lib/utils";
-import { Check, Copy, Minus, Plus } from "lucide-react";
-import { motion, useReducedMotion, useScroll } from "motion/react";
+import { AlertCircle, Check, Copy, Minus, Plus } from "lucide-react";
+import { motion, useScroll } from "motion/react";
 import type * as React from "react";
-import { useEffect, useRef, useState } from "react";
-import TextType from "./text-type";
+import { useId, useRef, useState } from "react";
+import { Terminal } from "./terminal";
 
 /* ─────────────────────────────────────────────────────────────
    Local dark marketing kit for the (landing) route group.
@@ -158,7 +159,7 @@ export function CommandBar({
   return (
     <div
       className={cn(
-        "inline-flex max-w-full items-center gap-3 rounded-full border border-border bg-black/50 py-2 pr-2 pl-4 shadow-black/30 shadow-lg backdrop-blur-sm",
+        "inline-flex max-w-full items-center gap-3 rounded-full border border-border bg-card/60 py-2 pr-2 pl-4 shadow-black/30 shadow-lg backdrop-blur-sm",
         className
       )}
       data-slot="command-bar"
@@ -296,58 +297,216 @@ export function ScrollProgress() {
   );
 }
 
-/** Dark text input with accent focus ring. */
+/** Shared field-shell classes — hover glow, focus glow, validation
+ *  borders. Same footprint (height/radius/padding) as before; only
+ *  transitions and states are new. */
+const fieldShellClasses = (invalid?: boolean, valid?: boolean) =>
+  cn(
+    "peer w-full rounded-lg border bg-background/60 px-4 text-foreground text-sm placeholder:text-transparent",
+    "transition-[border-color,background-color,box-shadow] duration-200 ease-out",
+    "hover:border-border/80 hover:bg-background/70 hover:shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-border)_60%,transparent)]",
+    "focus:border-primary/60 focus:bg-background/70 focus:outline-none focus:shadow-[0_0_0_3px_color-mix(in_oklab,var(--color-primary)_16%,transparent)]",
+    invalid
+      ? "border-[#c98a7f]/70 focus:border-[#c98a7f]/70 focus:shadow-[0_0_0_3px_color-mix(in_oklab,#c98a7f_16%,transparent)]"
+      : "border-border",
+    valid && "border-[#8bbf93]/70"
+  );
+
+/** Notched floating label — sits centered inside the field like a
+ *  placeholder at rest, then on focus/filled lifts to straddle the
+ *  field's top border with a background patch behind it (so it reads
+ *  as a cut in the border, not overlapping text), Material/Linear
+ *  style. `top` is the rest-state vertical center as a CSS length
+ *  (differs between the fixed-height Input and the top-anchored
+ *  Textarea). */
+function FloatingLabel({
+  htmlFor,
+  children,
+  floated,
+  top,
+}: {
+  htmlFor: string;
+  children: React.ReactNode;
+  floated: boolean;
+  top: string;
+}) {
+  return (
+    <label
+      className={cn(
+        "pointer-events-none absolute left-3.5 origin-left whitespace-nowrap font-medium transition-[transform,color,top] duration-[220ms] ease-in-out",
+        floated
+          ? "-translate-y-1/2 rounded bg-background px-1 text-primary/90 text-[0.8125rem]"
+          : "-translate-y-1/2 text-foreground/80 text-sm peer-hover:text-foreground/90"
+      )}
+      htmlFor={htmlFor}
+      style={{ top: floated ? 0 : top }}
+    >
+      {children}
+    </label>
+  );
+}
+
+/** Small inline validation message — fades/slides in once. */
+function FieldMessage({ invalid, message }: { invalid?: boolean; message?: string }) {
+  if (!message) {
+    return null;
+  }
+  return (
+    <p
+      className={cn(
+        "landing-field-message-in flex items-center gap-1 text-xs",
+        invalid ? "text-[#c98a7f]" : "text-[#8bbf93]"
+      )}
+    >
+      {invalid ? (
+        <AlertCircle className="size-3 shrink-0" />
+      ) : (
+        <Check className="size-3 shrink-0" />
+      )}
+      {message}
+    </p>
+  );
+}
+
+/** Dark text input — floating label, hover/focus micro-glow, optional
+ *  validation state. Same height/radius/spacing as before. */
 export function Input({
   className,
   label,
   id,
+  invalid,
+  valid,
+  message,
+  onFocus,
+  onBlur,
+  onChange,
   ...props
-}: React.ComponentProps<"input"> & { label?: string }) {
+}: React.ComponentProps<"input"> & {
+  label?: string;
+  invalid?: boolean;
+  valid?: boolean;
+  message?: string;
+}) {
+  const autoId = useId();
+  const fieldId = id ?? autoId;
+  const [focused, setFocused] = useState(false);
+  const [hasValue, setHasValue] = useState(
+    Boolean(props.defaultValue ?? props.value)
+  );
+  const [shake, setShake] = useState(false);
+
   return (
     <div className="space-y-1.5">
-      {label && (
-        <label className="font-medium text-foreground/80 text-sm" htmlFor={id}>
-          {label}
-        </label>
-      )}
-      <input
-        className={cn(
-          "h-11 w-full rounded-lg border border-border bg-background/60 px-4 text-foreground text-sm placeholder:text-muted-foreground",
-          "transition-colors duration-150 focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20",
-          className
+      <div className="relative">
+        <input
+          className={cn(
+            fieldShellClasses(invalid, valid),
+            "h-11",
+            shake && "landing-field-shake",
+            className
+          )}
+          data-slot="marketing-input"
+          id={fieldId}
+          onAnimationEnd={() => setShake(false)}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
+          onChange={(e) => {
+            setHasValue(e.currentTarget.value.length > 0);
+            onChange?.(e);
+          }}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          {...props}
+        />
+        {label && (
+          <FloatingLabel
+            floated={focused || hasValue}
+            htmlFor={fieldId}
+            top="50%"
+          >
+            {label}
+          </FloatingLabel>
         )}
-        data-slot="marketing-input"
-        id={id}
-        {...props}
-      />
+        {invalid && (
+          <AlertCircle className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-3.5 size-4 text-[#c98a7f]" />
+        )}
+        {valid && !invalid && (
+          <Check className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-3.5 size-4 text-[#8bbf93]" />
+        )}
+      </div>
+      <FieldMessage invalid={invalid} message={message} />
     </div>
   );
 }
 
-/** Dark textarea with accent focus ring. */
+/** Dark textarea — same treatment as Input, floating label included. */
 export function Textarea({
   className,
   label,
   id,
+  invalid,
+  valid,
+  message,
+  onFocus,
+  onBlur,
+  onChange,
   ...props
-}: React.ComponentProps<"textarea"> & { label?: string }) {
+}: React.ComponentProps<"textarea"> & {
+  label?: string;
+  invalid?: boolean;
+  valid?: boolean;
+  message?: string;
+}) {
+  const autoId = useId();
+  const fieldId = id ?? autoId;
+  const [focused, setFocused] = useState(false);
+  const [hasValue, setHasValue] = useState(
+    Boolean(props.defaultValue ?? props.value)
+  );
+  const [shake, setShake] = useState(false);
+
   return (
     <div className="space-y-1.5">
-      {label && (
-        <label className="font-medium text-foreground/80 text-sm" htmlFor={id}>
-          {label}
-        </label>
-      )}
-      <textarea
-        className={cn(
-          "min-h-[120px] w-full rounded-lg border border-border bg-background/60 px-4 py-3 text-foreground text-sm placeholder:text-muted-foreground",
-          "transition-colors duration-150 focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20",
-          className
+      <div className="relative">
+        <textarea
+          className={cn(
+            fieldShellClasses(invalid, valid),
+            "min-h-[120px] py-3",
+            shake && "landing-field-shake",
+            className
+          )}
+          data-slot="marketing-textarea"
+          id={fieldId}
+          onAnimationEnd={() => setShake(false)}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
+          onChange={(e) => {
+            setHasValue(e.currentTarget.value.length > 0);
+            onChange?.(e);
+          }}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          {...props}
+        />
+        {label && (
+          <FloatingLabel
+            floated={focused || hasValue}
+            htmlFor={fieldId}
+            top="1.375rem"
+          >
+            {label}
+          </FloatingLabel>
         )}
-        data-slot="marketing-textarea"
-        id={id}
-        {...props}
-      />
+      </div>
+      <FieldMessage invalid={invalid} message={message} />
     </div>
   );
 }
@@ -412,7 +571,10 @@ export function FAQ({
 }
 
 /**
- * CodeBlock — the site's one shared terminal window.
+ * CodeBlock — shared terminal-style window used by the coding and
+ * docs pages. (The hero and features pages use the newer `Terminal`
+ * component from ./terminal instead — scoped there deliberately, not
+ * yet rolled out here.)
  *
  * Fixed-size viewport, like a real terminal app (Warp/iTerm/VS Code):
  * 360px tall on mobile, 440px on tablet, 500px on desktop, up to
@@ -439,81 +601,43 @@ export function CodeBlock({
   code?: string;
   typing?: boolean;
 }) {
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const reduceMotion = useReducedMotion();
-  const showTyping = typing && !reduceMotion && !!code;
-
-  // Auto-scroll: while output is being typed, keep the viewport pinned
-  // to the newest line. A MutationObserver keeps this decoupled from
-  // the typing engine — any DOM growth inside the body re-pins.
-  useEffect(() => {
-    const el = bodyRef.current;
-    if (!(el && showTyping)) {
-      return;
-    }
-    const observer = new MutationObserver(() => {
-      el.scrollTop = el.scrollHeight;
-    });
-    observer.observe(el, {
-      childList: true,
-      characterData: true,
-      subtree: true,
-    });
-    return () => observer.disconnect();
-  }, [showTyping]);
-
   return (
-    <Reveal direction="up" duration={350} offset={32}>
+    <Terminal
+      className={className}
+      code={code}
+      shell={language}
+      title={header}
+      typing={typing}
+      {...props}
+    >
+      {children}
+    </Terminal>
+  );
+}
+
+export function StatCard({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <StarBorder
+      className={cn(
+        "h-full rounded-2xl shadow-[0_8px_30px_-14px_rgba(0,0,0,0.6)] transition-[border-color,box-shadow] duration-300 ease-out hover:shadow-[0_0_24px_1px_rgba(124,58,237,0.08)]",
+        className
+      )}
+      color="124, 58, 237"
+      hoverOpacity={0.25}
+      idleOpacity={0.06}
+      speed="7s"
+      thickness={1.5}
+    >
       <div
-        className={cn(
-          "mx-auto flex h-[360px] w-full max-w-[1000px] flex-col overflow-hidden rounded-xl border border-border bg-black/50 shadow-2xl shadow-black/40 backdrop-blur-sm md:h-[440px] lg:h-[500px]",
-          className
-        )}
-        data-slot="code-block"
+        className="group/stat relative flex h-full flex-col justify-between rounded-2xl border border-white/[0.05] bg-black px-6 py-8 text-center transition-[background-color,border-color] duration-300 hover:border-primary/20 hover:bg-white/[0.02]"
         {...props}
       >
-        <div className="flex shrink-0 items-center gap-2 border-border border-b bg-muted/30 px-4 py-2.5">
-          <span className="size-2.5 rounded-full bg-[#ff5f57]" />
-          <span className="size-2.5 rounded-full bg-[#febc2e]" />
-          <span className="size-2.5 rounded-full bg-[#28c840]" />
-          {header && (
-            <span className="ml-2 font-mono text-muted-foreground text-xs">
-              {header}
-            </span>
-          )}
-          <span className="ml-auto font-mono text-muted-foreground text-xs">
-            {language}
-          </span>
-        </div>
-        <div
-          className="flex-1 overflow-y-auto overflow-x-hidden p-4 [overscroll-behavior:contain] [scrollbar-color:var(--color-border)_transparent] [scrollbar-width:thin]"
-          ref={bodyRef}
-        >
-          {children ?? (
-            <pre className="whitespace-pre-wrap break-words font-mono text-foreground/85 text-sm leading-relaxed">
-              {showTyping && code ? (
-                <TextType
-                  as="span"
-                  cursorCharacter={
-                    <span
-                      aria-hidden={true}
-                      className="inline-block h-4 w-2 translate-y-0.5 bg-primary/80"
-                    />
-                  }
-                  cursorClassName="ml-0.5"
-                  loop={false}
-                  showCursor={true}
-                  startOnVisible={true}
-                  text={code}
-                  typingSpeed={8}
-                />
-              ) : (
-                <code>{code}</code>
-              )}
-            </pre>
-          )}
-        </div>
+        {children}
       </div>
-    </Reveal>
+    </StarBorder>
   );
 }

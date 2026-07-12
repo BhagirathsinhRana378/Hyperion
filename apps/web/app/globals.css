@@ -196,6 +196,28 @@
   animation: landing-hover-bob 7s ease-in-out infinite;
 }
 
+/* Stat-card float — vertical drift plus a hair of rotation, so the
+   card reads as tumbling gently rather than just bobbing on a
+   string. Amplitude/duration/delay are all tunable per instance via
+   custom properties so each card in a row can drift independently
+   without needing four separate keyframes. Paused on hover via the
+   consumer's own `hover:[animation-play-state:paused]` class. */
+@keyframes landing-card-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(var(--card-float-y, -4px))
+      rotate(var(--card-float-rot, 0.6deg));
+  }
+}
+
+.landing-card-float {
+  animation: landing-card-float var(--card-float-dur, 6s) ease-in-out infinite;
+  animation-delay: var(--card-float-delay, 0s);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-drift,
   .landing-shimmer,
@@ -203,9 +225,98 @@
   .landing-float,
   .landing-grid-flow,
   .landing-caret-blink,
-  .landing-hover-bob {
+  .landing-hover-bob,
+  .landing-card-float {
     animation: none;
   }
+}
+
+/* Form field invalid-state shake — a single quick horizontal nudge,
+   not a loop. Consumer toggles the class on and clears it again in
+   onAnimationEnd, so it can be retriggered on repeated failed
+   submits. */
+@keyframes landing-field-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(3px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(1px);
+  }
+}
+
+.landing-field-shake {
+  animation: landing-field-shake 320ms ease-out;
+}
+
+/* Validation helper message — fades and settles in from just below
+   its resting position, once, when it first appears. */
+@keyframes landing-field-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-field-message-in {
+  animation: landing-field-message-in 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-field-shake,
+  .landing-field-message-in {
+    animation: none;
+  }
+}
+
+/* Emphasized easing curve — matches the `emphasized` token in
+   motion-primitives.tsx, for CSS-only transitions (motion.div covers
+   the JS-driven ones) that want the same refined deceleration. */
+.landing-ease-emphasized {
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Terminal scroll — thin, theme-matched scrollbar for the terminal
+   window's internal viewport, both Firefox (scrollbar-color/width)
+   and Chromium/WebKit (::-webkit-scrollbar). scroll-behavior:smooth
+   only affects scrollIntoView/scrollTo-style scrolls (mouse wheel is
+   already smooth natively, and the typing auto-scroll writes
+   scrollTop directly, which bypasses it) — so it only smooths
+   manual/programmatic jumps, never fights the per-character pin. */
+.landing-terminal-scroll {
+  scroll-behavior: smooth;
+  scrollbar-color: var(--border) transparent;
+  scrollbar-width: thin;
+}
+
+.landing-terminal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.landing-terminal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.landing-terminal-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.landing-terminal-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
 }
 
 /* Footer wordmark watermark — near-invisible at rest (2–5%) on
@@ -220,4 +331,27 @@
   .wordmark-base {
     opacity: 0.1; /* slightly higher than before (was 0.025) */
   }
+}
+
+/* Soft-tinted section band — the shared replacement for hard
+   border-t/border-y dividers between page sections. The surface tint
+   fades to transparent at both edges via mask instead of snapping at
+   a hard line, so it blends into the surrounding background instead
+   of reading as a separate block. Percentage-based stops so it
+   self-scales to any section height. */
+.landing-band-fade {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
 }

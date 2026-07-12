@@ -10,9 +10,14 @@ import {
   SquareKanban,
   SquareTerminal,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useState } from "react";
 import { Badge, CtaLink, Eyebrow } from "../components/marketing-kit";
+
+const FloatingLines = dynamic(() => import("../components/FloatingLines"), {
+  ssr: false,
+});
 
 const PAGE_SIZE = 4;
 
@@ -85,12 +90,25 @@ export default function NewsPage() {
   const hasMore = visible < entries.length;
 
   return (
-    <section className="relative mx-auto max-w-4xl px-6 pt-36 pb-24 md:pb-32">
+    <div className="relative">
       <div
         aria-hidden={true}
-        className="landing-glow-breathe pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] [background:radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_0%,transparent_70%)]"
-      />
-      <Eyebrow>Dev log</Eyebrow>
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[550px] w-full overflow-hidden"
+      >
+        <FloatingLines
+          enabledWaves={["top", "middle", "bottom"]}
+          lineCount={7}
+          lineDistance={9}
+          bendRadius={5.0}
+          bendStrength={-8.5}
+          interactive={true}
+          parallax={true}
+          linesGradient={["#e8e8e8", "#6f6f6f", "#6a6a6a"]}
+        />
+        {/* Soft wash to blend it in */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
+      </div>
+      <section className="relative mx-auto max-w-4xl px-6 pt-36 pb-24 md:pb-32">
       <h1 className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl">
         Notes from the build.
       </h1>
@@ -159,5 +177,6 @@ export default function NewsPage() {
         </div>
       )}
     </section>
+    </div>
   );
 }

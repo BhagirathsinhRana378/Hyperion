@@ -5,12 +5,12 @@ import { cn } from "@workspace/ui/lib/utils";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { DocsBackdrop } from "../components/docs-backdrop";
+import { DocsSidebar } from "../components/docs-sidebar";
 import {
   Callout,
   CodeBlock,
   CommandBar,
   CopyButton,
-  Eyebrow,
   FAQ,
 } from "../components/marketing-kit";
 
@@ -189,6 +189,7 @@ export default function DocsPage() {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             setActiveId(entry.target.id);
+            window.history.replaceState(null, "", `#${entry.target.id}`);
           }
         }
       },
@@ -203,10 +204,24 @@ export default function DocsPage() {
     return () => observer.disconnect();
   }, []);
 
+  // Smooth scroll to section if URL hash is present on mount
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const el = document.getElementById(hash);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    }
+  }, []);
+
   const jumpTo = (id: string) => {
     document
       .getElementById(id)
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.history.pushState(null, "", `#${id}`);
   };
 
   return (
@@ -217,38 +232,23 @@ export default function DocsPage() {
       {/* Hero */}
       <section className="relative z-10 pt-36 pb-10">
         <div className="mx-auto max-w-7xl px-6">
-          <Eyebrow>Documentation</Eyebrow>
-          <h1 className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl">
+          {/* <Eyebrow>Documentation</Eyebrow> */}
+          {/* <h1 className="mt-3 font-display text-4xl text-foreground tracking-tighter md:text-6xl">
             Learn Hyperion.
           </h1>
           <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
             From first install to a running agent swarm — everything you need,
             on one page.
-          </p>
+          </p> */}
         </div>
       </section>
 
-      <div className="relative z-10 mx-auto flex max-w-7xl gap-12 px-6 pb-24 md:pb-32">
-        {/* Sidebar */}
-        <aside className="hidden w-52 shrink-0 lg:block">
-          <nav className="sticky top-32 space-y-0.5">
-            {sections.map((s) => (
-              <button
-                className={cn(
-                  "block w-full cursor-pointer rounded-md px-3 py-1.5 text-left text-sm transition-colors duration-150",
-                  activeId === s.id
-                    ? "bg-secondary text-foreground"
-                    : "text-muted-foreground hover:bg-muted/40 hover:text-foreground/80"
-                )}
-                key={s.id}
-                onClick={() => jumpTo(s.id)}
-                type="button"
-              >
-                {s.label}
-              </button>
-            ))}
-          </nav>
-        </aside>
+      <div className="relative z-10 mx-auto mt-0 flex max-w-7xl gap-12 px-15 pb-24 md:pb-32">
+        <DocsSidebar
+          activeId={activeId}
+          onSectionClick={jumpTo}
+          sections={sections}
+        />
 
         {/* Content */}
         <div className="min-w-0 flex-1 space-y-16" ref={contentRef}>

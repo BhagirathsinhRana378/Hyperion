@@ -109,7 +109,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning={true}>
       <body
         className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} ${fontBody.variable} ${fontCode.variable} font-sans antialiased`}
       >

@@ -116,10 +116,44 @@ export function HyperionNav() {
 
           <div className="hidden items-center gap-4 lg:flex">
             <Link
-              className="inline-flex h-8 items-center justify-center rounded-full bg-primary px-4 font-medium text-primary-foreground text-sm transition-all duration-150 hover:scale-[1.03] hover:bg-primary/85 active:scale-[0.98]"
+              className="group/btn relative inline-flex h-8 items-center justify-center rounded-xl bg-primary px-4 font-medium text-primary-foreground text-sm transition-all duration-300 active:scale-[0.98]"
               href="/contact"
             >
               Get access
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" fill="none">
+                <defs>
+                  <linearGradient id="shiny-gold-desktop" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#FFFFFF" />
+                    <stop offset="25%" stopColor="#FDE047" />
+                    <stop offset="65%" stopColor="#D4AF37" />
+                    <stop offset="100%" stopColor="#854D0E" />
+                  </linearGradient>
+                </defs>
+                <rect
+                  x="1"
+                  y="1"
+                  width="calc(100% - 2px)"
+                  height="calc(100% - 2px)"
+                  rx="12"
+                  ry="12"
+                  pathLength="100"
+                  stroke="url(#shiny-gold-desktop)"
+                  className="transition-[stroke-dasharray] duration-500 ease-out [stroke-dasharray:0_100] [stroke-dashoffset:-12.5] group-hover/btn:[stroke-dasharray:55_45]"
+                  strokeWidth="1.5"
+                />
+                <rect
+                  x="1"
+                  y="1"
+                  width="calc(100% - 2px)"
+                  height="calc(100% - 2px)"
+                  rx="12"
+                  ry="12"
+                  pathLength="100"
+                  stroke="url(#shiny-gold-desktop)"
+                  className="transition-[stroke-dasharray] duration-500 ease-out [stroke-dasharray:0_100] [stroke-dashoffset:-12.5] group-hover/btn:[stroke-dasharray:55_45] origin-center scale-x-[-1]"
+                  strokeWidth="1.5"
+                />
+              </svg>
             </Link>
           </div>
 
@@ -154,11 +188,45 @@ export function HyperionNav() {
               ))}
               <li className="border-border/60 border-t pt-4">
                 <Link
-                  className="inline-flex h-10 items-center justify-center rounded-full bg-primary px-5 font-medium text-primary-foreground text-sm transition-all duration-150 hover:scale-[1.02] active:scale-[0.98]"
+                  className="group/btn relative inline-flex h-10 items-center justify-center rounded-xl bg-primary px-5 font-medium text-primary-foreground text-sm transition-all duration-300 active:scale-[0.98]"
                   href="/contact"
                   onClick={() => setMenuOpen(false)}
                 >
                   Get access
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none" fill="none">
+                    <defs>
+                      <linearGradient id="shiny-gold-mobile" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#FFFFFF" />
+                        <stop offset="25%" stopColor="#FDE047" />
+                        <stop offset="65%" stopColor="#D4AF37" />
+                        <stop offset="100%" stopColor="#854D0E" />
+                      </linearGradient>
+                    </defs>
+                    <rect
+                      x="1"
+                      y="1"
+                      width="calc(100% - 2px)"
+                      height="calc(100% - 2px)"
+                      rx="12"
+                      ry="12"
+                      pathLength="100"
+                      stroke="url(#shiny-gold-mobile)"
+                      className="transition-[stroke-dasharray] duration-500 ease-out [stroke-dasharray:0_100] [stroke-dashoffset:-12.5] group-hover/btn:[stroke-dasharray:55_45]"
+                      strokeWidth="1.5"
+                    />
+                    <rect
+                      x="1"
+                      y="1"
+                      width="calc(100% - 2px)"
+                      height="calc(100% - 2px)"
+                      rx="12"
+                      ry="12"
+                      pathLength="100"
+                      stroke="url(#shiny-gold-mobile)"
+                      className="transition-[stroke-dasharray] duration-500 ease-out [stroke-dasharray:0_100] [stroke-dashoffset:-12.5] group-hover/btn:[stroke-dasharray:55_45] origin-center scale-x-[-1]"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
                 </Link>
               </li>
             </ul>
