@@ -120,7 +120,7 @@ export default function AboutPage() {
             className="mt-8 flex justify-center gap-4"
             variants={revealVariants}
           >
-            <CtaLink className="group h-11 px-6" href="/about/team">
+            <CtaLink className="group h-11 px-6" href="/devs">
               Meet the devs
               <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
             </CtaLink>
