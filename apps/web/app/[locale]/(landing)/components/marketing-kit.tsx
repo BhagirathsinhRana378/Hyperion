@@ -3,6 +3,7 @@
 import { BorderBeam } from "@workspace/ui/components/landing/border-beam";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
 import { StarBorder } from "@workspace/ui/components/marketing/StarBorder";
+import CountUp from "@workspace/ui/components/marketing/CountUp";
 import { cn } from "@workspace/ui/lib/utils";
 import { AlertCircle, Check, Copy, Minus, Plus } from "lucide-react";
 import { motion, useScroll } from "motion/react";
@@ -645,5 +646,44 @@ export function StatCard({
         {children}
       </div>
     </StarBorder>
+  );
+}
+
+export function HeroStatCard({
+  value,
+  suffix,
+  label,
+  description,
+  index,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  description?: string;
+  index: number;
+}) {
+  return (
+    <Reveal className="h-full" direction="up" duration={340} index={index}>
+      <StatCard>
+        <span className="font-display text-4xl text-foreground md:text-5xl">
+          <CountUp
+            className="count-up-text"
+            delay={index * 0.12}
+            duration={1.3}
+            separator=","
+            to={value}
+          />
+          {suffix}
+        </span>
+        <span className="mt-1.5 font-medium text-[11px] text-muted-foreground uppercase tracking-[0.16em]">
+          {label}
+        </span>
+        {description && (
+          <span className="mt-2 flex min-h-[2.25rem] items-center justify-center text-muted-foreground/70 text-xs leading-relaxed">
+            {description}
+          </span>
+        )}
+      </StatCard>
+    </Reveal>
   );
 }

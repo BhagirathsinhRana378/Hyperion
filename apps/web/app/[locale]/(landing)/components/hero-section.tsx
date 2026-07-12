@@ -35,7 +35,7 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import { HeroBackdrop } from "./hero-backdrop";
-import { CtaLink, Eyebrow, GlowCard, StatCard } from "./marketing-kit";
+import { CtaLink, Eyebrow, GlowCard, HeroStatCard, StatCard } from "./marketing-kit";
 import { easeOut, Marquee } from "./motion-primitives";
 import { Terminal, type TerminalLineInput } from "./terminal";
 
@@ -161,53 +161,7 @@ const TERMINAL_LINES: TerminalLineInput[] = [
   { text: "" },
   { text: "swarm active · 4 agents · you are in command" },
 ];
-
 /* ── Micro components ─────────────────────────────────────── */
-
-/** One floating glass stat card — counts up once on entry, then eases
- *  into an independent slow float+rotate drift (paused on hover).
- *  Lift + tilt + scale are cursor-driven (same recipe as GlowCard) on
- *  an inner element, kept separate from the float wrapper so the two
- *  transforms never fight over the same node. Every card is the same
- *  fixed height via grid stretch + h-full all the way down, and the
- *  description reserves a fixed two-line slot so no card's content
- *  shifts the number/label baseline relative to its neighbors. */
-function HeroStatCard({
-  value,
-  suffix,
-  label,
-  description,
-  index,
-}: {
-  value: number;
-  suffix: string;
-  label: string;
-  description: string;
-  index: number;
-}) {
-  return (
-    <Reveal className="h-full" direction="up" duration={340} index={index}>
-      <StatCard>
-        <span className="font-display text-4xl text-foreground md:text-5xl">
-          <CountUp
-            className="count-up-text"
-            delay={index * 0.12}
-            duration={1.3}
-            separator=","
-            to={value}
-          />
-          {suffix}
-        </span>
-        <span className="mt-1.5 font-medium text-[11px] text-muted-foreground uppercase tracking-[0.16em]">
-          {label}
-        </span>
-        <span className="mt-2 flex min-h-[2.25rem] items-center justify-center text-muted-foreground/70 text-xs leading-relaxed">
-          {description}
-        </span>
-      </StatCard>
-    </Reveal>
-  );
-}
 
 /** One headline word — blur-to-sharp rise, staggered by index. */
 function Word({

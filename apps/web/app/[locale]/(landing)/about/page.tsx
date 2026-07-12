@@ -4,9 +4,8 @@ import { Reveal } from "@workspace/ui/components/marketing/reveal";
 import { ArrowRight, Compass, GitFork, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 import Beams from "../components/beams";
-import { CtaLink, Eyebrow, GlowCard } from "../components/marketing-kit";
+import { CtaLink, Eyebrow, GlowCard, HeroStatCard } from "../components/marketing-kit";
 import {
-  Counter,
   revealVariants,
   staggerContainer,
 } from "../components/motion-primitives";
@@ -151,19 +150,16 @@ export default function AboutPage() {
       </section>
 
       {/* Animated stats */}
-      <section className="landing-band-fade bg-card/20">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 md:grid-cols-4 md:divide-x md:divide-border/60">
+      <section className="py-16 md:py-24">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 px-6 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, i) => (
-            <Reveal direction="up" duration={300} index={i} key={stat.label}>
-              <div className="group flex flex-col items-center gap-1.5 px-4 py-10 text-center">
-                <span className="font-display text-4xl text-foreground transition-colors duration-300 group-hover:text-primary md:text-5xl">
-                  <Counter suffix={stat.suffix} target={stat.value} />
-                </span>
-                <span className="text-muted-foreground text-sm">
-                  {stat.label}
-                </span>
-              </div>
-            </Reveal>
+            <HeroStatCard
+              index={i}
+              key={stat.label}
+              label={stat.label}
+              suffix={stat.suffix}
+              value={stat.value}
+            />
           ))}
         </div>
       </section>
