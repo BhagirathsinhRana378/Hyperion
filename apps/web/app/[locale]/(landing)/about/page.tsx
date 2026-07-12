@@ -3,6 +3,7 @@
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
 import { ArrowRight, Compass, GitFork, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
+import Beams from "../components/beams";
 import { CtaLink, Eyebrow, GlowCard } from "../components/marketing-kit";
 import {
   Counter,
@@ -53,7 +54,7 @@ const beliefs = [
 const stats = [
   { value: 8, suffix: "", label: "terminal panes per grid" },
   { value: 8, suffix: "", label: "agents per swarm" },
-  { value: 40, suffix: "+", label: "OKLCh themes shipped" },
+  { value: 1, suffix: "", label: "boss agent" },
   { value: 100, suffix: "%", label: "open source" },
 ];
 
@@ -83,8 +84,20 @@ const timeline = [
 export default function AboutPage() {
   return (
     <div className="relative">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[600px] select-none overflow-hidden opacity-30">
+        <Beams
+          beamHeight={15}
+          beamNumber={12}
+          beamWidth={2}
+          lightColor="#ffffff"
+          noiseIntensity={1.75}
+          rotation={0}
+          scale={0.2}
+          speed={2}
+        />
+      </div>
       {/* Hero */}
-      <section className="relative pt-36 pb-14">
+      <section className="relative z-10 pt-36 pb-14">
         <div
           aria-hidden={true}
           className="landing-glow-breathe pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px] [background:radial-gradient(60%_60%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_0%,transparent_70%)]"
@@ -108,6 +121,15 @@ export default function AboutPage() {
             Hyperion exists because the tools of the last era — one human, one
             editor, one cursor — can't carry the next one.
           </motion.p>
+          <motion.div
+            className="mt-8 flex justify-center gap-4"
+            variants={revealVariants}
+          >
+            <CtaLink className="group h-11 px-6" href="/about/team">
+              Meet the devs
+              <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+            </CtaLink>
+          </motion.div>
         </motion.div>
       </section>
 

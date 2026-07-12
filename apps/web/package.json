@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
     "@types/mdx": "^2.0.14",
     "@workspace/core": "workspace:*",
     "@workspace/i18n": "workspace:*",
