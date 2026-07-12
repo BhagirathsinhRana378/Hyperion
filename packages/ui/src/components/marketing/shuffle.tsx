@@ -328,14 +328,22 @@ const Shuffle: React.FC<ShuffleProps> = ({
               gsap.set(strips, {
                 y: (i) => {
                   const strip = strips[i];
-                  return strip ? Number.parseFloat(strip.getAttribute("data-start-y") || "0") : 0;
+                  return strip
+                    ? Number.parseFloat(
+                        strip.getAttribute("data-start-y") || "0"
+                      )
+                    : 0;
                 },
               });
             } else {
               gsap.set(strips, {
                 x: (i) => {
                   const strip = strips[i];
-                  return strip ? Number.parseFloat(strip.getAttribute("data-start-x") || "0") : 0;
+                  return strip
+                    ? Number.parseFloat(
+                        strip.getAttribute("data-start-x") || "0"
+                      )
+                    : 0;
                 },
               });
             }
@@ -364,12 +372,16 @@ const Shuffle: React.FC<ShuffleProps> = ({
           if (isVertical) {
             vars.y = (i: number) => {
               const target = targets[i];
-              return target ? Number.parseFloat(target.getAttribute("data-final-y") || "0") : 0;
+              return target
+                ? Number.parseFloat(target.getAttribute("data-final-y") || "0")
+                : 0;
             };
           } else {
             vars.x = (i: number) => {
               const target = targets[i];
-              return target ? Number.parseFloat(target.getAttribute("data-final-x") || "0") : 0;
+              return target
+                ? Number.parseFloat(target.getAttribute("data-final-x") || "0")
+                : 0;
             };
           }
           tl.to(targets, vars, at);

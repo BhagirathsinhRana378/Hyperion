@@ -24,50 +24,50 @@ export type TerminalState =
 
 export interface LogEntry {
   id: string;
-  timestamp: number;
-  source: "frontend" | "backend" | "ipc" | "api" | "planner" | "terminal";
-  type: "info" | "warn" | "error";
   message: string;
   requestId?: string;
+  source: "frontend" | "backend" | "ipc" | "api" | "planner" | "terminal";
+  timestamp: number;
+  type: "info" | "warn" | "error";
 }
 
 interface AgentState {
-  addMessage: (workspaceId: string, message: AgentMessage) => void;
-  upsertMessage: (workspaceId: string, message: AgentMessage) => void;
-  apiKey: string;
-  availableModels: string[];
-  baseUrl: string;
-  clearMessages: (workspaceId: string) => void;
-  clearProviderConfig: () => void;
-  isOpen: boolean;
-  messages: Record<string, AgentMessage[]>; // Mapped by workspace ID
-  provider: string;
-  selectedModel: string;
-  setApiKey: (key: string) => void;
-  setAvailableModels: (models: string[]) => void;
-  setBaseUrl: (url: string) => void;
-  setOpen: (isOpen: boolean) => void;
-  setProvider: (provider: string) => void;
-  setSelectedModel: (model: string) => void;
-  toggleOpen: () => void;
-
-  // System states for loops and monitoring
-  terminalStates: Record<string, TerminalState>;
-  setTerminalState: (paneId: string, state: TerminalState) => void;
-  logs: LogEntry[];
   addLog: (
     source: LogEntry["source"],
     type: LogEntry["type"],
     message: string,
     requestId?: string
   ) => void;
+  addMessage: (workspaceId: string, message: AgentMessage) => void;
+  apiKey: string;
+  availableModels: string[];
+  baseUrl: string;
   clearLogs: () => void;
+  clearMessages: (workspaceId: string) => void;
+  clearProviderConfig: () => void;
   health: {
     backend: boolean;
     provider: boolean;
     planner: boolean;
   };
+  isOpen: boolean;
+  logs: LogEntry[];
+  messages: Record<string, AgentMessage[]>; // Mapped by workspace ID
+  provider: string;
+  selectedModel: string;
+  setApiKey: (key: string) => void;
+  setAvailableModels: (models: string[]) => void;
+  setBaseUrl: (url: string) => void;
   setHealth: (key: keyof AgentState["health"], status: boolean) => void;
+  setOpen: (isOpen: boolean) => void;
+  setProvider: (provider: string) => void;
+  setSelectedModel: (model: string) => void;
+  setTerminalState: (paneId: string, state: TerminalState) => void;
+
+  // System states for loops and monitoring
+  terminalStates: Record<string, TerminalState>;
+  toggleOpen: () => void;
+  upsertMessage: (workspaceId: string, message: AgentMessage) => void;
 }
 
 export const useAgentStore = create<AgentState>()(
@@ -148,7 +148,9 @@ export const useAgentStore = create<AgentState>()(
           message,
           requestId,
         };
-        console.log(`[${source.toUpperCase()}] [${type.toUpperCase()}] ${message}`);
+        console.log(
+          `[${source.toUpperCase()}] [${type.toUpperCase()}] ${message}`
+        );
         set((prev) => ({
           logs: [...prev.logs.slice(-499), log], // Cap logs at 500 entries
         }));
