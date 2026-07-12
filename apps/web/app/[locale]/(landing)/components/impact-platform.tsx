@@ -41,8 +41,7 @@ export function ImpactBase({ members = [] }: { members?: string[] }) {
 
         {/* Closing content — sits below the strike so the base no longer
             reads as an empty box. */}
-        <div className="relative z-10 mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-6 pt-32 text-center">
-          <Eyebrow>The founding team</Eyebrow>
+        <div className="relative z-10 mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-6 pt-12 text-center">
           <h2 className="mt-5 text-balance font-display text-3xl text-foreground tracking-tighter md:text-5xl">
             The people behind the beam
           </h2>
