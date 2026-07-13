@@ -241,10 +241,17 @@ async function runTaskExecution(
     const isWin = navigator.userAgent.includes("Windows");
     // Use $LASTEXITCODE for PowerShell, $? for bash
     const commandWithSuffix = isWin
-      ? `${command} ; echo TASK_FINISHED_${task.id}_$LASTEXITCODE\r`
-      : `${command}; echo TASK_FINISHED_${task.id}_$?\r`;
+      ? `${command} ; echo TASK_FINISHED_${task.id}_$LASTEXITCODE`
+      : `${command}; echo TASK_FINISHED_${task.id}_$?`;
 
     await invoke("write_terminal", { id, data: commandWithSuffix });
+    setTimeout(() => {
+      import("@tauri-apps/api/core").then(({ invoke }) => {
+        invoke("write_terminal", { id, data: "\r" }).catch(() => {
+          /* ignore */
+        });
+      });
+    }, 150);
   } else {
     const term = termRef.current;
     if (term) {
