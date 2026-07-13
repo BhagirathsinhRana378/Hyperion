@@ -23,7 +23,6 @@ import {
 } from "@workspace/ui/components/sidebar";
 import { cn } from "@workspace/ui/lib/utils";
 import {
-  ChevronRight,
   Copy,
   Edit2,
   LayoutGrid,
@@ -70,14 +69,6 @@ export function WorkspaceNav({ navigate, onNewWorkspace }: WorkspaceNavProps) {
     [isMobile, setOpenMobile, navigate, setActiveWorkspace]
   );
 
-  const handleDelete = useCallback(
-    (id: string, e: React.MouseEvent) => {
-      e.stopPropagation();
-      e.preventDefault();
-      deleteWorkspace(id);
-    },
-    [deleteWorkspace]
-  );
 
   const handleRenameSave = (id: string) => {
     const trimmed = renameValue.trim();
@@ -94,6 +85,7 @@ export function WorkspaceNav({ navigate, onNewWorkspace }: WorkspaceNavProps) {
   const pinnedWorkspaces = workspaces.filter((w) => w.isPinned);
   const regularWorkspaces = workspaces.filter((w) => !w.isPinned);
 
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Self-contained item renderer
   const renderWorkspaceItem = (ws: Workspace) => {
     const isActive = ws.id === activeWorkspaceId;
     return (
@@ -127,41 +119,33 @@ export function WorkspaceNav({ navigate, onNewWorkspace }: WorkspaceNavProps) {
           <>
             <SidebarMenuButton
               className={cn(
-                "relative h-10 w-full justify-start gap-2.5 rounded-lg border transition-all duration-300 ease-out group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:pr-2",
+                "relative h-9 w-full justify-start gap-2 rounded-md transition-all duration-200 ease-out group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2",
                 isActive
-                  ? "border-primary/25 bg-gradient-to-r from-primary/[0.08] via-primary/[0.02] to-transparent font-semibold text-foreground shadow-primary/[0.02] shadow-sm backdrop-blur-xs"
-                  : "border-transparent font-medium text-muted-foreground hover:border-border/20 hover:bg-muted/10 hover:text-foreground"
+                  ? "bg-primary font-medium text-primary-foreground shadow-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  : "bg-transparent font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               )}
               isActive={isActive}
               onClick={() => handleSelect(ws.id)}
             >
-              <ChevronRight
-                className={cn(
-                  "size-3 shrink-0 transition-all duration-300 group-data-[collapsible=icon]:hidden",
-                  isActive
-                    ? "rotate-90 scale-110 text-primary"
-                    : "text-muted-foreground/40 group-hover/item:translate-x-0.5 group-hover/item:text-muted-foreground/75"
-                )}
-              />
               <Terminal
                 className={cn(
-                  "size-4 shrink-0 transition-transform duration-300",
+                  "size-4 shrink-0 transition-all duration-200",
                   isActive
-                    ? "scale-105 text-primary drop-shadow-[0_0_4px_rgba(255,224,194,0.4)]"
-                    : "text-muted-foreground/40 group-hover/item:scale-105 group-hover/item:text-primary/70"
+                    ? "text-primary-foreground group-hover/menu-button:text-sidebar-accent-foreground"
+                    : "text-muted-foreground/60 group-hover/menu-button:text-foreground/80"
                 )}
               />
-              <span className="truncate pr-1 text-sm tracking-wide group-data-[collapsible=icon]:hidden">
+              <span className="truncate text-sm group-data-[collapsible=icon]:hidden">
                 {ws.name}
               </span>
 
               {/* Terminal count pill */}
               <span
                 className={cn(
-                  "absolute right-2 scale-[0.85] rounded-full border px-2 py-0.5 font-bold font-mono text-[9px] transition-all duration-200 group-hover/item:translate-x-[-20px] group-data-[collapsible=icon]:hidden",
+                  "flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 font-bold font-mono text-[9px] transition-all duration-200 group-data-[collapsible=icon]:hidden",
                   isActive
-                    ? "border-primary/30 bg-primary/10 text-primary"
-                    : "border-border/40 bg-muted/60 text-muted-foreground/60"
+                    ? "bg-primary-foreground/20 text-primary-foreground group-hover/menu-button:bg-sidebar-accent-foreground/20 group-hover/menu-button:text-sidebar-accent-foreground"
+                    : "bg-muted text-muted-foreground/70 group-hover/menu-button:bg-muted/80"
                 )}
               >
                 {ws.terminalCount}
