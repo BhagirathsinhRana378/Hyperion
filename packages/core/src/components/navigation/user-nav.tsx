@@ -1,5 +1,7 @@
 "use client";
 
+import { useClerk, useUser } from "@clerk/clerk-react";
+
 import { navigationData } from "@workspace/core/config/navigation";
 import { useNotificationStore } from "@workspace/core/stores/notification-store";
 import { usePanelStore } from "@workspace/core/stores/panel-store";
@@ -35,10 +37,21 @@ interface UserNavProps {
   user: UserNavUser;
 }
 
-export function UserNav({ user }: UserNavProps) {
+export function UserNav({ user: defaultUser }: UserNavProps) {
   const t = useTranslations("Navigation");
+  const { user, isLoaded } = useUser();
+  const { signOut } = useClerk();
   const openPanel = usePanelStore((s) => s.openPanel);
   const openNotificationCenter = useNotificationStore((s) => s.setOpen);
+
+  const displayUser =
+    isLoaded && user
+      ? {
+          name: user.fullName || user.username || "User",
+          email: user.primaryEmailAddress?.emailAddress || "",
+          avatar: user.imageUrl,
+        }
+      : defaultUser;
 
   const handleSelect = (translationKey: string) => {
     switch (translationKey) {
@@ -72,14 +85,14 @@ export function UserNav({ user }: UserNavProps) {
               size="lg"
             >
               <Avatar className="size-8 rounded-lg">
-                <AvatarImage alt={user.name} src={user.avatar} />
+                <AvatarImage alt={displayUser.name} src={displayUser.avatar} />
                 <AvatarFallback className="rounded-lg">
-                  {user.name.slice(0, 2).toUpperCase()}
+                  {displayUser.name.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm group-data-[collapsible=icon]:hidden">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-medium">{displayUser.name}</span>
+                <span className="truncate text-xs">{displayUser.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4 shrink-0 group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>
@@ -93,14 +106,19 @@ export function UserNav({ user }: UserNavProps) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="size-8 rounded-lg">
-                  <AvatarImage alt={user.name} src={user.avatar} />
+                  <AvatarImage
+                    alt={displayUser.name}
+                    src={displayUser.avatar}
+                  />
                   <AvatarFallback className="rounded-lg">
-                    {user.name.slice(0, 2).toUpperCase()}
+                    {displayUser.name.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-medium">
+                    {displayUser.name}
+                  </span>
+                  <span className="truncate text-xs">{displayUser.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -126,6 +144,10 @@ export function UserNav({ user }: UserNavProps) {
                 )}
               </div>
             ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => signOut()}>
+              Log out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

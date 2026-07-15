@@ -1,8 +1,8 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@xterm/xterm/css/xterm.css";
-@import "./themes.css";
 @import "./mistral-tokens.css";
 
 @source "../../../../apps/**/*.{ts,tsx}";
@@ -186,6 +186,31 @@
   --tracking-wide: calc(var(--letter-spacing) + 0.025em);
   --tracking-wider: calc(var(--letter-spacing) + 0.05em);
   --tracking-widest: calc(var(--letter-spacing) + 0.1em);
+
+  --animate-star-movement-bottom: star-movement-bottom 6s linear infinite
+    alternate;
+  --animate-star-movement-top: star-movement-top 6s linear infinite alternate;
+
+  @keyframes star-movement-bottom {
+    0% {
+      transform: translate(0%, 0%);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-100%, 0%);
+      opacity: 0;
+    }
+  }
+  @keyframes star-movement-top {
+    0% {
+      transform: translate(0%, 0%);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(100%, 0%);
+      opacity: 0;
+    }
+  }
 }
 
 @layer base {
@@ -199,9 +224,15 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display, var(--font-serif));
+  }
 }
 
 @layer utilities {
+  .font-heading {
+    font-family: var(--font-display, var(--font-serif));
+  }
   .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */

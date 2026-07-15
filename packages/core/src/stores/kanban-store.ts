@@ -1,5 +1,6 @@
 "use client";
 
+import { safeUUID } from "@workspace/core/lib/uuid";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -36,7 +37,7 @@ interface KanbanState {
 }
 
 function generateId(): string {
-  return crypto.randomUUID();
+  return safeUUID();
 }
 
 const DEFAULT_COLUMNS: KanbanColumn[] = [

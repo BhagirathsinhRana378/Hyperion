@@ -6,7 +6,6 @@ import { WorkspaceNav } from "@workspace/core/components/navigation/workspace-na
 import { navigationData } from "@workspace/core/config/navigation";
 import { siteConfig } from "@workspace/core/config/site";
 import { useMounted } from "@workspace/core/hooks/use-mounted";
-import { useSidebarStore } from "@workspace/core/stores/sidebar-store";
 import { Logo } from "@workspace/ui/components/landing/logo";
 import {
   Sidebar,
@@ -42,7 +41,6 @@ export function AppSidebar({
   LinkComponent = "a",
   ...props
 }: AppSidebarProps) {
-  const { variant } = useSidebarStore();
   const mounted = useMounted();
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -52,7 +50,7 @@ export function AppSidebar({
 
   return (
     <>
-      <Sidebar collapsible="icon" variant={variant} {...props}>
+      <Sidebar collapsible="icon" variant="inset" {...props}>
         <SidebarHeader className="flex flex-row items-center justify-between border-border/40 border-b px-3 py-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
           <SidebarMenu className="flex-1 group-data-[collapsible=icon]:hidden">
             <SidebarMenuItem>
@@ -65,7 +63,7 @@ export function AppSidebar({
                   onClick={() => navigate("/workspace")}
                 >
                   <Logo className="!size-5" />
-                  <span className="font-semibold text-base tracking-tight">
+                  <span className="font-heading font-semibold text-base tracking-tight">
                     {siteConfig.name}
                   </span>
                 </LinkComponent>

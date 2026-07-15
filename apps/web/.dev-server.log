@@ -1,0 +1,25 @@
+
+> web@0.0.1 dev D:\Hyperion\apps\web
+> next dev --turbopack -p 3002
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3002
+- Network:       http://192.168.29.186:3002
+✓ Ready in 1336ms
+[MDX] generated files in 37.58800000000065ms
+[MDX] started dev server
+
+○ Compiling /[locale]/features ...
+ GET /features 200 in 45s (next.js: 38.7s, proxy.ts: 559ms, generate-params: 1240ms, application-code: 6.0s)
+ GET /features 200 in 259ms (next.js: 27ms, proxy.ts: 21ms, generate-params: 10ms, application-code: 211ms)
+ GET /serwist/sw.js 200 in 7.9s
+○ (serwist) Using esbuild to bundle the service worker.
+ GET /features 200 in 461ms (next.js: 55ms, proxy.ts: 19ms, generate-params: 20ms, application-code: 386ms)
+ GET /serwist/sw.js 200 in 81ms (next.js: 32ms, generate-params: 18ms, application-code: 49ms)
+ GET / 200 in 2.5s (next.js: 2.3s, proxy.ts: 6ms, generate-params: 892ms, application-code: 177ms)
+ GET /features 200 in 166ms (next.js: 16ms, proxy.ts: 5ms, generate-params: 7ms, application-code: 145ms)
+ GET /docs 200 in 1766ms (next.js: 1589ms, proxy.ts: 6ms, generate-params: 829ms, application-code: 171ms)
+ GET /coding 200 in 1665ms (next.js: 1521ms, proxy.ts: 6ms, generate-params: 871ms, application-code: 138ms)
+ GET / 200 in 147ms (next.js: 24ms, proxy.ts: 8ms, generate-params: 12ms, application-code: 115ms)
+[?25h
+ ELIFECYCLE  Command failed with exit code 1.

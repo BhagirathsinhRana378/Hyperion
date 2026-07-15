@@ -2,14 +2,10 @@
 
 import { NewWorkspaceDialog } from "@workspace/core/components/common/new-workspace-dialog";
 import { hotkeys } from "@workspace/core/config/hotkeys";
-import { themes } from "@workspace/core/config/themes";
 import { useDrawerHistory } from "@workspace/core/hooks/use-drawer-history";
-import { useThemeTransition } from "@workspace/core/hooks/use-theme-transition";
 import { formatHotkeyDisplay } from "@workspace/core/lib/utils";
 import { useCommandPaletteStore } from "@workspace/core/stores/command-palette-store";
 import { useHotkeysDialogStore } from "@workspace/core/stores/hotkeys-store";
-import { useSidebarStore } from "@workspace/core/stores/sidebar-store";
-import { useThemeStore } from "@workspace/core/stores/theme-store";
 import { useWorkspaceStore } from "@workspace/core/stores/workspace-store";
 import { useTranslations } from "@workspace/i18n";
 import {
@@ -41,18 +37,13 @@ import { useSidebar } from "@workspace/ui/components/sidebar";
 import { useIsMobile } from "@workspace/ui/hooks/use-mobile";
 import { cn } from "@workspace/ui/lib/utils";
 import {
-  Check,
   CornerDownLeftIcon,
   Keyboard,
-  LayoutTemplate,
-  Moon,
   MoveDown,
   MoveUp,
-  Palette,
   PanelLeft,
   Plus,
   Settings,
-  Sun,
   Terminal,
 } from "lucide-react";
 import React, { useCallback, useState } from "react";
@@ -87,14 +78,7 @@ export function CommandPalette({
   const { isOpen, close } = useCommandPaletteStore();
   useDrawerHistory(isOpen, close);
   const isMobile = useIsMobile();
-  const {
-    theme: activeMode,
-    resolvedTheme,
-    handleThemeChange,
-  } = useThemeTransition();
   const { toggleSidebar } = useSidebar();
-  const { variant, setVariant } = useSidebarStore();
-  const { selectedTheme, setSelectedTheme } = useThemeStore();
   const toggleHotkeysDialog = useHotkeysDialogStore((s) => s.toggle);
 
   // Workspaces access
@@ -206,23 +190,6 @@ export function CommandPalette({
           <CommandSeparator className="my-2" />
 
           <CommandGroup className={groupClasses} heading={t("general")}>
-            <CommandMenuItem
-              onSelect={() =>
-                runCommand(() =>
-                  handleThemeChange(
-                    (activeMode === "dark" ? "light" : "dark") as
-                      | "light"
-                      | "dark"
-                  )
-                )
-              }
-              value="system dark light theme mode"
-            >
-              {activeMode === "dark" ? <Moon /> : <Sun />}
-              <span>{t("toggleMode")}</span>
-              {getKeysDisplay("toggle-mode")}
-            </CommandMenuItem>
-
             {!isMobile && (
               <CommandMenuItem
                 onSelect={() => runCommand(() => toggleSidebar())}
@@ -250,67 +217,6 @@ export function CommandPalette({
               <span>Settings</span>
               {getKeysDisplay("go-settings")}
             </CommandMenuItem>
-          </CommandGroup>
-
-          <CommandSeparator className="my-2" />
-
-          {!isMobile && (
-            <>
-              <CommandGroup
-                className={groupClasses}
-                heading={t("sidebarVariants")}
-              >
-                {(["sidebar", "floating", "inset"] as const).map(
-                  (sidebarVariant) => (
-                    <CommandMenuItem
-                      data-checked={variant === sidebarVariant}
-                      key={sidebarVariant}
-                      onSelect={() =>
-                        runCommand(() => setVariant(sidebarVariant))
-                      }
-                    >
-                      <LayoutTemplate />
-                      <span className="capitalize">{t(sidebarVariant)}</span>
-                    </CommandMenuItem>
-                  )
-                )}
-              </CommandGroup>
-              <CommandSeparator className="my-2" />
-            </>
-          )}
-
-          <CommandGroup className={groupClasses} heading={t("themes")}>
-            {themes.map((themeItem) => {
-              const palette =
-                (activeMode === "system" ? resolvedTheme : activeMode) ===
-                "dark"
-                  ? themeItem.darkPalette
-                  : themeItem.lightPalette;
-              return (
-                <CommandMenuItem
-                  key={themeItem.name}
-                  onSelect={() =>
-                    runCommand(() => setSelectedTheme(themeItem.name))
-                  }
-                >
-                  {selectedTheme === themeItem.name ? <Check /> : <Palette />}
-                  <span>{themeItem.label}</span>
-                  <div className="ml-auto flex items-center gap-1">
-                    {palette.slice(0, 5).map((color, index) => {
-                      return (
-                        <div
-                          className="h-3 w-3 rounded-full border border-border"
-                          data-slot="command-shortcut"
-                          // biome-ignore lint/suspicious/noArrayIndexKey: Decorative static color list
-                          key={`${themeItem.name}-${index}`}
-                          style={{ backgroundColor: color }}
-                        />
-                      );
-                    })}
-                  </div>
-                </CommandMenuItem>
-              );
-            })}
           </CommandGroup>
         </CommandList>
       </Command>

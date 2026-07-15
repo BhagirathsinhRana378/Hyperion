@@ -112,6 +112,7 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_ZHVtbXktcHVibGlzaGFibGUta2V5"
         with:
           projectPath: apps/native
           tauriScript: pnpm tauri

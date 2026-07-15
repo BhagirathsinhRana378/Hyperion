@@ -1,8 +1,8 @@
 "use client";
 
-import { ModeToggle } from "@workspace/core/components/common/mode-toggle";
 import { NotificationCenter } from "@workspace/core/components/common/notification-center";
 import { formatHotkeyDisplay } from "@workspace/core/lib/utils";
+import { useAgentStore } from "@workspace/core/stores/agent-store";
 import { useCommandPaletteStore } from "@workspace/core/stores/command-palette-store";
 import { useWorkspaceStore } from "@workspace/core/stores/workspace-store";
 import {
@@ -13,8 +13,9 @@ import {
 } from "@workspace/ui/components/breadcrumb";
 import { Button } from "@workspace/ui/components/button";
 import { Kbd } from "@workspace/ui/components/kbd";
-import { ChevronRight, Search } from "lucide-react";
+import { ChevronRight, Search, Sparkles } from "lucide-react";
 import type { ComponentType } from "react";
+import { toast } from "sonner";
 
 interface AppHeaderProps {
   LinkComponent?:
@@ -30,6 +31,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ pathname, LinkComponent = "a" }: AppHeaderProps) {
   const toggleCommandPalette = useCommandPaletteStore((s) => s.toggle);
+  const toggleAgent = useAgentStore((s) => s.toggleOpen);
   const activeWorkspaceId = useWorkspaceStore((s) => s.activeWorkspaceId);
   const workspaces = useWorkspaceStore((s) => s.workspaces);
 
@@ -37,6 +39,14 @@ export function AppHeader({ pathname, LinkComponent = "a" }: AppHeaderProps) {
 
   const isSettings = pathname === "/settings";
   const hotkeyDisplay = formatHotkeyDisplay("mod+k");
+
+  const handleToggleAgent = () => {
+    if (!activeWorkspaceId) {
+      toast.error("Create a workspace first to use the Main Agent");
+      return;
+    }
+    toggleAgent();
+  };
 
   return (
     <header className="flex h-10.5 shrink-0 items-center justify-between border-border/40 border-b bg-background/95 px-4 backdrop-blur-md transition-[width,height] ease-linear md:px-6">
@@ -118,8 +128,16 @@ export function AppHeader({ pathname, LinkComponent = "a" }: AppHeaderProps) {
         >
           <Search className="size-4" />
         </Button>
+        <Button
+          className="flex rounded-lg text-muted-foreground hover:bg-muted/80 hover:text-foreground hover:text-primary"
+          onClick={handleToggleAgent}
+          size="icon"
+          title="Toggle Main Agent"
+          variant="ghost"
+        >
+          <Sparkles className="size-4" />
+        </Button>
         <NotificationCenter />
-        <ModeToggle />
       </div>
     </header>
   );

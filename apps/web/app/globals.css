@@ -1,3 +1,357 @@
 @import "@workspace/ui/globals.css";
 @import "fumadocs-ui/css/shadcn.css";
 @import "fumadocs-ui/css/preset.css";
+
+/* `font-display` was never a registered Tailwind utility anywhere in
+   this build, so every `className="... font-display ..."` across the
+   landing group silently did nothing and headings fell back to the
+   inherited body font. Defined directly as plain CSS (rather than via
+   Tailwind's @theme utility generation, which did not pick up a
+   cross-file self-referencing token here) so it reliably resolves to
+   the Plus Jakarta Sans variable set in app/[locale]/layout.tsx. */
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* ==========================================================================
+   Landing (marketing) theme — 60/30/10, strict monochrome.
+   Scoped to the (landing) route group via .landing-theme so the in-app
+   product UI and docs keep their own palette.
+
+   The palette is exactly three anchors — everything else is a step
+   between them:
+     Black    #080705 — 60%: the dominant surface everywhere.
+     Graphite #3A3A3A — 30%: structure. Borders/hairlines use it
+              directly; card/secondary/popover/accent are darker
+              steps on the black→graphite axis (elevation ladder,
+              darkest → lightest: card < popover < secondary < accent).
+     Platinum #EEEEED — 10%: the single point of emphasis. Primary
+              buttons (platinum fill, black text), active nav, focus
+              rings, glows, cursors, highlight dots. No hue anywhere —
+              light itself is the accent.
+   ========================================================================== */
+.landing-theme {
+  --background: #080705;
+  --foreground: #eeeeed;
+  --card: #121110;
+  --card-foreground: #eeeeed;
+  --popover: #1a1918;
+  --popover-foreground: #eeeeed;
+  --primary: #eeeeed;
+  --primary-foreground: #080705;
+  --secondary: #1e1d1c;
+  --secondary-foreground: #eeeeed;
+  --muted: #1e1d1c;
+  --muted-foreground: #969594;
+  --accent: #232221;
+  --accent-foreground: #eeeeed;
+  --border: #3a3a3a;
+  --input: #3a3a3a;
+  --ring: #eeeeed;
+}
+
+/* Slow ambient breathing glow — used behind hero/section headers on the
+   marketing sub-pages so they feel alive without any color or motion
+   that competes with content. Opacity + scale only (GPU-cheap). */
+@keyframes landing-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.landing-glow-breathe {
+  animation: landing-glow-breathe 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-glow-breathe {
+    animation: none;
+  }
+}
+
+/* Ambient hero particles — tiny accent dots drifting upward on a slow
+   loop. Transform + opacity only, so each one stays on the compositor. */
+@keyframes landing-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.15;
+  }
+  25% {
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(var(--drift-x, 10px), -22px, 0);
+    opacity: 0.35;
+  }
+  75% {
+    opacity: 0.5;
+  }
+}
+
+.landing-drift {
+  animation: landing-drift var(--drift-dur, 14s) ease-in-out infinite;
+  animation-delay: var(--drift-delay, 0s);
+}
+
+/* Single-hue shimmer sweep for the highlighted headline word — stays
+   between platinum and graphite so the 10% accent rule holds. */
+@keyframes landing-shimmer {
+  from {
+    background-position: 200% 50%;
+  }
+  to {
+    background-position: 0% 50%;
+  }
+}
+
+.landing-shimmer {
+  background-size: 200% auto;
+  animation: landing-shimmer 4s linear infinite;
+}
+
+/* Orbit rotation for the agent-swarm visual. */
+@keyframes landing-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.landing-orbit {
+  animation: landing-orbit var(--orbit-dur, 18s) linear infinite;
+}
+
+.landing-orbit-reverse {
+  animation-direction: reverse;
+}
+
+/* Gentle vertical bob for floating agent chips. */
+@keyframes landing-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.landing-float {
+  animation: landing-float var(--float-dur, 5s) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+/* Endless flow of the 3D perspective grid floor toward the viewer.
+   The pattern repeats every 64px, so translating exactly one cell and
+   looping reads as continuous motion — transform-only, composited. */
+@keyframes landing-grid-flow {
+  from {
+    transform: translateY(-64px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.landing-grid-flow {
+  animation: landing-grid-flow 3.6s linear infinite;
+}
+
+/* Blinking caret for TextType / terminal typing — replaces the
+   original's gsap opacity yoyo with an equivalent CSS loop. The full
+   cycle is 2× the one-way gsap duration, driven via --caret-dur. */
+@keyframes landing-caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.landing-caret-blink {
+  animation: landing-caret-blink var(--caret-dur, 1s) ease-in-out infinite;
+}
+
+/* Suspended-object bob for the hero showcase panel — ±3px over a slow
+   cycle, so the "floating above the page" read never fully settles. */
+@keyframes landing-hover-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.landing-hover-bob {
+  animation: landing-hover-bob 7s ease-in-out infinite;
+}
+
+/* Stat-card float — vertical drift plus a hair of rotation, so the
+   card reads as tumbling gently rather than just bobbing on a
+   string. Amplitude/duration/delay are all tunable per instance via
+   custom properties so each card in a row can drift independently
+   without needing four separate keyframes. Paused on hover via the
+   consumer's own `hover:[animation-play-state:paused]` class. */
+@keyframes landing-card-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(var(--card-float-y, -4px))
+      rotate(var(--card-float-rot, 0.6deg));
+  }
+}
+
+.landing-card-float {
+  animation: landing-card-float var(--card-float-dur, 6s) ease-in-out infinite;
+  animation-delay: var(--card-float-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-drift,
+  .landing-shimmer,
+  .landing-orbit,
+  .landing-float,
+  .landing-grid-flow,
+  .landing-caret-blink,
+  .landing-hover-bob,
+  .landing-card-float {
+    animation: none;
+  }
+}
+
+/* Form field invalid-state shake — a single quick horizontal nudge,
+   not a loop. Consumer toggles the class on and clears it again in
+   onAnimationEnd, so it can be retriggered on repeated failed
+   submits. */
+@keyframes landing-field-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(3px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(1px);
+  }
+}
+
+.landing-field-shake {
+  animation: landing-field-shake 320ms ease-out;
+}
+
+/* Validation helper message — fades and settles in from just below
+   its resting position, once, when it first appears. */
+@keyframes landing-field-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-field-message-in {
+  animation: landing-field-message-in 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-field-shake,
+  .landing-field-message-in {
+    animation: none;
+  }
+}
+
+/* Emphasized easing curve — matches the `emphasized` token in
+   motion-primitives.tsx, for CSS-only transitions (motion.div covers
+   the JS-driven ones) that want the same refined deceleration. */
+.landing-ease-emphasized {
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Terminal scroll — thin, theme-matched scrollbar for the terminal
+   window's internal viewport, both Firefox (scrollbar-color/width)
+   and Chromium/WebKit (::-webkit-scrollbar). scroll-behavior:smooth
+   only affects scrollIntoView/scrollTo-style scrolls (mouse wheel is
+   already smooth natively, and the typing auto-scroll writes
+   scrollTop directly, which bypasses it) — so it only smooths
+   manual/programmatic jumps, never fights the per-character pin. */
+.landing-terminal-scroll {
+  scroll-behavior: smooth;
+  scrollbar-color: var(--border) transparent;
+  scrollbar-width: thin;
+}
+
+.landing-terminal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.landing-terminal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.landing-terminal-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.landing-terminal-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Footer wordmark watermark — near-invisible at rest (2–5%) on
+   pointer devices, since the cursor-following spotlight in
+   footer-wordmark.tsx does the reveal. Touch devices have no hover,
+   so they get a slightly higher resting opacity instead. */
+.wordmark-base {
+  opacity: 0.15; /* increased from 0.06 for better visibility */
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wordmark-base {
+    opacity: 0.1; /* slightly higher than before (was 0.025) */
+  }
+}
+
+/* Soft-tinted section band — the shared replacement for hard
+   border-t/border-y dividers between page sections. The surface tint
+   fades to transparent at both edges via mask instead of snapping at
+   a hard line, so it blends into the surrounding background instead
+   of reading as a separate block. Percentage-based stops so it
+   self-scales to any section height. */
+.landing-band-fade {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 80%,
+    transparent 100%
+  );
+}

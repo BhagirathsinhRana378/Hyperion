@@ -1,16 +1,15 @@
 export const themeInitScript = `
-  (function() {
-    try {
-      const raw = localStorage.getItem("theme-storage");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const theme = parsed?.state?.selectedTheme || "default";
-        if (theme !== "default") {
-          document.documentElement.setAttribute("data-theme", theme);
-        }
-      }
-    } catch (error) {
-      console.error("[Theme Init]", error);
-    }
-  })();
+(function () {
+  try {
+    const storedTheme = window.localStorage.getItem("theme");
+    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const theme = storedTheme ?? (systemPrefersDark ? "dark" : "light");
+
+    const isDark = theme === "dark";
+    document.documentElement.classList.toggle("dark", isDark);
+    document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+  } catch (error) {
+    console.warn("Theme initialization failed", error);
+  }
+})();
 `;

@@ -2,13 +2,32 @@
 
 import { useMounted } from "@workspace/core/hooks/use-mounted";
 import "@xterm/xterm/css/xterm.css";
+import type { OrchestrationTask } from "@workspace/core/lib/orchestrator-client";
+import type { Task } from "@workspace/core/lib/task-dispatcher";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+const EXIT_CODE_REGEX = /^(\d+)/;
+
 interface TerminalPaneProps {
+  autoCommand?: string;
+  cwd?: string;
+  directory?: string;
   id: string;
+  index?: number;
+  isActiveWorkspace?: boolean;
   title: string;
+}
+
+interface TerminalEventPayload {
+  data: string;
+  offset: number;
+}
+
+interface TerminalHistoryInfo {
+  history: string;
+  total_read: number;
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: xterm types are dynamically imported
@@ -41,29 +60,305 @@ function loadXterm() {
   return xtermPromise;
 }
 
+// Helper to process a single stdout event with deduplication logic
+function handleSingleEvent(
+  term: TerminalInstance,
+  payload: TerminalEventPayload,
+  currentOffsetRef: React.MutableRefObject<number>
+) {
+  const offset = payload.offset;
+  const data = payload.data;
+  const currentOffset = currentOffsetRef.current;
+
+  if (offset + data.length <= currentOffset) {
+    // Ignore already-written bytes
+    return;
+  }
+  if (offset < currentOffset) {
+    // Partial overlap, slice data to write only new content
+    const overlap = currentOffset - offset;
+    term.write(data.slice(overlap));
+    currentOffsetRef.current = offset + data.length;
+  } else {
+    term.write(data);
+    currentOffsetRef.current = offset + data.length;
+  }
+}
+
+// Helper to process and deduplicate a sequence of buffered events
+function processPendingEvents(
+  term: TerminalInstance,
+  events: TerminalEventPayload[],
+  currentOffsetRef: React.MutableRefObject<number>
+) {
+  const sortedEvents = [...events].sort((a, b) => a.offset - b.offset);
+  for (const payload of sortedEvents) {
+    handleSingleEvent(term, payload, currentOffsetRef);
+  }
+}
+
+// Helper to execute startup autoCommand on Tauri environment (staggered delay based on index)
+function executeTauriAutoCommand(
+  id: string,
+  autoCommand: string | undefined,
+  isNew: boolean | undefined,
+  disposed: boolean,
+  index?: number
+) {
+  if (isNew && autoCommand) {
+    const lineEnding = navigator.userAgent.includes("Windows") ? "\r" : "\r\n";
+    const delay = 400 + (index ?? 0) * 150;
+    setTimeout(async () => {
+      if (!disposed) {
+        const { invoke } = await import("@tauri-apps/api/core");
+        invoke("write_terminal", {
+          id,
+          data: `${autoCommand}${lineEnding}`,
+        }).catch(() => {
+          /* ignore */
+        });
+      }
+    }, delay);
+  }
+}
+
+// Helper to execute startup autoCommand on Mock environment
+function executeMockAutoCommand(
+  term: TerminalInstance,
+  autoCommand: string | undefined,
+  directory: string | undefined,
+  handleMockCommand: (cmd: string, term: TerminalInstance) => void
+) {
+  if (autoCommand) {
+    if (directory) {
+      term.write(`cd "${directory}"\r\n`);
+    }
+    term.write(`${autoCommand}\r\n`);
+    handleMockCommand(autoCommand, term);
+    term.write("\x1b[1;32mhyperion-demo@web:~$\x1b[0m ");
+  }
+}
+
+async function processTaskOutput(
+  data: string,
+  taskInfo: { id: string; command: string; output: string },
+  activeTaskRef: {
+    current: { id: string; command: string; output: string } | null;
+  }
+) {
+  taskInfo.output += data;
+
+  const { updateTaskStatus } = await import(
+    "@workspace/core/lib/orchestrator-client"
+  );
+
+  await updateTaskStatus(taskInfo.id, "Streaming", data);
+
+  const marker = `TASK_FINISHED_${taskInfo.id}_`;
+  const markerIdx = taskInfo.output.lastIndexOf(marker);
+  if (markerIdx !== -1) {
+    const suffix = taskInfo.output.slice(markerIdx + marker.length);
+    const exitCodeMatch = suffix.match(EXIT_CODE_REGEX);
+    if (exitCodeMatch) {
+      const exitCode = Number.parseInt(exitCodeMatch[1] || "0", 10);
+      if (exitCode === 0) {
+        await updateTaskStatus(
+          taskInfo.id,
+          "Completed",
+          undefined,
+          undefined,
+          exitCode
+        );
+      } else {
+        await updateTaskStatus(
+          taskInfo.id,
+          "Failed",
+          undefined,
+          `Command exited with non-zero code: ${exitCode}`,
+          exitCode
+        );
+      }
+      activeTaskRef.current = null;
+    }
+  }
+}
+
+async function runTaskExecution(
+  id: string,
+  task: Task | OrchestrationTask,
+  activeTaskRef: {
+    current: { id: string; command: string; output: string } | null;
+  },
+  termRef: React.RefObject<TerminalInstance>,
+  disposed: boolean
+) {
+  const { acknowledgeTask, updateTaskStatus } = await import(
+    "@workspace/core/lib/orchestrator-client"
+  );
+
+  // 1. Send ACK
+  try {
+    await acknowledgeTask(task.id, id);
+  } catch {
+    // Fallback: emit event directly
+    const { emitEvent } = await import("@workspace/core/lib/task-dispatcher");
+    await emitEvent(`task-ack-${task.id}`, { taskId: task.id, terminalId: id });
+  }
+
+  // 2. Report Running status
+  try {
+    await updateTaskStatus(task.id, "Running");
+  } catch {
+    const { emitEvent } = await import("@workspace/core/lib/task-dispatcher");
+    await emitEvent(`task-status-${task.id}`, {
+      taskId: task.id,
+      status: "Running",
+    });
+  }
+
+  const command =
+    "payload" in task && task.payload
+      ? task.payload.command
+      : (task as OrchestrationTask).command || "";
+
+  activeTaskRef.current = {
+    id: task.id,
+    command,
+    output: "",
+  };
+
+  // 3. Execute command
+  let checkTauriActive = false;
+  try {
+    const { isTauri: checkTauri } = await import("@tauri-apps/api/core");
+    checkTauriActive = checkTauri();
+  } catch {
+    checkTauriActive = false;
+  }
+
+  if (checkTauriActive) {
+    const { invoke } = await import("@tauri-apps/api/core");
+    const isWin = navigator.userAgent.includes("Windows");
+    // Use $LASTEXITCODE for PowerShell, $? for bash
+    const commandWithSuffix = isWin
+      ? `${command} ; echo TASK_FINISHED_${task.id}_$LASTEXITCODE`
+      : `${command}; echo TASK_FINISHED_${task.id}_$?`;
+
+    await invoke("write_terminal", { id, data: commandWithSuffix });
+    setTimeout(() => {
+      import("@tauri-apps/api/core").then(({ invoke }) => {
+        invoke("write_terminal", { id, data: "\r" }).catch(() => {
+          /* ignore */
+        });
+      });
+    }, 150);
+  } else {
+    const term = termRef.current;
+    if (term) {
+      term.write(`${command}\r\n`);
+      simulateMockStreaming(task, activeTaskRef, term, disposed);
+    }
+  }
+}
+
+function simulateMockStreaming(
+  task: Task | OrchestrationTask,
+  activeTaskRef: {
+    current: { id: string; command: string; output: string } | null;
+  },
+  term: TerminalInstance,
+  disposed: boolean
+) {
+  const command =
+    "payload" in task && task.payload
+      ? task.payload.command
+      : (task as OrchestrationTask).command || "";
+  let count = 0;
+  const interval = setInterval(async () => {
+    if (disposed || !activeTaskRef.current) {
+      clearInterval(interval);
+      return;
+    }
+    count++;
+    const mockData = `Chunk ${count} of mock output for command "${command}"\r\n`;
+    term.write(mockData);
+
+    const { updateTaskStatus } = await import(
+      "@workspace/core/lib/orchestrator-client"
+    );
+    await updateTaskStatus(task.id, "Streaming", mockData);
+
+    if (count >= 3) {
+      clearInterval(interval);
+      const isFail = command.toLowerCase().includes("fail");
+      const exitCode = isFail ? 1 : 0;
+      term.write(`\r\nTASK_FINISHED_${task.id}_${exitCode}\r\n`);
+      term.write("\x1b[1;32mhyperion-demo@web:~$\x1b[0m ");
+
+      if (exitCode === 0) {
+        await updateTaskStatus(
+          task.id,
+          "Completed",
+          undefined,
+          undefined,
+          exitCode
+        );
+      } else {
+        await updateTaskStatus(
+          task.id,
+          "Failed",
+          undefined,
+          `Command exited with non-zero code: ${exitCode}`,
+          exitCode
+        );
+      }
+      activeTaskRef.current = null;
+    }
+  }, 500);
+}
+
 function TerminalPlaceholder({ shellType }: { shellType: string }) {
-  const isWin = shellType.includes("Command") || shellType.includes("Prompt");
+  const isWin =
+    shellType.toLowerCase().includes("cmd") ||
+    shellType.toLowerCase().includes("prompt") ||
+    shellType.toLowerCase().includes("command");
   const prompt = isWin ? "C:\\Users\\hyperion> " : "hyperion@dev:~$ ";
-  const promptColor = isWin ? "text-blue-500/50" : "text-emerald-500/50";
+  const promptColor = isWin ? "text-blue-500/30" : "text-emerald-500/30";
 
   return (
-    <div className="terminal-shimmer-sweep pointer-events-none absolute inset-0 z-10 flex select-none flex-col gap-2.5 bg-[#08080a] p-4 font-mono text-xs">
-      <div className="flex animate-pulse items-center gap-1.5 opacity-60">
-        <span className={`${promptColor} font-bold`}>{prompt}</span>
-        <div className="h-3.5 w-20 rounded bg-muted-foreground/15" />
+    <div className="terminal-shimmer-sweep pointer-events-none absolute inset-0 z-10 flex select-none flex-col gap-3 border border-border/10 bg-[#08080a] p-5 font-mono text-xs">
+      <div className="flex items-center gap-2 opacity-35">
+        <span className="size-2.5 rounded-full bg-red-500/30" />
+        <span className="size-2.5 rounded-full bg-yellow-500/30" />
+        <span className="size-2.5 rounded-full bg-green-500/30" />
       </div>
-      <div className="h-3.5 w-[85%] animate-pulse rounded bg-muted-foreground/10 [animation-delay:150ms]" />
-      <div className="h-3.5 w-[65%] animate-pulse rounded bg-muted-foreground/10 [animation-delay:300ms]" />
-      <div className="h-3.5 w-[75%] animate-pulse rounded bg-muted-foreground/10 [animation-delay:450ms]" />
-      <div className="mt-1 flex animate-pulse items-center gap-1.5 opacity-60 [animation-delay:600ms]">
+      <div className="mt-2 flex animate-pulse items-center gap-2 opacity-50">
         <span className={`${promptColor} font-bold`}>{prompt}</span>
-        <span className="h-3.5 w-1.5 animate-pulse bg-muted-foreground/45" />
+        <div className="h-4 w-32 rounded bg-muted-foreground/10" />
+      </div>
+      <div className="mt-1 space-y-2 opacity-30">
+        <div className="h-3.5 w-[90%] animate-pulse rounded bg-muted-foreground/5 [animation-delay:100ms]" />
+        <div className="h-3.5 w-[75%] animate-pulse rounded bg-muted-foreground/5 [animation-delay:200ms]" />
+        <div className="h-3.5 w-[80%] animate-pulse rounded bg-muted-foreground/5 [animation-delay:300ms]" />
+        <div className="h-3.5 w-[45%] animate-pulse rounded bg-muted-foreground/5 [animation-delay:400ms]" />
+      </div>
+      <div className="mt-3 flex animate-pulse items-center gap-2 opacity-45 [animation-delay:500ms]">
+        <span className={`${promptColor} font-bold`}>{prompt}</span>
+        <span className="h-4 w-1.5 animate-pulse bg-muted-foreground/30" />
       </div>
     </div>
   );
 }
 
-export function TerminalPane({ id, title }: TerminalPaneProps) {
+export function TerminalPane({
+  id,
+  title,
+  isActiveWorkspace = true,
+  cwd,
+  autoCommand,
+  directory,
+  index = 0,
+}: TerminalPaneProps) {
   const mounted = useMounted();
   const containerRef = useRef<HTMLDivElement>(null);
   const termRef = useRef<TerminalInstance>(null);
@@ -74,6 +369,11 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
 
   // Buffer input for mock shell
   const inputBufferRef = useRef("");
+
+  // Refs for offset-based terminal data deduplication
+  const pendingEventsRef = useRef<TerminalEventPayload[]>([]);
+  const currentOffsetRef = useRef<number>(0);
+  const isInitializedRef = useRef<boolean>(false);
 
   useEffect(() => {
     const checkEnvironment = async () => {
@@ -207,35 +507,121 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
       const { listen } = await import("@tauri-apps/api/event");
 
       if (!isTauri() || disposed) {
-        return false;
+        return { isTauriActive: false };
       }
 
-      const cols = term.cols;
-      const rows = term.rows;
-
-      await invoke("create_terminal", { id, cols, rows });
-
-      const history = await invoke<string>("get_terminal_history", { id });
-      if (history && !disposed) {
-        term.write(history);
-      }
-
-      unlistenStdout = await listen<string>(
+      // 1. Listen for stdout events first to avoid race conditions and lost bytes
+      unlistenStdout = await listen<TerminalEventPayload>(
         `terminal-stdout-${id}`,
-        (event) => {
-          if (!disposed) {
-            term.write(event.payload);
+        async (event) => {
+          if (disposed) {
+            return;
+          }
+          const payload = event.payload;
+
+          if (isInitializedRef.current) {
+            handleSingleEvent(term, payload, currentOffsetRef);
+          } else {
+            // Buffer events received while history is loading
+            pendingEventsRef.current.push(payload);
+          }
+
+          // Process task execution tracking
+          const activeTaskRef = (
+            window as unknown as Record<
+              string,
+              {
+                current: { id: string; command: string; output: string } | null;
+              }
+            >
+          )[`activeTask_${id}`];
+          if (activeTaskRef?.current) {
+            await processTaskOutput(
+              payload.data,
+              activeTaskRef.current,
+              activeTaskRef
+            );
           }
         }
       );
 
+      // 2. Setup user input key event forwarding
       term.onData((data: string) => {
         invoke("write_terminal", { id, data }).catch((err) => {
           term.writeln(`\r\n\x1b[31mError writing to terminal: ${err}\x1b[0m`);
         });
       });
 
-      return true;
+      // 3. Spawns/attaches backend session
+      const cols = term.cols > 0 ? term.cols : 80;
+      const rows = term.rows > 0 ? term.rows : 24;
+      const isNew = await invoke<boolean>("create_terminal", {
+        id,
+        cols,
+        rows,
+        cwd,
+      });
+
+      // 4. Retrieve history and current total bytes read from backend
+      const historyInfo = await invoke<TerminalHistoryInfo>(
+        "get_terminal_history",
+        { id }
+      );
+      if (!disposed && historyInfo) {
+        term.write(historyInfo.history);
+        currentOffsetRef.current = historyInfo.total_read;
+
+        // Process buffered pending events in order
+        processPendingEvents(term, pendingEventsRef.current, currentOffsetRef);
+
+        pendingEventsRef.current = [];
+        isInitializedRef.current = true;
+      }
+
+      return { isTauriActive: true, isNew };
+    }
+
+    async function runTauriSetupWithRetries(
+      term: TerminalInstance
+    ): Promise<{ isTauriActive: boolean; isNew?: boolean }> {
+      let retries = 3;
+      while (retries > 0 && !disposed) {
+        try {
+          const res = await setupTauri(term);
+          if (res.isTauriActive) {
+            return res;
+          }
+          return { isTauriActive: false };
+        } catch {
+          retries--;
+          if (retries > 0 && !disposed) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+        }
+      }
+      return { isTauriActive: false };
+    }
+
+    async function initializeShell(term: TerminalInstance) {
+      let res: { isTauriActive: boolean; isNew?: boolean } = {
+        isTauriActive: false,
+      };
+      try {
+        res = await runTauriSetupWithRetries(term);
+      } catch {
+        // ignore
+      }
+
+      if (res.isTauriActive) {
+        executeTauriAutoCommand(id, autoCommand, res.isNew, disposed, index);
+      } else if (!disposed) {
+        setupMockShell(term);
+        executeMockAutoCommand(term, autoCommand, directory, handleMockCommand);
+      }
+
+      if (!disposed) {
+        setIsTerminalReady(true);
+      }
     }
 
     async function init() {
@@ -279,21 +665,40 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
       termRef.current = term;
       fitAddonRef.current = fitAddon;
 
-      // Handle fitting
+      // Handle fitting initially if visible
       requestAnimationFrame(() => {
-        if (!disposed) {
-          fitAddon.fit();
+        if (
+          !disposed &&
+          fitAddonRef.current &&
+          containerRef.current &&
+          containerRef.current.clientWidth > 0
+        ) {
+          fitAddonRef.current.fit();
         }
       });
 
       observer = new ResizeObserver(() => {
+        if (
+          !containerRef.current ||
+          containerRef.current.clientWidth === 0 ||
+          containerRef.current.clientHeight === 0
+        ) {
+          return; // Skip resize logic if container is hidden/0px
+        }
         requestAnimationFrame(() => {
-          if (!disposed && fitAddonRef.current) {
+          if (
+            !disposed &&
+            fitAddonRef.current &&
+            containerRef.current &&
+            containerRef.current.clientWidth > 0
+          ) {
             fitAddonRef.current.fit();
             if (termRef.current) {
               const cols = termRef.current.cols;
               const rows = termRef.current.rows;
-              resizePty(cols, rows);
+              if (cols > 0 && rows > 0) {
+                resizePty(cols, rows);
+              }
             }
           }
         });
@@ -303,21 +708,13 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
         observer.observe(containerRef.current);
       }
 
-      try {
-        const isTauriActive = await setupTauri(term);
-        if (!isTauriActive) {
-          setupMockShell(term);
-        }
-      } catch {
-        setupMockShell(term);
-      } finally {
-        if (!disposed) {
-          setIsTerminalReady(true);
-        }
-      }
+      await initializeShell(term);
     }
 
     async function resizePty(cols: number, rows: number) {
+      if (cols <= 0 || rows <= 0) {
+        return;
+      }
       try {
         const { isTauri, invoke } = await import("@tauri-apps/api/core");
         if (isTauri()) {
@@ -339,21 +736,117 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
       if (unlistenStdout) {
         unlistenStdout();
       }
-
-      // Close the PTY process in Rust backend to prevent process leakage
-      import("@tauri-apps/api/core")
-        .then(({ isTauri, invoke }) => {
-          if (isTauri()) {
-            invoke("close_terminal", { id }).catch(() => {
-              // ignore error
-            });
-          }
-        })
-        .catch(() => {
-          // ignore error
-        });
     };
-  }, [id, mounted, setupMockShell]);
+  }, [
+    id,
+    mounted,
+    setupMockShell,
+    cwd,
+    autoCommand,
+    directory,
+    handleMockCommand,
+    index,
+  ]);
+
+  // Terminal Agent Task Runner
+  useEffect(() => {
+    let disposed = false;
+    let unlistenTask: (() => void) | undefined;
+    const activeTaskRef = {
+      current: null as { id: string; command: string; output: string } | null,
+    };
+
+    if (typeof window !== "undefined") {
+      (window as unknown as Record<string, unknown>)[`activeTask_${id}`] =
+        activeTaskRef;
+    }
+
+    async function setupTaskListener() {
+      try {
+        const { registerTerminal } = await import(
+          "@workspace/core/lib/orchestrator-client"
+        );
+        const { useWorkspaceStore } = await import(
+          "@workspace/core/stores/workspace-store"
+        );
+        const workspaceId = useWorkspaceStore.getState().activeWorkspaceId;
+        await registerTerminal(id, workspaceId || "");
+      } catch {
+        // Non-critical: might be browser environment or app loading
+      }
+
+      const { listenToEvent } = await import(
+        "@workspace/core/lib/task-dispatcher"
+      );
+
+      unlistenTask = await listenToEvent<Task>(
+        `dispatch-task-${id}`,
+        async (task) => {
+          if (disposed) {
+            return;
+          }
+          await runTaskExecution(id, task, activeTaskRef, termRef, disposed);
+        }
+      );
+    }
+
+    setupTaskListener();
+
+    return () => {
+      disposed = true;
+      if (unlistenTask) {
+        unlistenTask();
+      }
+      import("@workspace/core/lib/orchestrator-client")
+        .then(({ unregisterTerminal }) => unregisterTerminal(id))
+        .catch(() => {
+          /* ignore */
+        });
+      if (typeof window !== "undefined") {
+        delete (window as unknown as Record<string, unknown>)[
+          `activeTask_${id}`
+        ];
+      }
+    };
+  }, [id]);
+
+  // Fit terminal when workspace becomes active to adapt to container layout
+  useEffect(() => {
+    if (
+      isActiveWorkspace &&
+      termRef.current &&
+      fitAddonRef.current &&
+      containerRef.current &&
+      containerRef.current.clientWidth > 0
+    ) {
+      const timer = setTimeout(() => {
+        if (
+          fitAddonRef.current &&
+          termRef.current &&
+          containerRef.current &&
+          containerRef.current.clientWidth > 0
+        ) {
+          fitAddonRef.current.fit();
+          const cols = termRef.current.cols;
+          const rows = termRef.current.rows;
+          if (cols > 0 && rows > 0) {
+            import("@tauri-apps/api/core")
+              .then(({ isTauri, invoke }) => {
+                if (isTauri()) {
+                  invoke("resize_terminal", { id, cols, rows }).catch(() => {
+                    // ignore
+                  });
+                }
+              })
+              .catch(() => {
+                /* ignore */
+              });
+          }
+        }
+      }, 80);
+      return () => clearTimeout(timer);
+    }
+  }, [isActiveWorkspace, id]);
 
   const handleClear = async () => {
     if (termRef.current) {
@@ -373,25 +866,58 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
   };
 
   const handleReset = async () => {
-    if (isTauriEnv) {
-      try {
-        const { invoke } = await import("@tauri-apps/api/core");
-        await invoke("close_terminal", { id });
-        if (termRef.current && fitAddonRef.current) {
-          termRef.current.clear();
-          const cols = termRef.current.cols;
-          const rows = termRef.current.rows;
-          await invoke("create_terminal", { id, cols, rows });
-        }
-      } catch {
-        // ignore
+    if (!isTauriEnv) {
+      if (termRef.current) {
+        termRef.current.clear();
+        termRef.current.writeln(
+          "\x1b[1;33mShell session reset successfully.\x1b[0m\r\n"
+        );
+        termRef.current.write("\x1b[1;32mhyperion-demo@web:~$\x1b[0m ");
       }
-    } else if (termRef.current) {
-      termRef.current.clear();
-      termRef.current.writeln(
-        "\x1b[1;33mShell session reset successfully.\x1b[0m\r\n"
-      );
-      termRef.current.write("\x1b[1;32mhyperion-demo@web:~$\x1b[0m ");
+      return;
+    }
+
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+
+      // Reset frontend tracking state for new session
+      isInitializedRef.current = false;
+      currentOffsetRef.current = 0;
+      pendingEventsRef.current = [];
+
+      await invoke("close_terminal", { id });
+
+      const term = termRef.current;
+      if (term && fitAddonRef.current) {
+        term.clear();
+        const cols = term.cols > 0 ? term.cols : 80;
+        const rows = term.rows > 0 ? term.rows : 24;
+        await invoke("create_terminal", { id, cols, rows, cwd });
+
+        const historyInfo = await invoke<TerminalHistoryInfo>(
+          "get_terminal_history",
+          { id }
+        );
+        if (historyInfo) {
+          term.write(historyInfo.history);
+          currentOffsetRef.current = historyInfo.total_read;
+
+          // Process any events that arrived during re-creation
+          processPendingEvents(
+            term,
+            pendingEventsRef.current,
+            currentOffsetRef
+          );
+
+          pendingEventsRef.current = [];
+          isInitializedRef.current = true;
+
+          // Trigger startup command on reset
+          executeTauriAutoCommand(id, autoCommand, true, false, index);
+        }
+      }
+    } catch {
+      // ignore
     }
   };
 
@@ -411,7 +937,7 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
 
   if (!mounted) {
     return (
-      <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border/30 bg-[#08080a] shadow-md">
+      <div className="flex h-full flex-col overflow-auto overscroll-auto rounded-lg border border-border/30 bg-[#08080a] shadow-md">
         {/* Title Bar / Header Skeleton */}
         <div className="flex h-6.5 shrink-0 items-center justify-between border-border/20 border-b bg-[#0f0f12] px-3">
           <div className="flex items-center gap-2">
@@ -420,7 +946,7 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
             </span>
           </div>
         </div>
-        <div className="relative flex-1 overflow-hidden bg-[#08080a]">
+        <div className="relative flex-1 overflow-auto overscroll-auto bg-[#08080a]">
           <TerminalPlaceholder shellType="Local Shell" />
         </div>
       </div>
@@ -428,7 +954,7 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border/30 bg-[#08080a] shadow-md transition-all duration-300 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 hover:shadow-lg">
+    <div className="flex h-full flex-col overflow-auto rounded-lg border border-border/30 bg-[#08080a] shadow-md transition-all duration-300 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 hover:shadow-lg">
       {/* Title Bar / Header */}
       <div className="flex h-6.5 shrink-0 items-center justify-between border-border/20 border-b bg-[#0f0f12] px-3">
         <div className="flex items-center gap-2">
@@ -464,17 +990,25 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
 
       {/* xterm.js Container / Animated Transition */}
       <div
-        className="relative flex-1 overflow-hidden bg-[#08080a]"
+        className="relative flex-1 overflow-auto bg-[#08080a]"
         style={{ minHeight: 0 }}
       >
         <AnimatePresence initial={false}>
           {!isTerminalReady && (
             <motion.div
               className="absolute inset-0 z-10"
-              exit={{ opacity: 0 }}
+              exit={{
+                opacity: 0,
+                scale: 0.99,
+                y: -4,
+              }}
               initial={{ opacity: 1 }}
               key="placeholder"
-              transition={{ duration: 0.18, ease: "easeInOut" }}
+              transition={{
+                type: "spring",
+                stiffness: 300,
+                damping: 25,
+              }}
             >
               <TerminalPlaceholder shellType={shellType} />
             </motion.div>
@@ -483,11 +1017,17 @@ export function TerminalPane({ id, title }: TerminalPaneProps) {
         <motion.div
           animate={{
             opacity: isTerminalReady ? 1 : 0,
-            y: isTerminalReady ? 0 : 4,
+            y: isTerminalReady ? 0 : 8,
+            scale: isTerminalReady ? 1 : 0.99,
           }}
           className="h-full w-full"
-          initial={{ opacity: 0, y: 4 }}
-          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 8, scale: 0.99 }}
+          transition={{
+            type: "spring",
+            stiffness: 280,
+            damping: 24,
+            delay: 0.05,
+          }}
         >
           {/* biome-ignore lint/a11y/useSemanticElements: xterm.js container is non-semantic */}
           <div
