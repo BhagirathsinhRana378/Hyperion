@@ -41,7 +41,7 @@ export function AccountPanel() {
       {/* Profile Settings Card */}
       <Card className="border-border/40">
         <CardHeader>
-          <CardTitle className="font-bold text-sm uppercase tracking-wider">
+          <CardTitle className="text-sm uppercase tracking-wider">
             Profile Information
           </CardTitle>
           <CardDescription className="text-xs">
@@ -65,7 +65,7 @@ export function AccountPanel() {
                   Remove
                 </Button>
               </div>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-caption text-muted-foreground">
                 JPG, PNG or SVG. Max size 2MB.
               </p>
             </div>
@@ -74,7 +74,7 @@ export function AccountPanel() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label
-                className="font-semibold text-muted-foreground text-xs uppercase"
+                className="font-semibold text-muted-foreground text-micro uppercase"
                 htmlFor="display-name"
               >
                 Display Name
@@ -88,7 +88,7 @@ export function AccountPanel() {
             </div>
             <div className="space-y-1.5">
               <Label
-                className="font-semibold text-muted-foreground text-xs uppercase"
+                className="font-semibold text-muted-foreground text-micro uppercase"
                 htmlFor="username"
               >
                 Username
@@ -102,7 +102,7 @@ export function AccountPanel() {
             </div>
             <div className="space-y-1.5 sm:col-span-2">
               <Label
-                className="font-semibold text-muted-foreground text-xs uppercase"
+                className="font-semibold text-muted-foreground text-micro uppercase"
                 htmlFor="email"
               >
                 Email Address
@@ -130,7 +130,7 @@ export function AccountPanel() {
       {/* Linked Accounts */}
       <Card className="border-border/40">
         <CardHeader>
-          <CardTitle className="font-bold text-sm uppercase tracking-wider">
+          <CardTitle className="text-sm uppercase tracking-wider">
             Connected Accounts
           </CardTitle>
           <CardDescription className="text-xs">
@@ -141,14 +141,14 @@ export function AccountPanel() {
           {/* GitHub Connection */}
           <div className="flex items-center justify-between rounded-lg border border-border/20 bg-muted/5 p-3">
             <div className="flex items-center gap-3">
-              <div className="flex size-8 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900">
-                <Github className="size-4 text-white" />
+              <div className="flex size-8 items-center justify-center rounded-lg border-border bg-muted">
+                <Github className="size-4 text-foreground" />
               </div>
               <div className="flex flex-col">
                 <span className="font-semibold text-foreground text-xs">
                   GitHub
                 </span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-caption text-muted-foreground">
                   Connected as @BhagirathsinhRana378
                 </span>
               </div>
@@ -168,7 +168,7 @@ export function AccountPanel() {
                 <span className="font-semibold text-foreground text-xs">
                   Google Account
                 </span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-caption text-muted-foreground">
                   Not connected
                 </span>
               </div>
@@ -183,7 +183,7 @@ export function AccountPanel() {
       {/* Security & Authentication */}
       <Card className="border-border/40">
         <CardHeader>
-          <CardTitle className="font-bold text-sm uppercase tracking-wider">
+          <CardTitle className="text-sm uppercase tracking-wider">
             Security Settings
           </CardTitle>
           <CardDescription className="text-xs">
@@ -198,7 +198,7 @@ export function AccountPanel() {
                 <span className="font-semibold text-foreground text-xs">
                   Password Authentication
                 </span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-caption text-muted-foreground">
                   Last updated 3 months ago
                 </span>
               </div>
@@ -218,7 +218,7 @@ export function AccountPanel() {
                     Enabled
                   </Badge>
                 </span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-caption text-muted-foreground">
                   Verify login access via authenticator app
                 </span>
               </div>
@@ -230,7 +230,7 @@ export function AccountPanel() {
 
           {/* Active Sessions */}
           <div className="space-y-3 pt-2">
-            <span className="block font-semibold text-muted-foreground text-xs uppercase tracking-wider">
+            <span className="block font-semibold text-muted-foreground text-micro uppercase tracking-wider">
               Active Device Sessions
             </span>
             <div className="space-y-2">
@@ -244,12 +244,12 @@ export function AccountPanel() {
                         Current Session
                       </Badge>
                     </span>
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-caption text-muted-foreground">
                       Tauri WebView2 • Mumbai, India • IP: 192.168.1.5
                     </span>
                   </div>
                 </div>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-caption text-muted-foreground">
                   Active Now
                 </span>
               </div>
@@ -275,7 +275,7 @@ export function AccountPanel() {
             <span className="font-semibold text-foreground text-xs">
               Delete Account
             </span>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-caption text-muted-foreground">
               Permanently purge all workspace sessions, PTY history cache,
               themes, and cloud data mappings.
             </p>

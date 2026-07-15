@@ -161,7 +161,7 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
-  --font-heading: var(--font-heading);
+  --font-heading: var(--font-display);
 
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -224,8 +224,11 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1 {
     font-family: var(--font-display, var(--font-serif));
+  }
+  h2, h3, h4, h5, h6 {
+    font-family: var(--font-body, var(--font-sans));
   }
 }
 

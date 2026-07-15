@@ -46,7 +46,7 @@ export function KanbanColumn({ column, onDeleteColumn }: KanbanColumnProps) {
       }`}
     >
       <div className="flex items-center justify-between px-3 py-2">
-        <h3 className="font-semibold text-sm">{column.title}</h3>
+        <div className="font-semibold text-sm font-sans">{column.title}</div>
         <div className="flex items-center gap-1">
           <span className="text-muted-foreground text-xs">
             {columnCards.length}

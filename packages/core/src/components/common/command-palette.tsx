@@ -179,7 +179,7 @@ export function CommandPalette({
                 />
                 <span>{ws.name}</span>
                 {ws.id === activeWorkspaceId && (
-                  <span className="ml-auto rounded bg-primary/10 px-1.5 py-0.5 font-bold text-[10px] text-primary uppercase tracking-wider">
+                  <span className="ml-auto rounded bg-primary/10 px-1.5 py-0.5 font-bold text-micro-uppercase text-primary">
                     Active
                   </span>
                 )}
@@ -221,7 +221,7 @@ export function CommandPalette({
         </CommandList>
       </Command>
 
-      <div className="absolute inset-x-0 bottom-0 z-20 hidden h-10 items-center justify-between rounded-b-xl border-border border-t bg-muted/50 px-4 font-medium text-muted-foreground text-xs md:flex">
+      <div className="absolute inset-x-0 bottom-0 z-20 hidden h-10 items-center justify-between rounded-b-xl border-border border-t bg-muted/50 px-4 font-medium text-muted-foreground text-micro md:flex">
         <div className="flex items-center gap-2">
           <Kbd>
             <MoveUp />

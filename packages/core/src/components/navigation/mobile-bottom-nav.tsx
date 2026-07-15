@@ -149,7 +149,7 @@ export function MobileBottomNav({
                 {isActive && (
                   <motion.span
                     animate="animate"
-                    className="relative z-10 block min-w-0 truncate font-semibold text-sm"
+                    className="relative z-10 block min-w-0 truncate font-semibold text-body-sm-medium"
                     exit="exit"
                     initial="initial"
                     transition={transition}

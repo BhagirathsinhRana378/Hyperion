@@ -30,9 +30,9 @@ export function WorkspacePage() {
               <LayoutGrid className="size-6 text-muted-foreground/80" />
             </div>
             <div className="space-y-1.5">
-              <h2 className="font-bold text-foreground text-lg tracking-tight">
+              <div className="font-bold text-foreground text-lg tracking-tight font-sans">
                 No active workspace
-              </h2>
+              </div>
               <p className="max-w-xs text-muted-foreground text-sm leading-relaxed">
                 Create a workspace to instantly spawn independent real system
                 terminal instances.

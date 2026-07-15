@@ -91,7 +91,7 @@ export function WorkspaceNav({ navigate, onNewWorkspace }: WorkspaceNavProps) {
       <SidebarMenuItem className="group/item relative px-1.5" key={ws.id}>
         {isActive && (
           <motion.div
-            className="absolute top-1.5 bottom-1.5 left-0 z-20 w-[3px] rounded-full bg-primary shadow-[0_0_10px_#ffe0c2,0_0_20px_#ffe0c2]"
+            className="absolute top-1.5 bottom-1.5 left-0 z-20 w-[3px] rounded-full bg-primary shadow-[0_0_10px_var(--primary),0_0_20px_var(--primary)]"
             layoutId="activeWorkspaceIndicator"
             transition={{ type: "spring", stiffness: 350, damping: 25 }}
           />
@@ -141,7 +141,7 @@ export function WorkspaceNav({ navigate, onNewWorkspace }: WorkspaceNavProps) {
               {/* Terminal count pill */}
               <span
                 className={cn(
-                  "flex h-4 min-w-[16px] shrink-0 items-center justify-center rounded-full px-1 font-bold font-mono text-[9px] transition-all duration-200 group-data-[collapsible=icon]:hidden",
+                  "flex h-4 min-w-[16px] shrink-0 items-center justify-center rounded-full px-1 font-bold font-mono text-[10px] transition-all duration-200 group-data-[collapsible=icon]:hidden",
                   isActive
                     ? "bg-primary-foreground/20 text-primary-foreground group-hover/menu-button:bg-sidebar-accent-foreground/20 group-hover/menu-button:text-sidebar-accent-foreground"
                     : "bg-muted text-muted-foreground/70 group-hover/menu-button:bg-muted/80"
@@ -167,7 +167,7 @@ export function WorkspaceNav({ navigate, onNewWorkspace }: WorkspaceNavProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align={isMobile ? "end" : "start"}
-                className="w-48 border-border/60 bg-[#09090d]/98 backdrop-blur-xl"
+                className="w-48 border-border/60 bg-popover backdrop-blur-xl"
                 side={isMobile ? "bottom" : "right"}
               >
                 <DropdownMenuItem
@@ -234,7 +234,7 @@ export function WorkspaceNav({ navigate, onNewWorkspace }: WorkspaceNavProps) {
   return (
     <SidebarGroup className="px-2">
       <div className="flex items-center justify-between px-2 py-2 group-data-[collapsible=icon]:hidden">
-        <SidebarGroupLabel className="font-bold text-[9px] text-muted-foreground/40 uppercase tracking-widest">
+        <SidebarGroupLabel className="font-bold text-micro-uppercase text-muted-foreground/60 tracking-widest">
           Workspaces
         </SidebarGroupLabel>
         <button
@@ -276,7 +276,7 @@ export function WorkspaceNav({ navigate, onNewWorkspace }: WorkspaceNavProps) {
           <div className="mt-2.5 space-y-4">
             {pinnedWorkspaces.length > 0 && (
               <div className="space-y-1">
-                <div className="select-none px-3 font-semibold text-[9px] text-muted-foreground/35 uppercase tracking-widest group-data-[collapsible=icon]:hidden">
+                <div className="select-none px-3 font-semibold text-micro-uppercase text-muted-foreground/60 tracking-widest group-data-[collapsible=icon]:hidden">
                   Pinned
                 </div>
                 {pinnedWorkspaces.map(renderWorkspaceItem)}
@@ -285,7 +285,7 @@ export function WorkspaceNav({ navigate, onNewWorkspace }: WorkspaceNavProps) {
 
             {regularWorkspaces.length > 0 && (
               <div className="space-y-1">
-                <div className="select-none px-3 font-semibold text-[9px] text-muted-foreground/35 uppercase tracking-widest group-data-[collapsible=icon]:hidden">
+                <div className="select-none px-3 font-semibold text-micro-uppercase text-muted-foreground/60 tracking-widest group-data-[collapsible=icon]:hidden">
                   Active
                 </div>
                 {regularWorkspaces.map(renderWorkspaceItem)}
