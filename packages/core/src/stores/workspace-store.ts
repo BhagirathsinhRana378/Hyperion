@@ -11,11 +11,31 @@ export interface TerminalPane {
 }
 
 const FRIENDLY_NAMES = [
-  "Nova", "Pixel", "Sage", "Echo", "Zelda",
-  "Cosmo", "Nimbus", "Rune", "Ember", "Lark",
-  "Ella", "Theo", "Vela", "Koda", "Zara",
-  "Orin", "Luna", "Juno", "Remy", "Dax",
-  "Iris", "Faye", "Wren", "Sola", "Kai",
+  "Nova",
+  "Pixel",
+  "Sage",
+  "Echo",
+  "Zelda",
+  "Cosmo",
+  "Nimbus",
+  "Rune",
+  "Ember",
+  "Lark",
+  "Ella",
+  "Theo",
+  "Vela",
+  "Koda",
+  "Zara",
+  "Orin",
+  "Luna",
+  "Juno",
+  "Remy",
+  "Dax",
+  "Iris",
+  "Faye",
+  "Wren",
+  "Sola",
+  "Kai",
 ];
 
 export interface Workspace {

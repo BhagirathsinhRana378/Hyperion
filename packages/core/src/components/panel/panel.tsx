@@ -97,7 +97,7 @@ export function Panel({
           >
             {/* Sticky Header */}
             <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-border/40 border-b bg-background/50 px-6 backdrop-blur-md">
-              <div className="font-bold text-foreground text-lg tracking-tight font-sans">
+              <div className="font-bold font-sans text-foreground text-lg tracking-tight">
                 {title}
               </div>
               <Button

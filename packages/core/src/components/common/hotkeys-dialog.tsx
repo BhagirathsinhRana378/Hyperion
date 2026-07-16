@@ -57,7 +57,7 @@ function HotkeysList() {
     <div className="space-y-4">
       {generalHotkeys.length > 0 && (
         <div>
-          <div className="mb-2 font-semibold text-muted-foreground text-xs uppercase tracking-wider font-sans">
+          <div className="mb-2 font-sans font-semibold text-muted-foreground text-xs uppercase tracking-wider">
             {t("general")}
           </div>
           <div className="space-y-0.5">
@@ -74,7 +74,7 @@ function HotkeysList() {
 
       {navigationHotkeys.length > 0 && (
         <div>
-          <div className="mb-2 font-semibold text-muted-foreground text-xs uppercase tracking-wider font-sans">
+          <div className="mb-2 font-sans font-semibold text-muted-foreground text-xs uppercase tracking-wider">
             {t("navigation")}
           </div>
           <div className="space-y-0.5">

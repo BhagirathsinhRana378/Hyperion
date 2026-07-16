@@ -19,6 +19,7 @@ import {
 } from "@workspace/core/stores/agent-store";
 import { useWorkspaceStore } from "@workspace/core/stores/workspace-store";
 import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import {
   Select,
@@ -27,7 +28,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { cn } from "@workspace/ui/lib/utils";
 import {
@@ -327,7 +327,7 @@ async function executeSingleIteration(
     context: string,
     wsId: string
   ) => Promise<string>,
-  addMessageFn: (wsId: string, msg: AgentMessage) => void
+  _addMessageFn: (wsId: string, msg: AgentMessage) => void
 ): Promise<{ completed: boolean; newTasks?: TaskInput[] }> {
   logFn(`Waiting for iteration ${currentIteration} results...`);
   upsertMessage(workspaceId, {
@@ -870,8 +870,7 @@ export function AgentSidebar() {
       if (parsedTasks.length > 0) {
         const taskSummary = parsedTasks
           .map(
-            (t, i) =>
-              `${i + 1}. Terminal "${t.terminalId}" → \`${t.command}\``
+            (t, i) => `${i + 1}. Terminal "${t.terminalId}" → \`${t.command}\``
           )
           .join("\n");
 
@@ -895,9 +894,7 @@ export function AgentSidebar() {
             "run",
             "execute",
           ];
-          if (
-            !approved.includes(approval.toLowerCase().trim())
-          ) {
+          if (!approved.includes(approval.toLowerCase().trim())) {
             upsertMessage(workspaceId, {
               id: safeUUID(),
               role: "agent",
@@ -995,11 +992,10 @@ export function AgentSidebar() {
     setPendingQuestion(null);
   };
 
-  const waitForUserResponse = (question: string): Promise<string> => {
-    return new Promise<string>((resolve, reject) => {
+  const waitForUserResponse = (question: string): Promise<string> =>
+    new Promise<string>((resolve, reject) => {
       setPendingQuestion({ resolve, reject, question });
     });
-  };
 
   async function askForPermission(
     question: string,
@@ -1101,10 +1097,14 @@ export function AgentSidebar() {
                   <Trash2 className="size-3.5" />
                 </button>
                 <button
-                  className="flex size-6 items-center justify-center rounded-md text-destructive/80 transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-30 disabled:pointer-events-none"
-                  onClick={handleStop}
+                  className="flex size-6 items-center justify-center rounded-md text-destructive/80 transition-colors hover:bg-destructive/10 hover:text-destructive disabled:pointer-events-none disabled:opacity-30"
                   disabled={plannerState === "idle"}
-                  title={plannerState !== "idle" ? "Stop Execution" : "Nothing to stop"}
+                  onClick={handleStop}
+                  title={
+                    plannerState === "idle"
+                      ? "Nothing to stop"
+                      : "Stop Execution"
+                  }
                   type="button"
                 >
                   <Square className="size-3.5" />
@@ -1256,11 +1256,11 @@ export function AgentSidebar() {
                 {/* Pending Question / Approval Request */}
                 {pendingQuestion && (
                   <div className="flex flex-col gap-2 rounded-xl border border-primary/20 bg-primary/[0.03] p-4">
-                    <div className="flex items-center gap-2 text-xs text-foreground/80">
+                    <div className="flex items-center gap-2 text-foreground/80 text-xs">
                       <HelpCircle className="size-3.5 text-primary" />
                       <span className="font-medium">Agent needs input:</span>
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {pendingQuestion.question}
                     </p>
                     <div className="flex items-center gap-2">
@@ -1333,7 +1333,9 @@ export function AgentSidebar() {
                       <SelectItem value="all">All Terminals</SelectItem>
                       {activeWorkspace.panes.map((pane) => (
                         <SelectItem key={pane.id} value={pane.id}>
-                          {pane.name ? `${pane.name} (${pane.title})` : pane.title}
+                          {pane.name
+                            ? `${pane.name} (${pane.title})`
+                            : pane.title}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -1353,9 +1355,7 @@ export function AgentSidebar() {
                     }}
                     size="sm"
                     variant={
-                      isTyping || pendingQuestion
-                        ? "destructive"
-                        : "default"
+                      isTyping || pendingQuestion ? "destructive" : "default"
                     }
                   >
                     {isTyping ? (
@@ -1364,11 +1364,7 @@ export function AgentSidebar() {
                       <Send className="size-3.5" />
                     )}
                     <span>
-                      {isTyping
-                        ? "Stop"
-                        : pendingQuestion
-                          ? "Reply"
-                          : "Send"}
+                      {isTyping ? "Stop" : pendingQuestion ? "Reply" : "Send"}
                     </span>
                   </Button>
                 </div>

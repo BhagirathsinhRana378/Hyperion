@@ -222,7 +222,7 @@ export function AiProviderCard() {
   // Run health check initially
   useEffect(() => {
     checkAllHealth();
-  }, [provider, apiKey, baseUrl]);
+  }, [checkAllHealth]);
 
   return (
     <div className="flex flex-col gap-4">

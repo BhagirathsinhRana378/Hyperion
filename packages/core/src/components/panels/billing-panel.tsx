@@ -281,7 +281,7 @@ export function BillingPanel() {
                       {inv.amount}
                     </td>
                     <td className="p-3">
-                      <span className="inline-flex items-center gap-1 font-semibold text-micro text-emerald-400">
+                      <span className="inline-flex items-center gap-1 font-semibold text-emerald-400 text-micro">
                         <CheckCircle2 className="size-3 text-emerald-400" />
                         {inv.status}
                       </span>

@@ -4,9 +4,15 @@ import { ClerkProvider as BaseClerkProvider } from "@clerk/clerk-react";
 
 export function ClerkProvider({ children }: { children: React.ReactNode }) {
   // Falls back to "" when no env var is set (CI, forks, fresh clones).
-  // Clerk's SDK handles an empty key gracefully during SSR/build
-  // by providing safe null defaults for all auth hooks.
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "";
+  // During static export builds (native app), Clerk's SDK throws
+  // "Missing publishableKey" if the provider is mounted with an empty key
+  // and any child calls useAuth(). When the key is absent we skip the
+  // Clerk wrapper entirely so the build doesn't fail in CI / forks.
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  if (!publishableKey) {
+    return <>{children}</>;
+  }
 
   return (
     <BaseClerkProvider publishableKey={publishableKey}>

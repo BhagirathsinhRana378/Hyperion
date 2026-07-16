@@ -282,7 +282,7 @@ export function UpgradePanel() {
 
       {/* Detailed Comparison Table */}
       <div className="space-y-3">
-        <div className="font-bold text-foreground text-sm uppercase tracking-wider font-sans">
+        <div className="font-bold font-sans text-foreground text-sm uppercase tracking-wider">
           Features Comparison
         </div>
         <div className="overflow-x-auto rounded-lg border border-border/40 bg-muted/10">
@@ -341,7 +341,7 @@ export function UpgradePanel() {
 
       {/* FAQ Section */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 font-bold text-foreground text-sm uppercase tracking-wider font-sans">
+        <div className="flex items-center gap-2 font-bold font-sans text-foreground text-sm uppercase tracking-wider">
           <HelpCircle className="size-4 text-primary" />
           Frequently Asked Questions
         </div>

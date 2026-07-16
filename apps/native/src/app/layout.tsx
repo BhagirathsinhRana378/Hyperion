@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${fontSans.variable} ${fontDisplay.variable} font-sans overflow-hidden antialiased`}
+        className={`${fontSans.variable} ${fontDisplay.variable} overflow-hidden font-sans antialiased`}
       >
         <ClerkProvider>{children}</ClerkProvider>
       </body>

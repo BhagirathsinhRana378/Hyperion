@@ -73,7 +73,7 @@ export function AppHeader({ pathname, LinkComponent = "a" }: AppHeaderProps) {
               <>
                 <ChevronRight className="size-3 text-muted-foreground/45" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="font-bold text-micro-uppercase text-foreground tracking-wider">
+                  <BreadcrumbPage className="font-bold text-foreground text-micro-uppercase tracking-wider">
                     Settings
                   </BreadcrumbPage>
                 </BreadcrumbItem>

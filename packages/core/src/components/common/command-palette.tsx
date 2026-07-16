@@ -221,7 +221,7 @@ export function CommandPalette({
         </CommandList>
       </Command>
 
-      <div className="absolute inset-x-0 bottom-0 z-20 hidden h-10 items-center justify-between rounded-b-xl border-border border-t bg-muted/50 px-4 font-medium text-muted-foreground text-micro md:flex">
+      <div className="absolute inset-x-0 bottom-0 z-20 hidden h-10 items-center justify-between rounded-b-xl border-border border-t bg-muted/50 px-4 font-medium text-micro text-muted-foreground md:flex">
         <div className="flex items-center gap-2">
           <Kbd>
             <MoveUp />

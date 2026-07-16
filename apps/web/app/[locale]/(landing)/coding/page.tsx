@@ -119,10 +119,10 @@ export default function CodingPage() {
           speed={50}
         >
           <div className="flex items-center gap-8 px-4">
-            {techStack[0]?.split("·").map((item, i) => (
+            {techStack[0]?.split("·").map((item) => (
               <span
                 className="whitespace-nowrap font-medium text-muted-foreground text-sm"
-                key={i}
+                key={item.trim()}
               >
                 {item.trim()}
               </span>

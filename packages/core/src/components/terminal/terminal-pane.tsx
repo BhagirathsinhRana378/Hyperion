@@ -1031,7 +1031,16 @@ export function TerminalPane({
         <div className="flex h-6.5 shrink-0 items-center justify-between border-border/20 border-b bg-[#0f0f12] px-3">
           <div className="flex items-center gap-2">
             <span className="font-mono font-semibold text-[10px] text-muted-foreground/90 tracking-tight">
-              {name ? <>{name} <span className="font-normal text-muted-foreground/50">· {title}</span></> : title}
+              {name ? (
+                <>
+                  {name}{" "}
+                  <span className="font-normal text-muted-foreground/50">
+                    · {title}
+                  </span>
+                </>
+              ) : (
+                title
+              )}
             </span>
             <span
               className={`scale-90 rounded px-1.5 py-0.5 font-bold font-mono text-[8px] uppercase tracking-normal ${getBadgeColor(shellType)}`}

@@ -74,7 +74,7 @@ export function AccountPanel() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label
-                className="font-semibold text-muted-foreground text-micro uppercase"
+                className="font-semibold text-micro text-muted-foreground uppercase"
                 htmlFor="display-name"
               >
                 Display Name
@@ -88,7 +88,7 @@ export function AccountPanel() {
             </div>
             <div className="space-y-1.5">
               <Label
-                className="font-semibold text-muted-foreground text-micro uppercase"
+                className="font-semibold text-micro text-muted-foreground uppercase"
                 htmlFor="username"
               >
                 Username
@@ -102,7 +102,7 @@ export function AccountPanel() {
             </div>
             <div className="space-y-1.5 sm:col-span-2">
               <Label
-                className="font-semibold text-muted-foreground text-micro uppercase"
+                className="font-semibold text-micro text-muted-foreground uppercase"
                 htmlFor="email"
               >
                 Email Address
@@ -230,7 +230,7 @@ export function AccountPanel() {
 
           {/* Active Sessions */}
           <div className="space-y-3 pt-2">
-            <span className="block font-semibold text-muted-foreground text-micro uppercase tracking-wider">
+            <span className="block font-semibold text-micro text-muted-foreground uppercase tracking-wider">
               Active Device Sessions
             </span>
             <div className="space-y-2">

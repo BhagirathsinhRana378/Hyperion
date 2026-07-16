@@ -30,7 +30,7 @@ export function WorkspacePage() {
               <LayoutGrid className="size-6 text-muted-foreground/80" />
             </div>
             <div className="space-y-1.5">
-              <div className="font-bold text-foreground text-lg tracking-tight font-sans">
+              <div className="font-bold font-sans text-foreground text-lg tracking-tight">
                 No active workspace
               </div>
               <p className="max-w-xs text-muted-foreground text-sm leading-relaxed">
