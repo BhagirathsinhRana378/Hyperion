@@ -96,6 +96,7 @@ export function TerminalGrid() {
                   id={pane.id}
                   index={index}
                   isActiveWorkspace={isActive}
+                  name={pane.name}
                   title={`Terminal ${index + 1}`}
                 />
               </div>

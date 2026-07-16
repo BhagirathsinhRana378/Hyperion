@@ -4,7 +4,7 @@ import { useMounted } from "@workspace/core/hooks/use-mounted";
 import "@xterm/xterm/css/xterm.css";
 import type { OrchestrationTask } from "@workspace/core/lib/orchestrator-client";
 import type { Task } from "@workspace/core/lib/task-dispatcher";
-import { RotateCcw, Trash2 } from "lucide-react";
+import { Maximize2, Minimize2, RotateCcw, Trash2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -17,6 +17,7 @@ interface TerminalPaneProps {
   id: string;
   index?: number;
   isActiveWorkspace?: boolean;
+  name?: string;
   title: string;
 }
 
@@ -352,6 +353,7 @@ function TerminalPlaceholder({ shellType }: { shellType: string }) {
 
 export function TerminalPane({
   id,
+  name,
   title,
   isActiveWorkspace = true,
   cwd,
@@ -366,6 +368,7 @@ export function TerminalPane({
   const [shellType, setShellType] = useState("Local Shell");
   const [isTauriEnv, setIsTauriEnv] = useState(false);
   const [isTerminalReady, setIsTerminalReady] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Buffer input for mock shell
   const inputBufferRef = useRef("");
@@ -848,6 +851,32 @@ export function TerminalPane({
     }
   }, [isActiveWorkspace, id]);
 
+  // ─── Fullscreen: fit terminal on open + Escape to close ───
+  useEffect(() => {
+    if (!isFullscreen) {
+      return;
+    }
+
+    // Fit terminal to the new fullscreen dimensions
+    const timer = setTimeout(() => {
+      if (fitAddonRef.current && containerRef.current) {
+        fitAddonRef.current.fit();
+      }
+    }, 50);
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isFullscreen]);
+
   const handleClear = async () => {
     if (termRef.current) {
       termRef.current.clear();
@@ -921,6 +950,34 @@ export function TerminalPane({
     }
   };
 
+  // ─── Image paste handler for fullscreen mode ───
+  const handleImagePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) {
+      return;
+    }
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (!file) {
+          continue;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          const term = termRef.current;
+          if (term) {
+            term.writeln(
+              `\r\n\x1b[1;36m[Image pasted: ${file.name} | ${(file.size / 1024).toFixed(1)} KB]\x1b[0m`
+            );
+          }
+        };
+        reader.readAsDataURL(file);
+        break;
+      }
+    }
+  }, []);
+
   const getBadgeColor = (shell: string) => {
     const s = shell.toLowerCase();
     if (s.includes("powershell")) {
@@ -954,91 +1011,127 @@ export function TerminalPane({
   }
 
   return (
-    <div className="flex h-full flex-col overflow-auto rounded-lg border border-border/30 bg-[#08080a] shadow-md transition-all duration-300 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 hover:shadow-lg">
-      {/* Title Bar / Header */}
-      <div className="flex h-6.5 shrink-0 items-center justify-between border-border/20 border-b bg-[#0f0f12] px-3">
-        <div className="flex items-center gap-2">
-          <span className="font-mono font-semibold text-[10px] text-muted-foreground/90 tracking-tight">
-            {title}
-          </span>
-          <span
-            className={`scale-90 rounded px-1.5 py-0.5 font-bold font-mono text-[8px] uppercase tracking-normal ${getBadgeColor(shellType)}`}
-          >
-            {shellType}
-          </span>
-        </div>
+    <>
+      {/* Fullscreen backdrop */}
+      {isFullscreen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          onClick={() => setIsFullscreen(false)}
+        />
+      )}
 
-        <div className="flex items-center gap-1">
-          <button
-            className="flex size-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            onClick={handleClear}
-            title="Clear Terminal Screen"
-            type="button"
-          >
-            <Trash2 className="size-3" />
-          </button>
-          <button
-            className="flex size-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            onClick={handleReset}
-            title="Reset Shell Session"
-            type="button"
-          >
-            <RotateCcw className="size-3" />
-          </button>
-        </div>
-      </div>
-
-      {/* xterm.js Container / Animated Transition */}
       <div
-        className="relative flex-1 overflow-auto bg-[#08080a]"
-        style={{ minHeight: 0 }}
+        className={
+          isFullscreen
+            ? "fixed inset-6 z-50 flex flex-col overflow-hidden rounded-xl border border-border/30 bg-[#08080a] shadow-2xl"
+            : "flex h-full flex-col overflow-auto rounded-lg border border-border/30 bg-[#08080a] shadow-md transition-all duration-300 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 hover:shadow-lg"
+        }
       >
-        <AnimatePresence initial={false}>
-          {!isTerminalReady && (
-            <motion.div
-              className="absolute inset-0 z-10"
-              exit={{
-                opacity: 0,
-                scale: 0.99,
-                y: -4,
-              }}
-              initial={{ opacity: 1 }}
-              key="placeholder"
-              transition={{
-                type: "spring",
-                stiffness: 300,
-                damping: 25,
-              }}
+        {/* Title Bar / Header */}
+        <div className="flex h-6.5 shrink-0 items-center justify-between border-border/20 border-b bg-[#0f0f12] px-3">
+          <div className="flex items-center gap-2">
+            <span className="font-mono font-semibold text-[10px] text-muted-foreground/90 tracking-tight">
+              {name ? <>{name} <span className="font-normal text-muted-foreground/50">· {title}</span></> : title}
+            </span>
+            <span
+              className={`scale-90 rounded px-1.5 py-0.5 font-bold font-mono text-[8px] uppercase tracking-normal ${getBadgeColor(shellType)}`}
             >
-              <TerminalPlaceholder shellType={shellType} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <motion.div
-          animate={{
-            opacity: isTerminalReady ? 1 : 0,
-            y: isTerminalReady ? 0 : 8,
-            scale: isTerminalReady ? 1 : 0.99,
-          }}
-          className="h-full w-full"
-          initial={{ opacity: 0, y: 8, scale: 0.99 }}
-          transition={{
-            type: "spring",
-            stiffness: 280,
-            damping: 24,
-            delay: 0.05,
-          }}
+              {shellType}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <button
+              className="flex size-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              onClick={handleClear}
+              title="Clear Terminal Screen"
+              type="button"
+            >
+              <Trash2 className="size-3" />
+            </button>
+            <button
+              className="flex size-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              onClick={handleReset}
+              title="Reset Shell Session"
+              type="button"
+            >
+              <RotateCcw className="size-3" />
+            </button>
+            {isFullscreen ? (
+              <button
+                className="flex size-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                onClick={() => setIsFullscreen(false)}
+                title="Exit Fullscreen"
+                type="button"
+              >
+                <Minimize2 className="size-3" />
+              </button>
+            ) : (
+              <button
+                className="flex size-5 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                onClick={() => setIsFullscreen(true)}
+                title="Fullscreen Terminal"
+                type="button"
+              >
+                <Maximize2 className="size-3" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* xterm.js Container / Animated Transition */}
+        <div
+          className="relative flex-1 overflow-auto bg-[#08080a]"
+          onPaste={isFullscreen ? handleImagePaste : undefined}
+          style={{ minHeight: 0 }}
         >
-          {/* biome-ignore lint/a11y/useSemanticElements: xterm.js container is non-semantic */}
-          <div
-            aria-label={`${title} terminal`}
-            className="h-full w-full p-1 focus:outline-none"
-            ref={containerRef}
-            role="textbox"
-            tabIndex={0}
-          />
-        </motion.div>
+          <AnimatePresence initial={false}>
+            {!isTerminalReady && (
+              <motion.div
+                className="absolute inset-0 z-10"
+                exit={{
+                  opacity: 0,
+                  scale: 0.99,
+                  y: -4,
+                }}
+                initial={{ opacity: 1 }}
+                key="placeholder"
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 25,
+                }}
+              >
+                <TerminalPlaceholder shellType={shellType} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <motion.div
+            animate={{
+              opacity: isTerminalReady ? 1 : 0,
+              y: isTerminalReady ? 0 : 8,
+              scale: isTerminalReady ? 1 : 0.99,
+            }}
+            className="h-full w-full"
+            initial={{ opacity: 0, y: 8, scale: 0.99 }}
+            transition={{
+              type: "spring",
+              stiffness: 280,
+              damping: 24,
+              delay: 0.05,
+            }}
+          >
+            {/* biome-ignore lint/a11y/useSemanticElements: xterm.js container is non-semantic */}
+            <div
+              aria-label={`${title} terminal`}
+              className="h-full w-full p-1 focus:outline-none"
+              ref={containerRef}
+              role="textbox"
+              tabIndex={0}
+            />
+          </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

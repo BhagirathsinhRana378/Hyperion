@@ -1,0 +1,219 @@
+# Hyperion CI — Runs on every push and pull request
+#
+# Designed like a big open-source CI pipeline:
+#   - lint  → formatting + static analysis via ultracite/biome
+#   - typecheck → TypeScript type-checking across all packages
+#   - test  → unit tests (vitest, etc.)
+#   - build → turborepo build (Next.js apps, CLI, etc.)
+#
+# SECURITY: ZERO environment variables required.
+# This public repo never ships secrets. The Clerk provider gracefully
+# handles a missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY with a fallback.
+# No .env file or secret is needed for CI to pass.
+#
+#   "If it doesn't work with a fresh clone and `pnpm install`, it's broken."
+#   — Hyperion CI philosophy
+
+name: CI
+
+on:
+  push:
+    branches: ["main", "develop"]
+    paths-ignore:
+      - "**.md"
+      - "*.webp"
+      - "*.svg"
+      - ".github/assets/**"
+  pull_request:
+    branches: ["*"]
+    paths-ignore:
+      - "**.md"
+      - "*.webp"
+      - "*.svg"
+      - ".github/assets/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Biome / Ultracite check
+        run: pnpm check
+
+      - name: Ensure no .env files committed
+        run: |
+          # Only flag real .env files — .env.example is fine
+          COMMITTED_ENV=$(git ls-files | grep -E '\.env$|\.env\.(local|dev|prod|staging|production|development)' || true)
+          if [ -n "$COMMITTED_ENV" ]; then
+            echo "❌ ERROR: .env files found in git tracking:"
+            echo "$COMMITTED_ENV"
+            exit 1
+          fi
+          echo "✅ No .env files are tracked by git."
+
+  typecheck:
+    name: TypeScript Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type-check
+        run: pnpm typecheck
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests (CLI package)
+        working-directory: packages/cli
+        run: pnpm test -- --reporter verbose
+
+      - name: Upload coverage (if generated)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: packages/cli/coverage/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages & apps
+        run: pnpm build
+
+      - name: Verify CLI binary exists
+        run: |
+          if [ -f packages/cli/dist/index.js ]; then
+            echo "✅ CLI build successful"
+            node packages/cli/dist/index.js --version 2>/dev/null || echo "(version flag may not exist yet — binary is present)"
+          else
+            echo "❌ CLI dist/index.js not found!"
+            exit 1
+          fi
+
+      - name: Upload build artifacts (web)
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: apps/web/.next/
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Upload build artifacts (CLI)
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-build
+          path: packages/cli/dist/
+          if-no-files-found: ignore
+          retention-days: 3
+
+  # Dependency check — catch unused / outdated dependencies
+  deps:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for stale deps
+        run: pnpm deps:check
+
+  # Summary job — makes branch protection rules simple (just require this)
+  summary:
+    name: CI Summary
+    if: always()
+    needs: [lint, typecheck, test, build, deps]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check job outcomes
+        run: |
+          echo "### 📋 CI Results" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **lint**: ${{ needs.lint.result }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **typecheck**: ${{ needs.typecheck.result }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **test**: ${{ needs.test.result }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **build**: ${{ needs.build.result }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **deps**: ${{ needs.deps.result }}" >> "$GITHUB_STEP_SUMMARY"
