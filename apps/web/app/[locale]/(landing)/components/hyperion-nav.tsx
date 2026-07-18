@@ -17,7 +17,6 @@ const navLinks = [
   { label: "Docs", href: "/docs" },
   { label: "About", href: "/about" },
   { label: "News", href: "/news" },
-  { label: "Download", href: "/download" },
 ];
 
 export function HyperionNav() {
@@ -88,7 +87,7 @@ export function HyperionNav() {
           </Link>
 
           {/* Desktop */}
-          <ul className="hidden items-center gap-6 lg:flex">
+          <ul className="hidden items-center gap-8 lg:flex">
             {navLinks.map((link) => {
               const active = pathname?.includes(link.href);
               return (
@@ -117,9 +116,9 @@ export function HyperionNav() {
           <div className="hidden items-center gap-4 lg:flex">
             <Link
               className="group/btn relative inline-flex h-8 items-center justify-center rounded-xl bg-primary px-4 font-medium text-primary-foreground text-sm transition-all duration-300 active:scale-[0.98]"
-              href="/contact"
+              href="/download"
             >
-              Get access
+              Download
               <svg
                 className="pointer-events-none absolute inset-0 h-full w-full"
                 fill="none"
@@ -198,10 +197,10 @@ export function HyperionNav() {
               <li className="border-border/60 border-t pt-4">
                 <Link
                   className="group/btn relative inline-flex h-10 items-center justify-center rounded-xl bg-primary px-5 font-medium text-primary-foreground text-sm transition-all duration-300 active:scale-[0.98]"
-                  href="/contact"
+                  href="/download"
                   onClick={() => setMenuOpen(false)}
                 >
-                  Get access
+                  Download
                   <svg
                     className="pointer-events-none absolute inset-0 h-full w-full"
                     fill="none"

@@ -410,7 +410,7 @@ export default function GridScan({
   scanDuration = 4,
   scanDelay = 3,
   scanOnClick = false,
-  snapBackDelay = 250,
+  snapBackDelay: _snapBackDelay = 250,
   className,
   style,
 }: GridScanProps) {
@@ -450,47 +450,11 @@ export default function GridScan({
     if (!el) {
       return;
     }
-    let leaveTimer: number | null = null;
-
     const within = (e: MouseEvent, rect: DOMRect) =>
       e.clientX >= rect.left &&
       e.clientX <= rect.right &&
       e.clientY >= rect.top &&
       e.clientY <= rect.bottom;
-
-    const recenter = () => {
-      lookTarget.current.set(0, 0);
-      tiltTarget.current = 0;
-      yawTarget.current = 0;
-    };
-
-    const onMove = (e: MouseEvent) => {
-      const rect = el.getBoundingClientRect();
-      if (!within(e, rect)) {
-        if (leaveTimer === null) {
-          leaveTimer = window.setTimeout(
-            () => {
-              recenter();
-              leaveTimer = null;
-            },
-            Math.max(0, snapBackDelay)
-          );
-        }
-        return;
-      }
-      if (leaveTimer !== null) {
-        clearTimeout(leaveTimer);
-        leaveTimer = null;
-      }
-      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const ny = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-      lookTarget.current.set(nx, ny);
-      // No webcam/gyro here, so the cursor also drives the gentle
-      // roll/yaw the original reserved for head tracking — the plane
-      // leans to face the pointer.
-      tiltTarget.current = nx * -0.22;
-      yawTarget.current = nx * 0.45;
-    };
 
     const pushScan = (t: number) => {
       const u = scanUniformsRef.current;
@@ -521,16 +485,11 @@ export default function GridScan({
       }
     };
 
-    window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("click", onClick);
     return () => {
-      window.removeEventListener("mousemove", onMove);
       window.removeEventListener("click", onClick);
-      if (leaveTimer !== null) {
-        clearTimeout(leaveTimer);
-      }
     };
-  }, [snapBackDelay, scanOnClick]);
+  }, [scanOnClick]);
 
   // Renderer lifecycle + paused-when-offscreen render loop.
   useEffect(() => {

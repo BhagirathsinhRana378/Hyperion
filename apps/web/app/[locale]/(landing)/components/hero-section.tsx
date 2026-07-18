@@ -76,32 +76,6 @@ const CAPABILITIES = [
   "Local-first",
 ];
 
-const STATS = [
-  {
-    value: 8,
-    suffix: "",
-    label: "Terminals",
-    description: "Tiled into one adaptive workspace.",
-  },
-  {
-    value: 99.9,
-    suffix: "%",
-    label: "Agent Uptime",
-    description: "Autonomous agents that keep working.",
-  },
-  {
-    value: 10,
-    suffix: "×",
-    label: "Faster Delivery",
-    description: "Parallel agents cut iteration time.",
-  },
-  {
-    value: 100,
-    suffix: "%",
-    label: "Under Command",
-    description: "You approve every merge, always.",
-  },
-];
 
 const FEATURES = [
   {
@@ -161,53 +135,7 @@ const TERMINAL_LINES: TerminalLineInput[] = [
   { text: "" },
   { text: "swarm active · 4 agents · you are in command" },
 ];
-
 /* ── Micro components ─────────────────────────────────────── */
-
-/** One floating glass stat card — counts up once on entry, then eases
- *  into an independent slow float+rotate drift (paused on hover).
- *  Lift + tilt + scale are cursor-driven (same recipe as GlowCard) on
- *  an inner element, kept separate from the float wrapper so the two
- *  transforms never fight over the same node. Every card is the same
- *  fixed height via grid stretch + h-full all the way down, and the
- *  description reserves a fixed two-line slot so no card's content
- *  shifts the number/label baseline relative to its neighbors. */
-function HeroStatCard({
-  value,
-  suffix,
-  label,
-  description,
-  index,
-}: {
-  value: number;
-  suffix: string;
-  label: string;
-  description: string;
-  index: number;
-}) {
-  return (
-    <Reveal className="h-full" direction="up" duration={340} index={index}>
-      <StatCard>
-        <span className="font-display text-4xl text-foreground md:text-5xl">
-          <CountUp
-            className="count-up-text"
-            delay={index * 0.12}
-            duration={1.3}
-            separator=","
-            to={value}
-          />
-          {suffix}
-        </span>
-        <span className="mt-1.5 font-medium text-[11px] text-muted-foreground uppercase tracking-[0.16em]">
-          {label}
-        </span>
-        <span className="mt-2 flex min-h-[2.25rem] items-center justify-center text-muted-foreground/70 text-xs leading-relaxed">
-          {description}
-        </span>
-      </StatCard>
-    </Reveal>
-  );
-}
 
 /** One headline word — blur-to-sharp rise, staggered by index. */
 function _Word({
@@ -510,7 +438,7 @@ export default function HeroSection() {
                   className="relative aspect-15/8 rounded-2xl border border-border/50"
                   height="1080"
                   priority={true}
-                  src="/app-screen-dark.png"
+                  src="/hero_img.png"
                   width="1920"
                 />
                 <BorderBeam
@@ -542,21 +470,6 @@ export default function HeroSection() {
         </Marquee>
       </section>
 
-      {/* ── Stats ── */}
-      <section className="py-16 md:py-24">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 px-6 sm:grid-cols-2 lg:grid-cols-4">
-          {STATS.map((stat, i) => (
-            <HeroStatCard
-              description={stat.description}
-              index={i}
-              key={stat.label}
-              label={stat.label}
-              suffix={stat.suffix}
-              value={stat.value}
-            />
-          ))}
-        </div>
-      </section>
 
       {/* ── Feature grid ── */}
       <section className="mx-auto max-w-6xl px-6 py-16 md:py-24">
@@ -704,12 +617,21 @@ export default function HeroSection() {
           </div>
         </Reveal>
         <div className="mx-auto mt-10 max-w-[1000px]">
-          <Terminal
-            lines={TERMINAL_LINES}
-            shell="zsh"
-            title="hyperion — swarm"
-            typing={true}
-          />
+          <div className="relative mx-auto w-full overflow-hidden rounded-2xl border border-white/[0.07] bg-background shadow-[0_0_80px_-15px] shadow-primary/20">
+            <div className="aspect-video w-full relative">
+              <video
+                autoPlay
+                className="size-full object-cover"
+                loop
+                muted
+                playsInline
+                src="/hero_video.mp4"
+              />
+              {/* Solid inner border using box-shadow to completely hide the blue desktop in the video without cutting the app content */}
+              <div className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_0_0_24px_hsl(var(--background)),inset_0_0_40px_40px_hsl(var(--background))]" />
+            </div>
+            <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10" />
+          </div>
         </div>
       </section>
 

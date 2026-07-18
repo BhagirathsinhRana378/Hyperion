@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "../../node_modules/@tailwindcss/typography";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@xterm/xterm/css/xterm.css";

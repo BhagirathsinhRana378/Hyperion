@@ -22,7 +22,14 @@ export interface AIProvider {
   authenticate(): Promise<boolean>;
   disconnect(): void;
   healthCheck(): Promise<boolean>;
+  authenticate(): Promise<boolean>;
+  disconnect(): void;
+  healthCheck(): Promise<boolean>;
   initialize(apiKey: string, baseUrl: string, model: string): void;
+  sendPrompt(
+    messages: any[],
+    tools?: any[]
+  ): Promise<{ content: string; tool_calls?: any[] }>;
   sendPrompt(
     messages: any[],
     tools?: any[]
@@ -93,16 +100,34 @@ export class OpenAICompatibleProvider implements AIProvider {
         );
         if (res.ok) {
           (window as any).__lastProviderError = null;
+          return true;
+        }
+
+        const res2 = await fetchFn(`${this.baseUrl}/chat/completions`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${this.apiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: this.model || "gemini-1.5-flash",
+            messages: [{ role: "user", content: "Ping" }],
+            max_tokens: 1,
+          }),
+        });
+        if (res2.ok) {
+          (window as any).__lastProviderError = null;
         } else {
-          const bodyText = await res.text().catch(() => "");
+          const bodyText = await res2.text().catch(() => "");
           console.error(
-            `Gemini Auth Fail: Status ${res.status}, Body: ${bodyText}`
+            `Gemini Auth Fail: Status ${res2.status}, Body: ${bodyText}`
           );
           (window as any).__lastProviderError =
-            `Status ${res.status}: ${bodyText || "Empty response"}`;
+            `Status ${res2.status}: ${bodyText || "Empty response"}`;
         }
-        return res.ok;
+        return res2.ok;
       }
+
       const res = await fetchFn(combineUrl(this.baseUrl, "models"), {
         method: "GET",
         headers: {
