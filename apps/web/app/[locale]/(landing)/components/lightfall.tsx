@@ -65,7 +65,7 @@ const prepColors = (input?: string[]) => {
   // Synced to the site's exact three-anchor palette, not an
   // approximation — Platinum #EEEEED and Graphite #3A3A3A, the two
   // structural tones, evenly mixed for bright/dim streak variation.
-  const base = (input && input.length ? input : ["#EEEEED", "#3A3A3A"]).slice(
+  const base = (input?.length ? input : ["#EEEEED", "#3A3A3A"]).slice(
     0,
     MAX_COLORS
   );

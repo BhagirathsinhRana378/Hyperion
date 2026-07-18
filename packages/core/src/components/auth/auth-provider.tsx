@@ -8,7 +8,19 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
+/** Resolved at build time by Next.js env replacement. */
+const hasClerkPublishableKey = !!(
+  typeof process !== "undefined" &&
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+);
+
 export function AuthProvider({ children }: AuthProviderProps) {
+  // When Clerk isn't configured (CI / fresh clone / static export build)
+  // skip auth entirely so the build doesn't crash.
+  if (!hasClerkPublishableKey) {
+    return <>{children}</>;
+  }
+
   const { isLoaded, userId } = useAuth();
   const router = useRouter();
 

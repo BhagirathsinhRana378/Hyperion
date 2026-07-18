@@ -57,13 +57,13 @@ export function AppHeader({ pathname, LinkComponent = "a" }: AppHeaderProps) {
             <BreadcrumbItem>
               {isSettings ? (
                 <LinkComponent
-                  className="font-bold text-[11px] uppercase tracking-wider transition-colors hover:text-foreground"
+                  className="font-bold text-micro-uppercase tracking-wider transition-colors hover:text-foreground"
                   href="/workspace"
                 >
                   Workspaces
                 </LinkComponent>
               ) : (
-                <span className="font-bold text-[11px] text-muted-foreground/60 uppercase tracking-wider">
+                <span className="font-bold text-micro-uppercase text-muted-foreground/60 tracking-wider">
                   Workspaces
                 </span>
               )}
@@ -73,7 +73,7 @@ export function AppHeader({ pathname, LinkComponent = "a" }: AppHeaderProps) {
               <>
                 <ChevronRight className="size-3 text-muted-foreground/45" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="font-bold text-[11px] text-foreground uppercase tracking-wider">
+                  <BreadcrumbPage className="font-bold text-foreground text-micro-uppercase tracking-wider">
                     Settings
                   </BreadcrumbPage>
                 </BreadcrumbItem>

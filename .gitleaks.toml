@@ -1,0 +1,44 @@
+# Gitleaks configuration for Hyperion
+# https://github.com/gitleaks/gitleaks
+
+title = "Hyperion secret scanning config"
+
+# Extend the default ruleset
+[extend]
+useDefault = true
+
+# Paths to always skip (globs)
+[allowlist]
+paths = [
+  # Test fixtures that may contain fake keys
+  "(?i)test.*fixture",
+  "(?i)__snapshots__",
+  # MDX documentation examples
+  "*.mdx",
+  "*.md",
+  # Lock files are too large / have false positives
+  "pnpm-lock.yaml",
+  # Tauri build artifacts
+  "**/src-tauri/target/**",
+  # Generated test data
+  "**/test-data/**",
+]
+
+# Allowlist individual known safe values
+[[allowlist.allowlist]]
+regexTarget = "line"
+regexes = [
+  # This is a public key (pk_test) used in CI — it's designed to be public
+  "pk_test_ZHVtbXktcHVibGlzaGFibGUta2V5",
+  # Example/placeholder values
+  "your-.*-here",
+  "CHANGE_ME",
+  # Version strings that look like tokens
+  "\\d+\\.\\d+\\.\\d+",
+]
+
+# Allow specific file-level exclusions
+[[allowlist.allowlist]]
+paths = [
+  "apps/native/.env.local",
+]

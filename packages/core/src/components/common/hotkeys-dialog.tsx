@@ -57,9 +57,9 @@ function HotkeysList() {
     <div className="space-y-4">
       {generalHotkeys.length > 0 && (
         <div>
-          <h3 className="mb-2 font-semibold text-muted-foreground text-xs uppercase tracking-wider">
+          <div className="mb-2 font-sans font-semibold text-muted-foreground text-xs uppercase tracking-wider">
             {t("general")}
-          </h3>
+          </div>
           <div className="space-y-0.5">
             {generalHotkeys.map((hotkey) => (
               <HotkeyRow hotkey={hotkey} key={hotkey.id} />
@@ -74,9 +74,9 @@ function HotkeysList() {
 
       {navigationHotkeys.length > 0 && (
         <div>
-          <h3 className="mb-2 font-semibold text-muted-foreground text-xs uppercase tracking-wider">
+          <div className="mb-2 font-sans font-semibold text-muted-foreground text-xs uppercase tracking-wider">
             {t("navigation")}
-          </h3>
+          </div>
           <div className="space-y-0.5">
             {navigationHotkeys.map((hotkey) => (
               <HotkeyRow hotkey={hotkey} key={hotkey.id} />

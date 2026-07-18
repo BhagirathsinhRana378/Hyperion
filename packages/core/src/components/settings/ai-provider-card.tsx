@@ -222,7 +222,7 @@ export function AiProviderCard() {
   // Run health check initially
   useEffect(() => {
     checkAllHealth();
-  }, [provider, apiKey, baseUrl]);
+  }, [checkAllHealth]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -289,7 +289,7 @@ export function AiProviderCard() {
               placeholder="https://opencode.ai/zen/v1"
               value={baseUrl}
             />
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-caption text-muted-foreground">
               E.g. https://opencode.ai/zen/v1 or https://openrouter.ai/api/v1
             </p>
           </div>
@@ -402,8 +402,8 @@ export function AiProviderCard() {
           <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-muted/10 p-3">
             <Server className="size-5 text-muted-foreground" />
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-xs">Tauri Backend</p>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="font-medium text-micro">Tauri Backend</p>
+              <p className="text-caption text-muted-foreground">
                 Shell PTY service
               </p>
             </div>
@@ -418,9 +418,9 @@ export function AiProviderCard() {
           <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-muted/10 p-3">
             <Sparkles className="size-5 text-muted-foreground" />
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-xs">AI Provider</p>
+              <p className="font-medium text-micro">AI Provider</p>
               <p
-                className="truncate text-[10px] text-muted-foreground"
+                className="truncate text-caption text-muted-foreground"
                 title={providerError || "LLM completion endpoint"}
               >
                 {providerError
@@ -439,8 +439,8 @@ export function AiProviderCard() {
           <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-muted/10 p-3">
             <Database className="size-5 text-muted-foreground" />
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-xs">Supabase DB</p>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="font-medium text-micro">Supabase DB</p>
+              <p className="text-caption text-muted-foreground">
                 Cloud persistence
               </p>
             </div>
@@ -451,8 +451,8 @@ export function AiProviderCard() {
           <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-muted/10 p-3">
             <Terminal className="size-5 text-muted-foreground" />
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-xs">Active Terminals</p>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="font-medium text-micro">Active Terminals</p>
+              <p className="text-caption text-muted-foreground">
                 {activeWorkspace
                   ? `${activeWorkspace.panes.length} PTY panes active`
                   : "0 active"}
@@ -469,8 +469,8 @@ export function AiProviderCard() {
           <div className="flex items-center gap-3 rounded-lg border border-border/30 bg-muted/10 p-3">
             <Activity className="size-5 text-muted-foreground" />
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-xs">Main Planner</p>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="font-medium text-micro">Main Planner</p>
+              <p className="text-caption text-muted-foreground">
                 Orchestration engine
               </p>
             </div>

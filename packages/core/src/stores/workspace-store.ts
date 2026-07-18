@@ -6,8 +6,37 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 export interface TerminalPane {
   id: string;
+  name?: string;
   title: string;
 }
+
+const FRIENDLY_NAMES = [
+  "Nova",
+  "Pixel",
+  "Sage",
+  "Echo",
+  "Zelda",
+  "Cosmo",
+  "Nimbus",
+  "Rune",
+  "Ember",
+  "Lark",
+  "Ella",
+  "Theo",
+  "Vela",
+  "Koda",
+  "Zara",
+  "Orin",
+  "Luna",
+  "Juno",
+  "Remy",
+  "Dax",
+  "Iris",
+  "Faye",
+  "Wren",
+  "Sola",
+  "Kai",
+];
 
 export interface Workspace {
   autoCommand?: string;
@@ -42,9 +71,12 @@ function generateId(): string {
 }
 
 function createPanes(count: number): TerminalPane[] {
+  const maxOffset = FRIENDLY_NAMES.length - count;
+  const offset = maxOffset > 0 ? Math.floor(Math.random() * maxOffset) : 0;
   return Array.from({ length: count }, (_, i) => ({
     id: generateId(),
     title: `Terminal ${i + 1}`,
+    name: FRIENDLY_NAMES[(offset + i) % FRIENDLY_NAMES.length],
   }));
 }
 

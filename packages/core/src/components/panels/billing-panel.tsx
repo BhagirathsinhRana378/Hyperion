@@ -188,7 +188,7 @@ export function BillingPanel() {
               <div className="relative z-10 my-3 text-center font-medium font-mono text-base text-foreground tracking-widest">
                 •••• •••• •••• 4242
               </div>
-              <div className="relative z-10 flex items-center justify-between font-semibold text-[10px] text-muted-foreground uppercase">
+              <div className="relative z-10 flex items-center justify-between font-semibold text-micro text-muted-foreground uppercase">
                 <div className="flex flex-col">
                   <span>Cardholder</span>
                   <span className="mt-0.5 text-foreground tracking-tight">
@@ -281,14 +281,14 @@ export function BillingPanel() {
                       {inv.amount}
                     </td>
                     <td className="p-3">
-                      <span className="inline-flex items-center gap-1 font-semibold text-[10px] text-emerald-400">
+                      <span className="inline-flex items-center gap-1 font-semibold text-emerald-400 text-micro">
                         <CheckCircle2 className="size-3 text-emerald-400" />
                         {inv.status}
                       </span>
                     </td>
                     <td className="p-3 pr-6 text-right">
                       <Button
-                        className="h-7 px-2 font-semibold text-[10px]"
+                        className="h-7 px-2 font-semibold text-micro"
                         size="sm"
                         variant="ghost"
                       >

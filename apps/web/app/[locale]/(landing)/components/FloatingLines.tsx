@@ -218,9 +218,9 @@ function hexToVec3(hex: string): Vector3 {
   let b = 255;
 
   if (value.length === 3) {
-    r = Number.parseInt(value[0]! + value[0]!, 16);
-    g = Number.parseInt(value[1]! + value[1]!, 16);
-    b = Number.parseInt(value[2]! + value[2]!, 16);
+    r = Number.parseInt(value.slice(0, 1) + value.slice(0, 1), 16);
+    g = Number.parseInt(value.slice(1, 2) + value.slice(1, 2), 16);
+    b = Number.parseInt(value.slice(2, 3) + value.slice(2, 3), 16);
   } else if (value.length === 6) {
     r = Number.parseInt(value.slice(0, 2), 16);
     g = Number.parseInt(value.slice(2, 4), 16);
@@ -403,7 +403,7 @@ export default function FloatingLines({
 
       stops.forEach((hex, i) => {
         const color = hexToVec3(hex);
-        uniforms.lineGradient.value[i]!.set(color.x, color.y, color.z);
+        uniforms.lineGradient.value[i]?.set(color.x, color.y, color.z);
       });
     }
 
@@ -541,8 +541,6 @@ export default function FloatingLines({
   }, [
     linesGradient,
     enabledWaves,
-    lineCount,
-    lineDistance,
     topWavePosition,
     middleWavePosition,
     bottomWavePosition,
@@ -553,6 +551,12 @@ export default function FloatingLines({
     mouseDamping,
     parallax,
     parallaxStrength,
+    topLineCount,
+    bottomLineDistance,
+    topLineDistance,
+    middleLineDistance,
+    middleLineCount,
+    bottomLineCount,
   ]);
 
   return (

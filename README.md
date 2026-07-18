@@ -51,10 +51,10 @@ The core of Hyperion. The sidebar holds all your workspaces — each one is a se
 ┌──────────┐
 │ SIDEBAR  │
 │          │
-│ 🟢 KeyKing│  ← Active workspace
-│ ⚪ Ledgion│
-│ ⚪ Synapse│
-│ ⚪ WASSIST│
+│ 🟢 claude│  ← Active workspace
+│ ⚪ claude│
+│ ⚪ claude│
+│ ⚪ claude│
 │          │
 │ + Create │
 └──────────┘

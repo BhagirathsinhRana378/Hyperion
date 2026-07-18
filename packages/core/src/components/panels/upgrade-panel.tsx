@@ -120,7 +120,7 @@ export function UpgradePanel() {
         {/* Tier 1: Free */}
         <Card className="flex flex-col justify-between border-border/40 transition-shadow duration-300 hover:shadow-md">
           <CardHeader>
-            <CardTitle className="font-bold text-base">Standard</CardTitle>
+            <CardTitle className="text-base">Standard</CardTitle>
             <CardDescription className="text-xs">
               Perfect for getting started
             </CardDescription>
@@ -170,7 +170,7 @@ export function UpgradePanel() {
           />
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="font-bold text-base text-primary">
+              <CardTitle className="text-base text-primary">
                 Pro Developer
               </CardTitle>
               <span className="rounded-full bg-primary/20 px-2 py-0.5 font-bold font-mono text-[9px] text-primary uppercase tracking-wider">
@@ -241,7 +241,7 @@ export function UpgradePanel() {
         {/* Tier 3: Enterprise */}
         <Card className="flex flex-col justify-between border-border/40 transition-shadow duration-300 hover:shadow-md">
           <CardHeader>
-            <CardTitle className="font-bold text-base">Enterprise</CardTitle>
+            <CardTitle className="text-base">Enterprise</CardTitle>
             <CardDescription className="text-xs">
               Custom requirements & support
             </CardDescription>
@@ -282,9 +282,9 @@ export function UpgradePanel() {
 
       {/* Detailed Comparison Table */}
       <div className="space-y-3">
-        <h4 className="font-bold text-foreground text-sm uppercase tracking-wider">
+        <div className="font-bold font-sans text-foreground text-sm uppercase tracking-wider">
           Features Comparison
-        </h4>
+        </div>
         <div className="overflow-x-auto rounded-lg border border-border/40 bg-muted/10">
           <table className="w-full border-collapse text-left text-xs">
             <thead>
@@ -341,10 +341,10 @@ export function UpgradePanel() {
 
       {/* FAQ Section */}
       <div className="space-y-4">
-        <h4 className="flex items-center gap-2 font-bold text-foreground text-sm uppercase tracking-wider">
+        <div className="flex items-center gap-2 font-bold font-sans text-foreground text-sm uppercase tracking-wider">
           <HelpCircle className="size-4 text-primary" />
           Frequently Asked Questions
-        </h4>
+        </div>
         <div className="divide-y divide-border/40 overflow-hidden rounded-lg border border-border/40 bg-muted/10">
           {FAQS.map((faq, index) => {
             const isOpen = openFaqIndex === index;

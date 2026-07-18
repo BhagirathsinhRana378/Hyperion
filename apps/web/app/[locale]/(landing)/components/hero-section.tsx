@@ -138,7 +138,7 @@ const TERMINAL_LINES: TerminalLineInput[] = [
 /* ── Micro components ─────────────────────────────────────── */
 
 /** One headline word — blur-to-sharp rise, staggered by index. */
-function Word({
+function _Word({
   children,
   delay,
   highlight = false,

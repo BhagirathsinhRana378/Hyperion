@@ -80,7 +80,7 @@ export function Panel({
           {/* Backdrop Blur Overlay */}
           <motion.div
             animate="visible"
-            className="absolute inset-0 bg-zinc-950/40 backdrop-blur-md"
+            className="absolute inset-0 bg-background/80 backdrop-blur-md"
             exit="hidden"
             initial="hidden"
             onClick={onClose}
@@ -97,9 +97,9 @@ export function Panel({
           >
             {/* Sticky Header */}
             <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-border/40 border-b bg-background/50 px-6 backdrop-blur-md">
-              <h2 className="font-bold text-foreground text-lg tracking-tight">
+              <div className="font-bold font-sans text-foreground text-lg tracking-tight">
                 {title}
-              </h2>
+              </div>
               <Button
                 aria-label="Close panel"
                 className="size-8 rounded-lg hover:bg-muted"

@@ -172,25 +172,3 @@ jobs:
           tag_name: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # --- Publish CLI to npm (optional, future) ---
-  # publish-cli:
-  #   name: Publish CLI
-  #   needs: create-release
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: read
-  #     packages: write
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: pnpm/action-setup@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 22
-  #         cache: pnpm
-  #         registry-url: "https://registry.npmjs.org"
-  #     - run: pnpm install --frozen-lockfile
-  #     - run: pnpm --filter create-hyperion build
-  #     - run: pnpm --filter create-hyperion publish --no-git-checks
-  #       env:
-  #         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

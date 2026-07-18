@@ -26,32 +26,32 @@ import * as THREE from "three";
  *    platinum scan beam
  */
 
-type GridScanProps = {
-  sensitivity?: number;
-  lineThickness?: number;
-  linesColor?: string;
-  gridScale?: number;
-  lineStyle?: "solid" | "dashed" | "dotted";
-  lineJitter?: number;
-  enablePost?: boolean;
+interface GridScanProps {
   bloomIntensity?: number;
-  bloomThreshold?: number;
   bloomSmoothing?: number;
+  bloomThreshold?: number;
   chromaticAberration?: number;
+  className?: string;
+  enablePost?: boolean;
+  gridScale?: number;
+  lineJitter?: number;
+  lineStyle?: "solid" | "dashed" | "dotted";
+  linesColor?: string;
+  lineThickness?: number;
   noiseIntensity?: number;
   scanColor?: string;
-  scanOpacity?: number;
-  scanDirection?: "forward" | "backward" | "pingpong";
-  scanSoftness?: number;
-  scanGlow?: number;
-  scanPhaseTaper?: number;
-  scanDuration?: number;
   scanDelay?: number;
+  scanDirection?: "forward" | "backward" | "pingpong";
+  scanDuration?: number;
+  scanGlow?: number;
   scanOnClick?: boolean;
+  scanOpacity?: number;
+  scanPhaseTaper?: number;
+  scanSoftness?: number;
+  sensitivity?: number;
   snapBackDelay?: number;
-  className?: string;
   style?: React.CSSProperties;
-};
+}
 
 const MAX_SCANS = 8;
 

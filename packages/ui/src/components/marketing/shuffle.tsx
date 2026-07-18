@@ -84,8 +84,8 @@ const Shuffle: React.FC<ShuffleProps> = ({
   const scrollTriggerStart = useMemo(() => {
     const startPct = (1 - threshold) * 100;
     const mm = /^(-?\d+(?:\.\d+)?)(px|em|rem|%)?$/.exec(rootMargin || "");
-    const mv = mm && mm[1] ? Number.parseFloat(mm[1]) : 0;
-    const mu = mm && mm[2] ? mm[2] || "px" : "px";
+    const mv = mm?.[1] ? Number.parseFloat(mm[1]) : 0;
+    const mu = mm?.[2] ? mm[2] || "px" : "px";
     const sign =
       mv === 0 ? "" : mv < 0 ? `-=${Math.abs(mv)}${mu}` : `+=${mv}${mu}`;
     return `top ${startPct}%${sign}`;

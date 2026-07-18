@@ -424,7 +424,7 @@ function WorkspaceLivePreview({
         <motion.div
           animate={{ opacity: 1, scale: 1 }}
           className={cn(
-            "flex min-h-0 min-w-0 flex-col overflow-hidden rounded-lg border bg-[#050508]/98 transition-all duration-300",
+            "flex min-h-0 min-w-0 flex-col overflow-hidden rounded-lg border bg-muted/80 transition-all duration-300",
             getPaneClass(count, i),
             isFirst
               ? "border-primary/45 shadow-[0_0_15px_rgba(255,224,194,0.06)]"
@@ -441,7 +441,7 @@ function WorkspaceLivePreview({
           }}
         >
           {/* Terminal Window Header */}
-          <div className="flex h-5 select-none items-center justify-between border-border/10 border-b bg-[#0a0a0e] px-2 font-mono text-[7.5px] text-muted-foreground/60">
+          <div className="flex h-5 select-none items-center justify-between border-border/10 border-b bg-accent px-2 font-mono text-[7.5px] text-muted-foreground/60">
             <div className="flex min-w-0 items-center gap-1">
               {/* Window dots */}
               <div className="size-1.5 shrink-0 rounded-full bg-rose-500/50" />
@@ -512,7 +512,7 @@ function WorkspaceLivePreview({
   return (
     <div
       className={cn(
-        "relative grid h-[140px] w-full gap-2 overflow-hidden rounded-xl border border-border/20 bg-[#030305] p-2 shadow-[inset_0_2px_8px_rgba(0,0,0,0.9)]",
+        "relative grid h-[140px] w-full gap-2 overflow-hidden rounded-xl border border-border/20 bg-muted/40 p-2 shadow-[inset_0_2px_8px_rgba(0,0,0,0.9)]",
         gridClass
       )}
     >
@@ -617,7 +617,7 @@ export function NewWorkspaceDialog({
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="flex max-h-[92vh] flex-col overflow-hidden border-border/85 bg-[#09090d]/98 p-0 shadow-3xl backdrop-blur-xl focus:outline-none sm:max-w-[950px]">
+      <DialogContent className="flex max-h-[92vh] flex-col overflow-hidden border-border/85 bg-popover p-0 shadow-3xl backdrop-blur-xl focus:outline-none sm:max-w-[950px]">
         <DialogHeader className="flex-shrink-0 border-border/10 border-b p-5 pb-3">
           <div className="flex items-center gap-2.5">
             <div className="flex size-9 animate-pulse items-center justify-center rounded-xl bg-primary/10 text-primary shadow-primary/5 shadow-sm">
@@ -683,7 +683,7 @@ export function NewWorkspaceDialog({
                   onDrop={handleDrop}
                 >
                   <Input
-                    className="h-9.5 w-full border-border/40 bg-[#07070a]/20 pr-10 font-mono text-foreground text-xs tracking-wide transition-all focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary/20"
+                    className="h-9.5 w-full border-border/40 bg-muted/20 pr-10 font-mono text-foreground text-xs tracking-wide transition-all focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary/20"
                     onChange={(e) => setDirectory(e.target.value)}
                     placeholder="Drag & drop folder or browse path..."
                     value={directory}
@@ -707,7 +707,7 @@ export function NewWorkspaceDialog({
                     </span>
                     {recentDirectories.map((dir) => (
                       <button
-                        className="rounded border border-border/30 bg-[#07070a]/35 px-1.5 py-0.5 font-mono text-[9px] text-muted-foreground/60 transition-all duration-200 hover:border-primary/25 hover:text-primary"
+                        className="rounded border border-border/30 bg-muted/30 px-1.5 py-0.5 font-mono text-[9px] text-muted-foreground/60 transition-all duration-200 hover:border-primary/25 hover:text-primary"
                         key={dir}
                         onClick={() => setDirectory(dir)}
                         title={dir}
@@ -735,7 +735,7 @@ export function NewWorkspaceDialog({
                           "group flex flex-col items-center justify-center gap-1.5 rounded-lg border py-2 text-center transition-all duration-300",
                           isSelected
                             ? "border-primary/45 bg-primary/[0.04] shadow-[0_4px_12px_rgba(255,224,194,0.04)]"
-                            : "border-border/30 bg-[#07070a]/20 hover:border-border/70 hover:bg-background/40"
+                            : "border-border/30 bg-muted/15 hover:border-border/70 hover:bg-background/40"
                         )}
                         key={count}
                         onClick={() => setTerminalCount(count)}
@@ -772,7 +772,7 @@ export function NewWorkspaceDialog({
                     <Terminal className="size-3 text-muted-foreground/80" />{" "}
                     Auto-run Command
                   </Label>
-                  <div className="flex w-full items-center gap-2 rounded-lg border border-border/40 bg-[#060608] px-2.5 py-0.5 transition-colors focus-within:border-primary/45">
+                  <div className="flex w-full items-center gap-2 rounded-lg border border-border/40 bg-muted/15 px-2.5 py-0.5 transition-colors focus-within:border-primary/45">
                     <Input
                       className="h-8.5 flex-1 border-transparent bg-transparent p-0 font-mono text-foreground text-xs focus-visible:ring-0 focus-visible:ring-offset-0"
                       onChange={(e) => setAutoCommand(e.target.value)}
@@ -836,7 +836,7 @@ export function NewWorkspaceDialog({
                               "group/card flex items-center justify-between rounded-lg border px-3 py-1.5 transition-all duration-300",
                               isSelected
                                 ? "border-primary/45 bg-primary/[0.04]"
-                                : "border-border/20 bg-[#07070a]/20 hover:border-border/50 hover:bg-background/40"
+                                : "border-border/20 bg-muted/15 hover:border-border/50 hover:bg-background/40"
                             )}
                             key={agent.name}
                           >
@@ -908,7 +908,7 @@ export function NewWorkspaceDialog({
                             const isUpdate = tool.status === "Update Available";
                             return (
                               <div
-                                className="group/card flex items-center justify-between rounded-lg border border-border/20 bg-[#07070a]/20 px-3 py-1.5 transition-all duration-300 hover:border-border/50 hover:bg-background/40"
+                                className="group/card flex items-center justify-between rounded-lg border border-border/20 bg-muted/15 px-3 py-1.5 transition-all duration-300 hover:border-border/50 hover:bg-background/40"
                                 key={tool.name}
                               >
                                 <div className="min-w-0 flex-1 pr-3">
@@ -965,7 +965,7 @@ export function NewWorkspaceDialog({
 
               {/* Summary Details card */}
               <div className="border-border/10 border-t pt-3">
-                <div className="space-y-1.5 rounded-lg border border-border/15 bg-[#07070a]/40 p-3 text-[10.5px] text-muted-foreground/75 shadow-sm">
+                <div className="space-y-1.5 rounded-lg border border-border/15 bg-muted/30 p-3 text-[10.5px] text-muted-foreground/75 shadow-sm">
                   <div className="flex justify-between">
                     <span className="select-none font-bold text-[9.5px] uppercase tracking-wider opacity-60">
                       Layout:
@@ -1002,7 +1002,7 @@ export function NewWorkspaceDialog({
           </motion.div>
         </div>
 
-        <DialogFooter className="flex-shrink-0 gap-2 border-border/20 border-t bg-[#07070a]/40 p-6 pt-4">
+        <DialogFooter className="flex-shrink-0 gap-2 border-border/20 border-t bg-muted/30 p-6 pt-4">
           <Button
             className="h-8.5 border border-border/40 text-xs transition-colors hover:bg-muted/50"
             onClick={() => onOpenChange(false)}

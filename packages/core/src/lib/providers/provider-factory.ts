@@ -711,10 +711,6 @@ export class ProviderFactory {
     switch (type.toLowerCase()) {
       case "anthropic":
         return new AnthropicDirectProvider();
-      case "opencode":
-      case "openai":
-      case "google":
-      case "gemini":
       default:
         return new OpenAICompatibleProvider();
     }

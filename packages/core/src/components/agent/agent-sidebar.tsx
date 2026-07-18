@@ -19,6 +19,7 @@ import {
 } from "@workspace/core/stores/agent-store";
 import { useWorkspaceStore } from "@workspace/core/stores/workspace-store";
 import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import {
   Select,
@@ -32,12 +33,15 @@ import { cn } from "@workspace/ui/lib/utils";
 import {
   Check,
   Edit2,
+  HelpCircle,
   Loader2,
   Play,
+  Plus,
   Send,
   Sparkles,
   Square,
   TerminalSquare,
+  Trash2,
   User,
   X,
 } from "lucide-react";
@@ -50,26 +54,31 @@ import { toast } from "sonner";
 const MAX_ITERATIONS = 20;
 
 function buildPlanningSystemPrompt(
-  panes: { id: string; title: string }[]
+  panes: { id: string; title: string; name?: string }[]
 ): string {
   const agentList = panes
-    .map((p, i) => `  - Agent ${i + 1}: id="${p.id}" (${p.title})`)
+    .map((p) => `  - ${p.name || p.title} (${p.title}) — id="${p.id}"`)
     .join("\n");
 
   return `You are the Hyperion Orchestrator Planner. Your task is to analyze the user request and generate a structured execution plan.
 You have ${panes.length} terminal agents:
 ${agentList}
 
+Important: You can ask the user for input mid-execution when you need approval or clarification.
+When a command is potentially dangerous (rm -rf, sudo, format, etc.), pause and ask the user for approval before proceeding.
+To ask the user a question mid-execution, include "ASK_USER: <your question>" on its own line in the plan or review.
+When the user responds, their answer will be fed back to you so you can continue.
+
 Generate a clear, bulleted plan showing which terminal agent will perform what actions. Break down the tasks logically and ensure there are no overlapping tasks. Do not call any tools.`;
 }
 
 async function parsePlanToTasks(
   planText: string,
-  targetedPanes: { id: string; title: string }[],
+  targetedPanes: { id: string; title: string; name?: string }[],
   providerInstance: ReturnType<typeof ProviderFactory.getProvider>
 ): Promise<Array<{ terminalId: string; command: string }>> {
   const parserPrompt = `You are a structured task parser. Your job is to extract executable terminal commands from a natural language execution plan.
-You have access to the following terminal IDs: ${targetedPanes.map((p) => `"${p.id}" (${p.title})`).join(", ")}.
+You have access to the following terminals: ${targetedPanes.map((p) => `"${p.name || p.title}" (id: "${p.id}")`).join(", ")}.
 
 Convert the plan into a JSON array of task objects. Each object must have:
 - terminalId: the ID of the terminal to run the command on (MUST match one of the IDs provided above)
@@ -162,13 +171,13 @@ Respond ONLY with the JSON object, no markdown formatting, no extra text.`;
 
 async function parseNextPlanToTasks(
   nextPlan: string,
-  targetedPanes: { id: string; title: string }[],
+  targetedPanes: { id: string; title: string; name?: string }[],
   providerInstance: ReturnType<typeof ProviderFactory.getProvider>
 ): Promise<Array<{ terminalId: string; command: string }>> {
   const nextParserPrompt = `You are a structured task parser. Extract the terminal commands from this plan:
 "${nextPlan}"
 
-Available terminal IDs: ${targetedPanes.map((p) => `"${p.id}" (${p.title})`).join(", ")}.
+Available terminals: ${targetedPanes.map((p) => `"${p.name || p.title}" (id: "${p.id}")`).join(", ")}.
 
 Respond ONLY with the JSON array of task objects (terminalId, command).`;
 
@@ -306,13 +315,19 @@ async function executeSingleIteration(
   approvedPlan: string,
   currentPlan: string,
   providerInstance: ReturnType<typeof ProviderFactory.getProvider>,
-  targetedPanes: { id: string; title: string }[],
+  targetedPanes: { id: string; title: string; name?: string }[],
   workspaceId: string,
   execMsgId: string,
   setTerminalState: (id: string, s: TerminalState) => void,
   logFn: (msg: string, type?: "info" | "warn" | "error") => void,
   // biome-ignore lint/suspicious/noExplicitAny: matching store type
-  upsertMessage: (workspaceId: string, msg: any) => void
+  upsertMessage: (workspaceId: string, msg: any) => void,
+  askForPermissionFn: (
+    question: string,
+    context: string,
+    wsId: string
+  ) => Promise<string>,
+  _addMessageFn: (wsId: string, msg: AgentMessage) => void
 ): Promise<{ completed: boolean; newTasks?: TaskInput[] }> {
   logFn(`Waiting for iteration ${currentIteration} results...`);
   upsertMessage(workspaceId, {
@@ -337,7 +352,7 @@ async function executeSingleIteration(
   upsertMessage(workspaceId, {
     id: execMsgId,
     role: "agent",
-    content: `🔍 **Reviewing iteration ${currentIteration} results...**`,
+    content: `��� **Reviewing iteration ${currentIteration} results...**`,
     timestamp: Date.now(),
   });
 
@@ -347,6 +362,37 @@ async function executeSingleIteration(
     taskResultsSummary,
     providerInstance
   );
+
+  // If LLM says "IMPROVE" and includes ASK_USER, route to interactive prompt
+  if (
+    reviewObj.status === "IMPROVE" &&
+    reviewObj.nextPlan?.includes("ASK_USER:")
+  ) {
+    const question = reviewObj.nextPlan
+      .split("ASK_USER:")[1]
+      ?.split("\n")[0]
+      ?.trim();
+    if (question) {
+      const userAnswer = await askForPermissionFn(
+        question,
+        `Context: ${currentPlan}\n\nCurrent results:\n${taskResultsSummary}`,
+        workspaceId
+      );
+      // Re-plan with user's answer
+      const newRawTasks = await parseNextPlanToTasks(
+        `User response: "${userAnswer}"\n\nOriginal context: ${currentPlan}\n\nResults: ${taskResultsSummary}`,
+        targetedPanes,
+        providerInstance
+      );
+      return {
+        completed: false,
+        newTasks: newRawTasks.map((t) => ({
+          terminalId: t.terminalId,
+          command: t.command,
+        })),
+      };
+    }
+  }
 
   if (reviewObj.status === "COMPLETED") {
     const summary = reviewObj.summary || "Goal achieved.";
@@ -388,7 +434,7 @@ async function executeSingleIteration(
 async function parseTasksWithFallback(
   approvedPlan: string | undefined,
   currentPlan: string,
-  targetedPanes: { id: string; title: string }[],
+  targetedPanes: { id: string; title: string; name?: string }[],
   providerInstance: ReturnType<typeof ProviderFactory.getProvider>,
   _requestId: string,
   logFn: (msg: string, type?: "info" | "warn" | "error") => void
@@ -424,7 +470,7 @@ async function parseTasksWithFallback(
 function handleExecutePlanError(
   error: unknown,
   requestId: string,
-  targetedPanes: { id: string; title: string }[],
+  targetedPanes: { id: string; title: string; name?: string }[],
   execMsgId: string,
   workspaceId: string,
   setTerminalState: (id: string, s: TerminalState) => void,
@@ -466,8 +512,8 @@ function handleExecutePlanError(
 
 function getTargetedPanes(
   targetTerminalId: string,
-  panes: { id: string; title: string }[]
-): { id: string; title: string }[] {
+  panes: { id: string; title: string; name?: string }[]
+): { id: string; title: string; name?: string }[] {
   if (targetTerminalId === "all") {
     return panes;
   }
@@ -480,7 +526,7 @@ async function runIterationLoop(
   approvedPlan: string | undefined,
   currentPlan: string,
   providerInstance: ReturnType<typeof ProviderFactory.getProvider>,
-  targetedPanes: { id: string; title: string }[],
+  targetedPanes: { id: string; title: string; name?: string }[],
   workspaceId: string,
   execMsgId: string,
   setTerminalState: (id: string, s: TerminalState) => void,
@@ -488,7 +534,13 @@ async function runIterationLoop(
   // biome-ignore lint/suspicious/noExplicitAny: matching store type
   upsertMessage: (workspaceId: string, msg: any) => void,
   abortSignal: AbortSignal,
-  setIterationCount: (count: number) => void
+  setIterationCount: (count: number) => void,
+  askForPermissionFn: (
+    question: string,
+    context: string,
+    wsId: string
+  ) => Promise<string>,
+  addMessageFn: (wsId: string, msg: AgentMessage) => void
 ): Promise<void> {
   let completed = false;
   let currentIteration = 1;
@@ -512,7 +564,9 @@ async function runIterationLoop(
       execMsgId,
       setTerminalState,
       logFn,
-      upsertMessage
+      upsertMessage,
+      askForPermissionFn,
+      addMessageFn
     );
 
     if (iterationResult.completed) {
@@ -575,6 +629,12 @@ export function AgentSidebar() {
   const [isEditingPlan, setIsEditingPlan] = useState(false);
   const [editedPlanText, setEditedPlanText] = useState("");
   const [planMessageId, setPlanMessageId] = useState("");
+  const [pendingQuestion, setPendingQuestion] = useState<{
+    resolve: (value: string) => void;
+    reject: (err: Error) => void;
+    question: string;
+  } | null>(null);
+  const [approvalInput, setApprovalInput] = useState("");
 
   const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId);
   const workspaceMessages = activeWorkspaceId
@@ -806,7 +866,49 @@ export function AgentSidebar() {
         throw new Error("No tasks could be parsed from the execution plan.");
       }
 
-      // 2. Start orchestration via backend
+      // 2. Pre-execution approval step
+      if (parsedTasks.length > 0) {
+        const taskSummary = parsedTasks
+          .map(
+            (t, i) => `${i + 1}. Terminal "${t.terminalId}" → \`${t.command}\``
+          )
+          .join("\n");
+
+        upsertMessage(workspaceId, {
+          id: execMsgId,
+          role: "agent",
+          content: `📋 **Execution Plan — ${parsedTasks.length} tasks**\n\n${taskSummary}\n\n_Reply "approve" to execute, or tell me what to change._`,
+          timestamp: Date.now(),
+        });
+
+        try {
+          const approval = await waitForUserResponse(
+            "Do you approve this execution plan?"
+          );
+          const approved = [
+            "approve",
+            "yes",
+            "y",
+            "continue",
+            "go ahead",
+            "run",
+            "execute",
+          ];
+          if (!approved.includes(approval.toLowerCase().trim())) {
+            upsertMessage(workspaceId, {
+              id: safeUUID(),
+              role: "agent",
+              content: `⏸ **Plan paused.** You said: "${approval}"\n\nHow should I adjust the plan?`,
+              timestamp: Date.now(),
+            });
+            return;
+          }
+        } catch {
+          return;
+        }
+      }
+
+      // 3. Start orchestration via backend
       upsertMessage(workspaceId, {
         id: execMsgId,
         role: "agent",
@@ -846,7 +948,9 @@ export function AgentSidebar() {
         logFn,
         upsertMessage,
         abortControllerRef.current.signal,
-        setIterationCount
+        setIterationCount,
+        askForPermission,
+        addMessage
       );
     } catch (error: unknown) {
       const logFn = (msg: string, type?: "info" | "warn" | "error") =>
@@ -871,11 +975,59 @@ export function AgentSidebar() {
   };
 
   const handleStop = () => {
+    if (pendingQuestion) {
+      pendingQuestion.reject(new Error("AbortError"));
+      setPendingQuestion(null);
+    }
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     setIsTyping(false);
     setPlannerState("idle");
+  };
+
+  // ─── Interactive agent helpers ───
+  const handleAgentResponse = (response: string) => {
+    pendingQuestion?.resolve(response);
+    setPendingQuestion(null);
+  };
+
+  const waitForUserResponse = (question: string): Promise<string> =>
+    new Promise<string>((resolve, reject) => {
+      setPendingQuestion({ resolve, reject, question });
+    });
+
+  async function askForPermission(
+    question: string,
+    context: string,
+    wsId: string
+  ): Promise<string> {
+    const msgId = safeUUID();
+    addMessage(wsId, {
+      id: msgId,
+      role: "agent",
+      content: `🤔 **${question}**\n\n${context}\n\n_Waiting for your response..._`,
+      timestamp: Date.now(),
+    });
+
+    const userResponse = await waitForUserResponse(question);
+    return userResponse;
+  }
+
+  const handleNewChat = () => {
+    if (!activeWorkspaceId) {
+      return;
+    }
+    useAgentStore.getState().clearMessages(activeWorkspaceId);
+    toast.success("Started new chat");
+  };
+
+  const handleClearChat = () => {
+    if (!activeWorkspaceId) {
+      return;
+    }
+    useAgentStore.getState().clearMessages(activeWorkspaceId);
+    toast.success("Conversation cleared");
   };
 
   const saveEditedPlan = () => {
@@ -923,6 +1075,53 @@ export function AgentSidebar() {
               >
                 <X className="size-4 text-muted-foreground" />
               </Button>
+            </div>
+
+            {/* Agent Toolbar */}
+            <div className="flex shrink-0 items-center justify-between border-border/30 border-b bg-muted/20 px-4 py-1.5">
+              <div className="flex items-center gap-1">
+                <button
+                  className="flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  onClick={handleNewChat}
+                  title="New Chat"
+                  type="button"
+                >
+                  <Plus className="size-3.5" />
+                </button>
+                <button
+                  className="flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  onClick={handleClearChat}
+                  title="Clear Conversation"
+                  type="button"
+                >
+                  <Trash2 className="size-3.5" />
+                </button>
+                <button
+                  className="flex size-6 items-center justify-center rounded-md text-destructive/80 transition-colors hover:bg-destructive/10 hover:text-destructive disabled:pointer-events-none disabled:opacity-30"
+                  disabled={plannerState === "idle"}
+                  onClick={handleStop}
+                  title={
+                    plannerState === "idle"
+                      ? "Nothing to stop"
+                      : "Stop Execution"
+                  }
+                  type="button"
+                >
+                  <Square className="size-3.5" />
+                </button>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {iterationCount > 0 && (
+                  <span className="rounded bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] text-primary">
+                    Step {iterationCount}/{MAX_ITERATIONS}
+                  </span>
+                )}
+                {plannerState !== "idle" && (
+                  <span className="rounded bg-amber-500/10 px-1.5 py-0.5 font-mono text-[10px] text-amber-500">
+                    {plannerState === "planning" ? "Planning" : "Executing"}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Chat History */}
@@ -999,7 +1198,7 @@ export function AgentSidebar() {
                               </div>
                             </div>
                           ) : (
-                            <div className="prose prose-invert max-w-none break-words leading-relaxed [&_a]:text-primary [&_h1]:mb-2 [&_h1]:text-sm [&_h2]:mb-2 [&_h2]:text-sm [&_h3]:mb-1 [&_h3]:text-xs [&_h4]:text-xs [&_li]:text-xs [&_p]:text-xs [&_pre]:my-2 [&_pre]:rounded-md [&_pre]:bg-[#0c0c0f] [&_pre]:p-2 [&_pre]:text-[10px] [&_pre]:shadow-inner [&_strong]:text-foreground">
+                            <div className="prose prose-invert max-w-none break-words leading-relaxed [&_a]:text-primary [&_h1]:mb-2 [&_h1]:text-sm [&_h2]:mb-2 [&_h2]:text-sm [&_h3]:mb-1 [&_h3]:text-xs [&_h4]:text-xs [&_li]:text-xs [&_p]:text-xs [&_pre]:my-2 [&_pre]:rounded-md [&_pre]:bg-muted [&_pre]:p-2 [&_pre]:text-[10px] [&_pre]:shadow-inner [&_strong]:text-foreground">
                               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                 {msg.content}
                               </ReactMarkdown>
@@ -1048,9 +1247,45 @@ export function AgentSidebar() {
                     </div>
                     <div className="flex items-center gap-2 rounded-2xl rounded-tl-sm border border-border/40 bg-muted/60 px-4 py-3 text-foreground">
                       <Loader2 className="size-4 animate-spin opacity-70" />
-                      <span className="font-medium text-xs opacity-70">
+                      <span className="font-medium text-micro opacity-70">
                         {statusText}
                       </span>
+                    </div>
+                  </div>
+                )}
+                {/* Pending Question / Approval Request */}
+                {pendingQuestion && (
+                  <div className="flex flex-col gap-2 rounded-xl border border-primary/20 bg-primary/[0.03] p-4">
+                    <div className="flex items-center gap-2 text-foreground/80 text-xs">
+                      <HelpCircle className="size-3.5 text-primary" />
+                      <span className="font-medium">Agent needs input:</span>
+                    </div>
+                    <p className="text-muted-foreground text-xs">
+                      {pendingQuestion.question}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        className="h-8 flex-1 text-xs"
+                        onChange={(e) => setApprovalInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleAgentResponse(approvalInput);
+                            setApprovalInput("");
+                          }
+                        }}
+                        placeholder="Type your response..."
+                        value={approvalInput}
+                      />
+                      <Button
+                        className="h-8 shrink-0 px-3 text-[10px]"
+                        onClick={() => {
+                          handleAgentResponse(approvalInput);
+                          setApprovalInput("");
+                        }}
+                        size="sm"
+                      >
+                        Send
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -1067,10 +1302,19 @@ export function AgentSidebar() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
-                      handleSend();
+                      if (pendingQuestion) {
+                        handleAgentResponse(input);
+                        setInput("");
+                      } else {
+                        handleSend();
+                      }
                     }
                   }}
-                  placeholder="Ask the Main Agent to plan and execute a task..."
+                  placeholder={
+                    pendingQuestion
+                      ? "Respond to the agent..."
+                      : "Ask the Main Agent to plan and execute a task..."
+                  }
                   value={input}
                 />
                 <div className="flex items-center justify-between border-border/40 border-t bg-muted/20 px-3 py-2">
@@ -1089,7 +1333,9 @@ export function AgentSidebar() {
                       <SelectItem value="all">All Terminals</SelectItem>
                       {activeWorkspace.panes.map((pane) => (
                         <SelectItem key={pane.id} value={pane.id}>
-                          {pane.title}
+                          {pane.name
+                            ? `${pane.name} (${pane.title})`
+                            : pane.title}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -1097,16 +1343,29 @@ export function AgentSidebar() {
                   <Button
                     className="h-7 gap-1.5 rounded-lg px-3"
                     disabled={!(input.trim() || isTyping)}
-                    onClick={() => (isTyping ? handleStop() : handleSend())}
+                    onClick={() => {
+                      if (pendingQuestion) {
+                        handleAgentResponse(input);
+                        setInput("");
+                      } else if (isTyping) {
+                        handleStop();
+                      } else {
+                        handleSend();
+                      }
+                    }}
                     size="sm"
-                    variant={isTyping ? "destructive" : "default"}
+                    variant={
+                      isTyping || pendingQuestion ? "destructive" : "default"
+                    }
                   >
                     {isTyping ? (
                       <Square className="size-3.5 fill-current" />
                     ) : (
                       <Send className="size-3.5" />
                     )}
-                    <span>{isTyping ? "Stop" : "Send"}</span>
+                    <span>
+                      {isTyping ? "Stop" : pendingQuestion ? "Reply" : "Send"}
+                    </span>
                   </Button>
                 </div>
               </div>
