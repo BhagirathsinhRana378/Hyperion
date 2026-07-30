@@ -1,4 +1,4 @@
-const siteUrl = "https://hyperion.dev";
+const siteUrl = "https://hyperian.in";
 const repoUrl = "https://github.com/BhagirathsinhRana378/hyperion";
 const apiUrl = "https://api.github.com/repos/BhagirathsinhRana378/hyperion";
 

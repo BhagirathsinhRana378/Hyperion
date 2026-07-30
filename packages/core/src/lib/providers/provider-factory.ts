@@ -20,10 +20,10 @@ export function combineUrl(baseUrl: string, path: string): string {
 
 export interface AIProvider {
   authenticate(): Promise<boolean>;
-  disconnect(): void;
-  healthCheck(): Promise<boolean>;
   authenticate(): Promise<boolean>;
   disconnect(): void;
+  disconnect(): void;
+  healthCheck(): Promise<boolean>;
   healthCheck(): Promise<boolean>;
   initialize(apiKey: string, baseUrl: string, model: string): void;
   sendPrompt(
