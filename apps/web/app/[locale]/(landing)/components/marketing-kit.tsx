@@ -1,9 +1,9 @@
 "use client";
 
 import { BorderBeam } from "@workspace/ui/components/landing/border-beam";
+import CountUp from "@workspace/ui/components/marketing/CountUp";
 import { Reveal } from "@workspace/ui/components/marketing/reveal";
 import { StarBorder } from "@workspace/ui/components/marketing/StarBorder";
-import CountUp from "@workspace/ui/components/marketing/CountUp";
 import { cn } from "@workspace/ui/lib/utils";
 import { AlertCircle, Check, Copy, Minus, Plus } from "lucide-react";
 import { motion, useScroll } from "motion/react";
