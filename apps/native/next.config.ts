@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  distDir: "dist",
   transpilePackages: ["@workspace/ui", "@workspace/core", "@workspace/i18n"],
 };
 

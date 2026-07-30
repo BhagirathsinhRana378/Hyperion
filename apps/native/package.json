@@ -9,7 +9,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "tauri": "tauri",
-    "clean": "rimraf dist .next .turbo src-tauri/target"
+    "clean": "rimraf dist out .next .turbo src-tauri/target"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.0",
