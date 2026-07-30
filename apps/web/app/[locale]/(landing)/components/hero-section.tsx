@@ -3,7 +3,6 @@
 import { siteConfig } from "@workspace/core/config/site";
 import { fetchLatestGithubVersion } from "@workspace/core/lib/utils";
 import { BorderBeam } from "@workspace/ui/components/landing/border-beam";
-import CountUp from "@workspace/ui/components/marketing/CountUp";
 import {
   MagicBentoCard,
   MagicBentoGrid,
@@ -35,9 +34,9 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import { HeroBackdrop } from "./hero-backdrop";
-import { CtaLink, Eyebrow, GlowCard, StatCard } from "./marketing-kit";
+import { CtaLink, Eyebrow, GlowCard } from "./marketing-kit";
 import { easeOut, Marquee } from "./motion-primitives";
-import { Terminal, type TerminalLineInput } from "./terminal";
+import type { TerminalLineInput } from "./terminal";
 
 /* ── Copy ─────────────────────────────────────────────────── */
 
@@ -75,7 +74,6 @@ const CAPABILITIES = [
   "Autonomous PRs",
   "Local-first",
 ];
-
 
 const FEATURES = [
   {
@@ -124,7 +122,7 @@ const SWARM_CHECKLIST = [
   "Interrupt, redirect, or take over at any moment",
 ];
 
-const TERMINAL_LINES: TerminalLineInput[] = [
+const _TERMINAL_LINES: TerminalLineInput[] = [
   { text: "$ hyperion swarm start --agents 4" },
   { text: "" },
   { text: "workspace attached — 4 terminals tiled", status: "success" },
@@ -470,7 +468,6 @@ export default function HeroSection() {
         </Marquee>
       </section>
 
-
       {/* ── Feature grid ── */}
       <section className="mx-auto max-w-6xl px-6 py-16 md:py-24">
         <Reveal direction="up" duration={250}>
@@ -618,19 +615,19 @@ export default function HeroSection() {
         </Reveal>
         <div className="mx-auto mt-10 max-w-[1000px]">
           <div className="relative mx-auto w-full overflow-hidden rounded-2xl border border-white/[0.07] bg-background shadow-[0_0_80px_-15px] shadow-primary/20">
-            <div className="aspect-video w-full relative">
+            <div className="relative aspect-video w-full">
               <video
                 autoPlay
                 className="size-full object-cover"
                 loop
                 muted
                 playsInline
-                src="/hero_video.mp4"
+                src="/heroVideo.mp4"
               />
               {/* Solid inner border using box-shadow to completely hide the blue desktop in the video without cutting the app content */}
               <div className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_0_0_24px_hsl(var(--background)),inset_0_0_40px_40px_hsl(var(--background))]" />
             </div>
-            <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10" />
+            <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-white/10 ring-inset" />
           </div>
         </div>
       </section>

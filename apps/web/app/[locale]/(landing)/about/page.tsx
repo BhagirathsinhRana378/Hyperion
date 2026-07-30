@@ -50,7 +50,6 @@ const beliefs = [
   },
 ];
 
-
 const timeline = [
   {
     date: "April 2026",
@@ -142,7 +141,6 @@ export default function AboutPage() {
           ))}
         </div>
       </section>
-
 
       {/* Philosophy */}
       <section className="mx-auto max-w-6xl px-6 py-16 md:py-24">

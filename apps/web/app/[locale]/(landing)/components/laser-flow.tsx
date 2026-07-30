@@ -664,7 +664,27 @@ export default function LaserFlow({
       }
     };
     // biome-ignore lint/correctness/useExhaustiveDependencies: uniforms are synced by the effect below; this effect only re-runs on dpr change (mirrors upstream ReactBits source)
-  }, [dpr]);
+  }, [
+    dpr,
+    verticalSizing,
+    wispDensity,
+    wispIntensity,
+    verticalBeamOffset,
+    wispSpeed,
+    mouseTiltStrength,
+    mouseSmoothTime,
+    intensitySmoothTime,
+    intensity,
+    horizontalSizing,
+    fogIntensity,
+    horizontalBeamOffset,
+    fogFallSpeed,
+    falloffStart,
+    fogScale,
+    flowStrength,
+    flowSpeed,
+    decay,
+  ]);
 
   useEffect(() => {
     const uniforms = uniformsRef.current;
