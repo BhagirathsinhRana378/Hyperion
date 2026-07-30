@@ -1,5 +1,4 @@
 import { siteConfig } from "@workspace/core/config/site";
-import { ClerkProvider } from "@workspace/core/providers/clerk-provider";
 import type { Metadata, Viewport } from "next";
 import { Lora, Plus_Jakarta_Sans } from "next/font/google";
 import "@workspace/ui/globals.css";
@@ -33,7 +32,7 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontDisplay.variable} overflow-hidden font-sans antialiased`}
       >
-        <ClerkProvider>{children}</ClerkProvider>
+        {children}
       </body>
     </html>
   );
