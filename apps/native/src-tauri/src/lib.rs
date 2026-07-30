@@ -1,6 +1,7 @@
 mod terminal;
 mod ai;
 mod orchestrator;
+mod auth;
 
 use serde::Serialize;
 
@@ -27,6 +28,10 @@ pub fn run() {
     .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_opener::init())
     .plugin(tauri_plugin_http::init())
+    .setup(|app| {
+      auth::start_auth_listener(app.handle().clone());
+      Ok(())
+    })
     .invoke_handler(tauri::generate_handler![
       greet,
       terminal::create_terminal,
@@ -44,6 +49,10 @@ pub fn run() {
       orchestrator::cancel_orchestration,
       orchestrator::add_iteration,
       orchestrator::get_orchestration_state,
+      auth::save_session,
+      auth::get_session,
+      auth::clear_session,
+      auth::open_browser,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
