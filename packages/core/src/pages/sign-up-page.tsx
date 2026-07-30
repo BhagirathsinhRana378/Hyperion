@@ -1,6 +1,7 @@
 "use client";
 
 import { SignUp } from "@clerk/clerk-react";
+import { dark } from "@clerk/themes";
 
 /** Resolved at build time by Next.js env replacement. */
 const hasClerkPublishableKey = !!(
@@ -21,7 +22,19 @@ export function SignUpPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <SignUp routing="hash" />
+      <SignUp
+        appearance={{
+          baseTheme: dark,
+          variables: {
+            colorBackground: "#18181b",
+            colorText: "#f4f4f5",
+            colorTextSecondary: "#a1a1aa",
+            colorInputBackground: "#09090b",
+            colorInputText: "#f4f4f5",
+          },
+        }}
+        routing="hash"
+      />
     </div>
   );
 }
