@@ -81,9 +81,6 @@ export function KanbanBoard() {
       const newIndex = columnCards.findIndex((c) => c.id === overCard.id);
 
       if (oldIndex !== newIndex) {
-        const newOrder = [...columnCards.map((c) => c.id)];
-        newOrder.splice(oldIndex, 1);
-        newOrder.splice(newIndex, 0, activeCard.id);
         moveCard(activeCard.id, activeCard.columnId, newIndex);
       }
     }

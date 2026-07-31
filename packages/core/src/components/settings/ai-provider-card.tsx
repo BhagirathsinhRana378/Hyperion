@@ -220,9 +220,10 @@ export function AiProviderCard() {
   };
 
   // Run health check initially
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional run-once-on-mount; checkAllHealth is redefined every render and would otherwise loop
   useEffect(() => {
     checkAllHealth();
-  }, [checkAllHealth]);
+  }, []);
 
   return (
     <div className="flex flex-col gap-4">
