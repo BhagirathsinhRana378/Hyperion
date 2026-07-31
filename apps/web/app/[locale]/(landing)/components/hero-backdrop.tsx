@@ -2,6 +2,7 @@
 
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
+import { useWebglSupported } from "./use-webgl-supported";
 
 /* three.js + postprocessing are heavy — split them out of the main
    bundle and only load on the client, after hydration. The hero
@@ -23,13 +24,17 @@ const GridScan = dynamic(() => import("./grid-scan"), { ssr: false });
  */
 export function HeroBackdrop() {
   const reduceMotion = useReducedMotion();
+  const webglSupported = useWebglSupported();
+  const showLive = !reduceMotion && webglSupported;
 
   return (
     <div aria-hidden={true} className="absolute inset-0 z-0 overflow-hidden">
       {/* 1 — living holographic surface. Pingpong sweep + click-to-scan
           (clicking anywhere in the hero fires an extra beam); the
-          cursor skews, rolls, and yaws the plane toward the pointer. */}
-      {!reduceMotion && (
+          cursor skews, rolls, and yaws the plane toward the pointer.
+          Falls back to a static grid + glow when motion is reduced or
+          WebGL is unavailable (see useWebglSupported). */}
+      {showLive ? (
         <GridScan
           className="absolute inset-0"
           lineJitter={0.05}
@@ -37,6 +42,11 @@ export function HeroBackdrop() {
           scanOnClick={true}
           sensitivity={0.01}
         />
+      ) : (
+        <>
+          <div className="landing-grid-noise absolute inset-0" />
+          <div className="absolute inset-0 [background:radial-gradient(60%_50%_at_50%_38%,color-mix(in_oklab,var(--color-primary)_9%,transparent)_0%,transparent_70%)]" />
+        </>
       )}
 
       {/* 2 — dark wash so mid-screen lines never fight the copy */}
