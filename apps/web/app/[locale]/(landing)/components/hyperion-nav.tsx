@@ -1,8 +1,9 @@
 "use client";
 
 import { cn } from "@workspace/ui/lib/utils";
-import { Menu, X } from "lucide-react";
+import { Github, Menu, X } from "lucide-react";
 import { Unbounded } from "next/font/google";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -32,224 +33,194 @@ export function HyperionNav() {
   }, []);
 
   return (
-    <div
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 transition-[padding] duration-500 ease-out sm:px-6"
-      style={{ paddingTop: scrolled ? 16 : 24 }}
-    >
-      <header
-        className={cn(
-          "pointer-events-auto relative w-full rounded-2xl transition-[max-width] duration-500 ease-out",
-          scrolled ? "max-w-5xl" : "max-w-7xl"
-        )}
-        data-slot="hyperion-nav"
+    <>
+      {/* Full screen blur backdrop for mobile menu */}
+      {menuOpen && (
+        <div
+          aria-hidden="true"
+          className="fixed inset-0 z-40 bg-background/20 backdrop-blur-sm lg:hidden"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+      <div
+        className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 transition-[padding] duration-500 ease-out sm:px-6"
+        style={{ paddingTop: scrolled ? 16 : 24 }}
       >
-        {/* Glass pill — invisible at rest (nav floats flush over the hero with
-         * no box at all), fades in once scrolled. Faded via opacity rather
-         * than toggling border/bg/blur classes directly so the whole glass
-         * treatment cross-fades as one smooth GPU-cheap layer instead of
-         * jumping between discrete utility values. */}
-        <div
-          aria-hidden={true}
+        <header
           className={cn(
-            "pointer-events-none absolute inset-0 rounded-2xl border border-border/60 bg-background/55 shadow-black/30 shadow-lg backdrop-blur-xl backdrop-saturate-150 transition-opacity duration-500 ease-out",
-            scrolled ? "opacity-100" : "opacity-0"
+            "pointer-events-auto relative w-full rounded-2xl transition-[max-width] duration-500 ease-out",
+            scrolled ? "max-w-5xl" : "max-w-7xl"
           )}
-        />
-        {/* hairline sheen along the top edge — only reads once the glass pill is present */}
-        <div
-          aria-hidden={true}
-          className={cn(
-            "pointer-events-none absolute inset-x-4 top-0 h-px rounded-full bg-gradient-to-r from-transparent via-foreground/25 to-transparent transition-opacity duration-500 ease-out",
-            scrolled ? "opacity-100" : "opacity-0"
-          )}
-        />
-        <nav
-          className="relative mx-auto flex items-center justify-between px-6 transition-[height] duration-500 ease-out"
-          style={{ height: scrolled ? 56 : 64 }}
+          data-slot="hyperion-nav"
         >
-          <Link
-            aria-label="Home"
-            className="group/logo relative shrink-0"
-            href="/"
-          >
-            <span
-              className={cn(
-                wordmarkFont.className,
-                "bg-[length:200%_100%] bg-gradient-to-r from-primary via-muted-foreground to-primary bg-clip-text text-sm text-transparent tracking-[0.3em] transition-[background-position,letter-spacing] duration-700 ease-out group-hover/logo:bg-[position:100%_0%] group-hover/logo:tracking-[0.36em]"
-              )}
-            >
-              HYPERION
-            </span>
-            <span
-              aria-hidden={true}
-              className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-gradient-to-r from-primary/70 to-transparent transition-transform duration-500 ease-out group-hover/logo:scale-x-100"
-            />
-          </Link>
-
-          {/* Desktop */}
-          <ul className="hidden items-center gap-8 lg:flex">
-            {navLinks.map((link) => {
-              const active = pathname?.includes(link.href);
-              return (
-                <li key={link.href}>
-                  <Link
-                    className={cn(
-                      "group/nav relative text-sm transition-colors duration-150 hover:text-primary",
-                      active ? "text-foreground" : "text-muted-foreground"
-                    )}
-                    href={link.href}
-                  >
-                    {link.label}
-                    <span
-                      aria-hidden={true}
-                      className={cn(
-                        "absolute -bottom-1 left-0 h-px bg-primary/70 transition-all duration-300 ease-out",
-                        active ? "w-full" : "w-0 group-hover/nav:w-full"
-                      )}
-                    />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-
-          <div className="hidden items-center gap-4 lg:flex">
-            <Link
-              className="group/btn relative inline-flex h-8 items-center justify-center rounded-xl bg-primary px-4 font-medium text-primary-foreground text-sm transition-all duration-300 active:scale-[0.98]"
-              href="/download"
-            >
-              Download
-              <svg
-                className="pointer-events-none absolute inset-0 h-full w-full"
-                fill="none"
-              >
-                <defs>
-                  <linearGradient
-                    id="shiny-gold-desktop"
-                    x1="0%"
-                    x2="0%"
-                    y1="0%"
-                    y2="100%"
-                  >
-                    <stop offset="0%" stopColor="#FFFFFF" />
-                    <stop offset="25%" stopColor="#FDE047" />
-                    <stop offset="65%" stopColor="#D4AF37" />
-                    <stop offset="100%" stopColor="#854D0E" />
-                  </linearGradient>
-                </defs>
-                <rect
-                  className="transition-[stroke-dasharray] duration-500 ease-out [stroke-dasharray:0_100] [stroke-dashoffset:-12.5] group-hover/btn:[stroke-dasharray:55_45]"
-                  height="calc(100% - 2px)"
-                  pathLength="100"
-                  rx="12"
-                  ry="12"
-                  stroke="url(#shiny-gold-desktop)"
-                  strokeWidth="1.5"
-                  width="calc(100% - 2px)"
-                  x="1"
-                  y="1"
-                />
-                <rect
-                  className="origin-center scale-x-[-1] transition-[stroke-dasharray] duration-500 ease-out [stroke-dasharray:0_100] [stroke-dashoffset:-12.5] group-hover/btn:[stroke-dasharray:55_45]"
-                  height="calc(100% - 2px)"
-                  pathLength="100"
-                  rx="12"
-                  ry="12"
-                  stroke="url(#shiny-gold-desktop)"
-                  strokeWidth="1.5"
-                  width="calc(100% - 2px)"
-                  x="1"
-                  y="1"
-                />
-              </svg>
-            </Link>
-          </div>
-
-          {/* Mobile */}
-          <button
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            className="relative z-20 flex cursor-pointer items-center lg:hidden"
-            onClick={() => setMenuOpen(!menuOpen)}
-            type="button"
-          >
-            {menuOpen ? (
-              <X className="size-5 text-foreground" />
-            ) : (
-              <Menu className="size-5 text-foreground" />
+          {/* Glass pill — invisible at rest (nav floats flush over the hero with
+           * no box at all), fades in once scrolled. Faded via opacity rather
+           * than toggling border/bg/blur classes directly so the whole glass
+           * treatment cross-fades as one smooth GPU-cheap layer instead of
+           * jumping between discrete utility values. */}
+          <div
+            aria-hidden={true}
+            className={cn(
+              "pointer-events-none absolute inset-0 rounded-2xl border border-border/60 bg-background/55 shadow-black/30 shadow-lg backdrop-blur-xl backdrop-saturate-150 transition-opacity duration-500 ease-out",
+              scrolled ? "opacity-100" : "opacity-0"
             )}
-          </button>
-        </nav>
+          />
+          {/* hairline sheen along the top edge — only reads once the glass pill is present */}
+          <div
+            aria-hidden={true}
+            className={cn(
+              "pointer-events-none absolute inset-x-4 top-0 h-px rounded-full bg-gradient-to-r from-transparent via-foreground/25 to-transparent transition-opacity duration-500 ease-out",
+              scrolled ? "opacity-100" : "opacity-0"
+            )}
+          />
+          <nav
+            className="relative mx-auto flex items-center justify-between px-6 transition-[height] duration-500 ease-out"
+            style={{ height: scrolled ? 64 : 76 }}
+          >
+            <Link
+              aria-label="Home"
+              className="group/logo relative flex shrink-0 items-center"
+              href="/"
+            >
+              <Image
+                alt="Hyperion"
+                className="size-9 object-contain opacity-90 transition-opacity group-hover/logo:opacity-100 md:size-11 lg:size-12"
+                height={48}
+                src="/main_logo.png"
+                width={48}
+              />
+              <span
+                aria-hidden={true}
+                className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-gradient-to-r from-primary/70 to-transparent transition-transform duration-500 ease-out group-hover/logo:scale-x-100"
+              />
+            </Link>
 
-        {menuOpen && (
-          <div className="absolute inset-x-0 top-full z-10 mt-2 rounded-2xl border border-border/60 bg-background/80 px-6 pt-4 pb-6 shadow-black/30 shadow-lg backdrop-blur-xl lg:hidden">
-            <ul className="space-y-4">
-              {navLinks.map((link) => (
-                <li key={link.href}>
+            {/* Desktop */}
+            <ul className="hidden items-center gap-8 lg:flex">
+              {navLinks.map((link) => {
+                const active = pathname?.includes(link.href);
+                return (
+                  <li key={link.href}>
+                    <Link
+                      className={cn(
+                        "group/nav relative text-base font-medium transition-colors duration-150 hover:text-primary",
+                        active ? "text-foreground" : "text-muted-foreground"
+                      )}
+                      href={link.href}
+                    >
+                      {link.label}
+                      <span
+                        aria-hidden={true}
+                        className={cn(
+                          "absolute -bottom-1 left-0 h-px bg-primary/70 transition-all duration-300 ease-out",
+                          active ? "w-full" : "w-0 group-hover/nav:w-full"
+                        )}
+                      />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="hidden items-center gap-4 lg:flex">
+              <Link
+                className="group/btn relative inline-flex h-8 items-center justify-center rounded-xl bg-primary px-4 font-medium text-primary-foreground text-sm transition-all duration-300 active:scale-[0.98]"
+                href="/download"
+              >
+                Download
+                <svg
+                  className="pointer-events-none absolute inset-0 h-full w-full"
+                  fill="none"
+                >
+                  <defs>
+                    <linearGradient
+                      id="shiny-gold-desktop"
+                      x1="0%"
+                      x2="0%"
+                      y1="0%"
+                      y2="100%"
+                    >
+                      <stop offset="0%" stopColor="#FFFFFF" />
+                      <stop offset="25%" stopColor="#FDE047" />
+                      <stop offset="65%" stopColor="#D4AF37" />
+                      <stop offset="100%" stopColor="#854D0E" />
+                    </linearGradient>
+                  </defs>
+                  <rect
+                    className="transition-[stroke-dasharray] duration-500 ease-out [stroke-dasharray:0_100] [stroke-dashoffset:-12.5] group-hover/btn:[stroke-dasharray:55_45]"
+                    height="calc(100% - 2px)"
+                    pathLength="100"
+                    rx="12"
+                    ry="12"
+                    stroke="url(#shiny-gold-desktop)"
+                    strokeWidth="1.5"
+                    width="calc(100% - 2px)"
+                    x="1"
+                    y="1"
+                  />
+                  <rect
+                    className="origin-center scale-x-[-1] transition-[stroke-dasharray] duration-500 ease-out [stroke-dasharray:0_100] [stroke-dashoffset:-12.5] group-hover/btn:[stroke-dasharray:55_45]"
+                    height="calc(100% - 2px)"
+                    pathLength="100"
+                    rx="12"
+                    ry="12"
+                    stroke="url(#shiny-gold-desktop)"
+                    strokeWidth="1.5"
+                    width="calc(100% - 2px)"
+                    x="1"
+                    y="1"
+                  />
+                </svg>
+              </Link>
+            </div>
+
+            {/* Mobile */}
+            <button
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              className="relative z-20 flex cursor-pointer items-center lg:hidden"
+              onClick={() => setMenuOpen(!menuOpen)}
+              type="button"
+            >
+              {menuOpen ? (
+                <X className="size-5 text-foreground" />
+              ) : (
+                <Menu className="size-5 text-foreground" />
+              )}
+            </button>
+          </nav>
+
+          {menuOpen && (
+            <div className="absolute inset-x-0 top-full z-10 mt-2 rounded-2xl border border-border/60 bg-background/80 px-6 pt-4 pb-6 shadow-black/30 shadow-lg backdrop-blur-xl lg:hidden">
+              <ul className="space-y-4">
+                {navLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      className="block py-1 text-foreground/80 text-sm hover:text-primary"
+                      href={link.href}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+
+                <li className="border-border/60 border-t pt-4">
                   <Link
-                    className="block py-1 text-foreground/80 text-sm hover:text-primary"
-                    href={link.href}
+                    className="flex items-center gap-2 py-1 text-foreground/80 text-sm hover:text-primary"
+                    href="https://github.com"
                     onClick={() => setMenuOpen(false)}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
-                    {link.label}
+                    <Github className="size-4" />
+                    GitHub
                   </Link>
                 </li>
-              ))}
-              <li className="border-border/60 border-t pt-4">
-                <Link
-                  className="group/btn relative inline-flex h-10 items-center justify-center rounded-xl bg-primary px-5 font-medium text-primary-foreground text-sm transition-all duration-300 active:scale-[0.98]"
-                  href="/download"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Download
-                  <svg
-                    className="pointer-events-none absolute inset-0 h-full w-full"
-                    fill="none"
-                  >
-                    <defs>
-                      <linearGradient
-                        id="shiny-gold-mobile"
-                        x1="0%"
-                        x2="0%"
-                        y1="0%"
-                        y2="100%"
-                      >
-                        <stop offset="0%" stopColor="#FFFFFF" />
-                        <stop offset="25%" stopColor="#FDE047" />
-                        <stop offset="65%" stopColor="#D4AF37" />
-                        <stop offset="100%" stopColor="#854D0E" />
-                      </linearGradient>
-                    </defs>
-                    <rect
-                      className="transition-[stroke-dasharray] duration-500 ease-out [stroke-dasharray:0_100] [stroke-dashoffset:-12.5] group-hover/btn:[stroke-dasharray:55_45]"
-                      height="calc(100% - 2px)"
-                      pathLength="100"
-                      rx="12"
-                      ry="12"
-                      stroke="url(#shiny-gold-mobile)"
-                      strokeWidth="1.5"
-                      width="calc(100% - 2px)"
-                      x="1"
-                      y="1"
-                    />
-                    <rect
-                      className="origin-center scale-x-[-1] transition-[stroke-dasharray] duration-500 ease-out [stroke-dasharray:0_100] [stroke-dashoffset:-12.5] group-hover/btn:[stroke-dasharray:55_45]"
-                      height="calc(100% - 2px)"
-                      pathLength="100"
-                      rx="12"
-                      ry="12"
-                      stroke="url(#shiny-gold-mobile)"
-                      strokeWidth="1.5"
-                      width="calc(100% - 2px)"
-                      x="1"
-                      y="1"
-                    />
-                  </svg>
-                </Link>
-              </li>
-            </ul>
-          </div>
-        )}
-      </header>
-    </div>
+              </ul>
+            </div>
+          )}
+        </header>
+      </div>
+    </>
   );
 }

@@ -64,7 +64,10 @@ function NativeAuthGate({ children }: { children: React.ReactNode }) {
           await openUrl(authUrl);
           opened = true;
         } catch (err) {
-          console.warn("Plugin opener error, falling back to Rust command:", err);
+          console.warn(
+            "Plugin opener error, falling back to Rust command:",
+            err
+          );
         }
 
         if (!opened) {
@@ -84,7 +87,7 @@ function NativeAuthGate({ children }: { children: React.ReactNode }) {
 
   if (!isLoaded) {
     return (
-      <div className="flex flex-1 items-center justify-center min-h-screen bg-background">
+      <div className="flex min-h-screen flex-1 items-center justify-center bg-background">
         <Loader2 className="size-6 animate-spin text-muted-foreground" />
       </div>
     );
@@ -93,21 +96,24 @@ function NativeAuthGate({ children }: { children: React.ReactNode }) {
   if (!session) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
-        <div className="w-full max-w-md p-8 border rounded-2xl bg-card text-card-foreground shadow-lg flex flex-col items-center text-center space-y-6">
-          <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+        <div className="flex w-full max-w-md flex-col items-center space-y-6 rounded-2xl border bg-card p-8 text-center text-card-foreground shadow-lg">
+          <div className="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary">
             <ShieldCheck className="size-8" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">Sign in to Hyperion</h1>
-            <p className="text-sm text-muted-foreground">
-              Authentication is safely handled via the Hyperion web portal. Click below to connect your session.
+            <h1 className="font-bold text-2xl tracking-tight">
+              Sign in to Hyperion
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Authentication is safely handled via the Hyperion web portal.
+              Click below to connect your session.
             </p>
           </div>
           <button
-            type="button"
-            onClick={handleSignIn}
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground shadow-md transition-all hover:opacity-90 disabled:opacity-50"
             disabled={connecting}
-            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold px-5 py-3 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer shadow-md"
+            onClick={handleSignIn}
+            type="button"
           >
             {connecting ? (
               <Loader2 className="size-5 animate-spin" />
@@ -136,7 +142,7 @@ function ClerkAuthGate({ children }: { children: React.ReactNode }) {
 
   if (!isLoaded) {
     return (
-      <div className="flex flex-1 items-center justify-center min-h-screen bg-background">
+      <div className="flex min-h-screen flex-1 items-center justify-center bg-background">
         <Loader2 className="size-6 animate-spin text-muted-foreground" />
       </div>
     );

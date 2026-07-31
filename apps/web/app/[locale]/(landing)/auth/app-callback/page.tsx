@@ -5,7 +5,12 @@ import { CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
-function AppCallbackInner() {
+const hasClerkPublishableKey = !!(
+  typeof process !== "undefined" &&
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+);
+
+function AppCallbackInnerWithClerk() {
   const { isLoaded, isSignedIn, user } = useUser();
   const { sessionId } = useAuth();
   const searchParams = useSearchParams();
@@ -15,7 +20,7 @@ function AppCallbackInner() {
 
   useEffect(() => {
     if (isLoaded) {
-      if (!isSignedIn || !user) {
+      if (!(isSignedIn && user)) {
         router.push(`/auth/app-login?port=${port}`);
         return;
       }
@@ -29,8 +34,12 @@ function AppCallbackInner() {
       callbackUrl.searchParams.set("session_id", sessionId || userId);
       callbackUrl.searchParams.set("user_id", userId);
       callbackUrl.searchParams.set("email", email);
-      if (name) callbackUrl.searchParams.set("name", name);
-      if (avatar) callbackUrl.searchParams.set("avatar", avatar);
+      if (name) {
+        callbackUrl.searchParams.set("name", name);
+      }
+      if (avatar) {
+        callbackUrl.searchParams.set("avatar", avatar);
+      }
 
       setTransferred(true);
       window.location.href = callbackUrl.toString();
@@ -45,7 +54,7 @@ function AppCallbackInner() {
       <div className="relative z-10 flex w-full max-w-md flex-col items-center space-y-6 rounded-2xl border border-border/80 bg-card/90 p-8 shadow-2xl backdrop-blur-xl sm:p-10">
         <div className="flex size-16 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-primary">
           {transferred ? (
-            <CheckCircle2 className="size-8 text-green-500 animate-pulse" />
+            <CheckCircle2 className="size-8 animate-pulse text-green-500" />
           ) : (
             <ShieldCheck className="size-8" />
           )}
@@ -69,6 +78,24 @@ function AppCallbackInner() {
       </div>
     </div>
   );
+}
+
+function AppCallbackFallback() {
+  return (
+    <div className="flex min-h-[calc(100vh-120px)] items-center justify-center p-4 text-center">
+      <p className="text-muted-foreground text-sm">
+        Authentication is not configured (missing
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY).
+      </p>
+    </div>
+  );
+}
+
+function AppCallbackInner() {
+  if (!hasClerkPublishableKey) {
+    return <AppCallbackFallback />;
+  }
+  return <AppCallbackInnerWithClerk />;
 }
 
 export default function AppCallbackPage() {

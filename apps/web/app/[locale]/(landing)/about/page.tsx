@@ -213,7 +213,10 @@ export default function AboutPage() {
             Build the future with us.
           </h2>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <CtaLink className="group h-11 px-6" href="/download">
+            <CtaLink
+              className="group hidden h-11 px-6 lg:inline-flex"
+              href="/download"
+            >
               Download Hyperion
               <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
             </CtaLink>

@@ -1,4 +1,3 @@
-import { Android } from "@workspace/ui/components/svgs/android";
 import { Apple } from "@workspace/ui/components/svgs/apple";
 import { Linux } from "@workspace/ui/components/svgs/linux";
 import { Windows } from "@workspace/ui/components/svgs/windows";
@@ -25,16 +24,6 @@ export const platformConfig: Record<
     label: "Download for Linux",
     icon: <Linux className="size-5" />,
     primaryAssetKey: "linux_amd64_deb",
-  },
-  android: {
-    label: "Download for Android",
-    icon: <Android className="size-5" />,
-    primaryAssetKey: "android_arm64_apk",
-  },
-  ios: {
-    label: "Download for iOS",
-    icon: <Apple className="size-5" />,
-    primaryAssetKey: "",
   },
   unknown: {
     label: "Download",
