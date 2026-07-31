@@ -3,13 +3,12 @@
 import { SignIn, useUser } from "@clerk/clerk-react";
 import { dark } from "@clerk/themes";
 import { Laptop, Loader2 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
 function AppLoginInner() {
   const { isSignedIn, isLoaded } = useUser();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const port = searchParams.get("port") || "8787";
 
   useEffect(() => {
