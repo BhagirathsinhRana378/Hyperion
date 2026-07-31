@@ -5,11 +5,7 @@ import { ArrowLeft, Calendar } from "lucide-react";
 import Link from "next/link";
 import { Badge, CtaLink } from "../../components/marketing-kit";
 
-export default function NewsDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default function NewsDetailPage() {
   const entry = {
     title: "v0.1.0 — Terminal Multiplexer + Agent Dispatch",
     date: "July 1, 2026",

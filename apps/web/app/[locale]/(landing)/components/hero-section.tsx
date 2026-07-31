@@ -15,7 +15,6 @@ import {
   Bot,
   Check,
   Eye,
-  Github,
   LayoutGrid,
   SquareKanban,
   SquareTerminal,
@@ -420,7 +419,7 @@ export default function HeroSection() {
                 composes with the scroll transforms below. */}
             <div className="landing-hover-bob [transform-style:preserve-3d]">
               <motion.div
-                className="relative mx-auto max-w-6xl overflow-hidden rounded-xl border border-white/[0.07] bg-card/40 p-2 sm:rounded-2xl sm:p-4 will-change-transform [transform-style:preserve-3d]"
+                className="relative mx-auto max-w-6xl overflow-hidden rounded-xl border border-white/[0.07] bg-card/40 p-2 will-change-transform [transform-style:preserve-3d] sm:rounded-2xl sm:p-4"
                 style={{ rotateX, scale, y: shotY, boxShadow: shotShadow }}
               >
                 {/* light catching the upper edge */}

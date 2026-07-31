@@ -2,16 +2,10 @@
 
 import { cn } from "@workspace/ui/lib/utils";
 import { Github, Menu, X } from "lucide-react";
-import { Unbounded } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
-const wordmarkFont = Unbounded({
-  subsets: ["latin"],
-  weight: ["600"],
-});
 
 const navLinks = [
   { label: "Features", href: "/features" },
@@ -103,7 +97,7 @@ export function HyperionNav() {
                   <li key={link.href}>
                     <Link
                       className={cn(
-                        "group/nav relative text-base font-medium transition-colors duration-150 hover:text-primary",
+                        "group/nav relative font-medium text-base transition-colors duration-150 hover:text-primary",
                         active ? "text-foreground" : "text-muted-foreground"
                       )}
                       href={link.href}
