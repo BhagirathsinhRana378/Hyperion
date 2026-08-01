@@ -2,6 +2,7 @@
 
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
+import { useWebglSupported } from "./use-webgl-supported";
 
 /* ogl is client-only — split it out of the main bundle; the docs
    render instantly and the waves fade in when the chunk arrives. */
@@ -16,13 +17,15 @@ const LineWaves = dynamic(() => import("./line-waves"), { ssr: false });
  */
 export function DocsBackdrop() {
   const reduceMotion = useReducedMotion();
+  const webglSupported = useWebglSupported();
+  const showLive = !reduceMotion && webglSupported;
 
   return (
     <div
       aria-hidden={true}
       className="absolute inset-x-0 top-0 z-0 h-[560px] overflow-hidden"
     >
-      {!reduceMotion && (
+      {showLive ? (
         <LineWaves
           brightness={0.08}
           className="absolute inset-0"
@@ -35,6 +38,10 @@ export function DocsBackdrop() {
           speed={0.25}
           warpIntensity={1.0}
         />
+      ) : (
+        // Static fallback — a soft upper-right glow where the waves live,
+        // for reduced-motion / no-WebGL machines.
+        <div className="absolute inset-0 [background:radial-gradient(50%_60%_at_75%_18%,color-mix(in_oklab,var(--color-primary)_8%,transparent)_0%,transparent_72%)]" />
       )}
 
       {/* readability wash — heavy over the title/sidebar zone (left),

@@ -3,13 +3,17 @@
 import { SignIn, useUser } from "@clerk/clerk-react";
 import { dark } from "@clerk/themes";
 import { Laptop, Loader2 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
-function AppLoginInner() {
+const hasClerkPublishableKey = !!(
+  typeof process !== "undefined" &&
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+);
+
+function AppLoginInnerWithClerk() {
   const { isSignedIn, isLoaded } = useUser();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const port = searchParams.get("port") || "8787";
 
   useEffect(() => {
@@ -41,7 +45,8 @@ function AppLoginInner() {
             Connect Desktop App
           </h1>
           <p className="max-w-sm text-muted-foreground text-sm sm:text-base">
-            Sign in to securely transfer your authentication session to your Hyperion desktop client.
+            Sign in to securely transfer your authentication session to your
+            Hyperion desktop client.
           </p>
         </div>
 
@@ -62,7 +67,8 @@ function AppLoginInner() {
                 headerSubtitle: "text-zinc-400 text-sm",
                 socialButtonsBlockButton:
                   "border border-zinc-800 bg-zinc-950/60 hover:bg-zinc-800 text-zinc-100 font-medium rounded-xl transition-all",
-                socialButtonsBlockButtonText: "text-zinc-100 font-medium text-sm",
+                socialButtonsBlockButtonText:
+                  "text-zinc-100 font-medium text-sm",
                 formButtonPrimary:
                   "bg-primary text-primary-foreground font-semibold rounded-xl hover:opacity-90 transition-all shadow-md py-2.5",
                 formFieldInput:
@@ -84,6 +90,24 @@ function AppLoginInner() {
       </div>
     </div>
   );
+}
+
+function AppLoginFallback() {
+  return (
+    <div className="flex min-h-[calc(100vh-120px)] items-center justify-center p-4 text-center">
+      <p className="text-muted-foreground text-sm">
+        Authentication is not configured (missing
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY).
+      </p>
+    </div>
+  );
+}
+
+function AppLoginInner() {
+  if (!hasClerkPublishableKey) {
+    return <AppLoginFallback />;
+  }
+  return <AppLoginInnerWithClerk />;
 }
 
 export default function AppLoginPage() {

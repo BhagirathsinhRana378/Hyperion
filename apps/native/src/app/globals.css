@@ -1,0 +1,45 @@
+@import "@workspace/ui/globals.css";
+
+/* ==========================================================================
+   Native app palette — synced from the web marketing site's monochrome
+   plate (see `.landing-theme` in apps/web/app/globals.css). Strict
+   three-anchor monochrome, no hue anywhere:
+     Black    #080705 — dominant surface
+     Graphite #3A3A3A — borders/structure; card/popover/secondary/accent
+              are darker steps on the black→graphite axis
+     Platinum #EEEEED — the single accent (primary, focus rings, highlights)
+   Overrides only the palette tokens; radius, fonts, shadows, chart colors,
+   and the semantic `--destructive` red are inherited from @workspace/ui.
+   Applied to both :root and .dark so it holds regardless of theme class.
+   ========================================================================== */
+:root,
+.dark {
+  --background: #080705;
+  --foreground: #eeeeed;
+  --card: #121110;
+  --card-foreground: #eeeeed;
+  --popover: #1a1918;
+  --popover-foreground: #eeeeed;
+  --primary: #eeeeed;
+  --primary-foreground: #080705;
+  --secondary: #1e1d1c;
+  --secondary-foreground: #eeeeed;
+  --muted: #1e1d1c;
+  --muted-foreground: #969594;
+  --accent: #232221;
+  --accent-foreground: #eeeeed;
+  --border: #3a3a3a;
+  --input: #3a3a3a;
+  --ring: #eeeeed;
+
+  /* Sidebar — mapped onto the same monochrome ladder (the web landing has
+     no sidebar, so these mirror the core tokens). */
+  --sidebar: #080705;
+  --sidebar-foreground: #eeeeed;
+  --sidebar-primary: #eeeeed;
+  --sidebar-primary-foreground: #080705;
+  --sidebar-accent: #232221;
+  --sidebar-accent-foreground: #eeeeed;
+  --sidebar-border: #3a3a3a;
+  --sidebar-ring: #eeeeed;
+}

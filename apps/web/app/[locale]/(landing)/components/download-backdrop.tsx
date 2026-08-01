@@ -2,6 +2,7 @@
 
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
+import { useWebglSupported } from "./use-webgl-supported";
 
 /* ogl is client-only and worth splitting out of the main bundle —
    the page renders instantly, the star field fades in when its
@@ -19,13 +20,15 @@ const Galaxy = dynamic(() => import("./galaxy"), { ssr: false });
  */
 export function DownloadBackdrop() {
   const reduceMotion = useReducedMotion();
+  const webglSupported = useWebglSupported();
+  const showLive = !reduceMotion && webglSupported;
 
   return (
     <div
       aria-hidden={true}
       className="absolute inset-x-0 top-0 z-0 h-[760px] overflow-hidden"
     >
-      {!reduceMotion && (
+      {showLive ? (
         <Galaxy
           className="absolute inset-0"
           density={1.2}
@@ -37,6 +40,13 @@ export function DownloadBackdrop() {
           starSpeed={0.15}
           twinkleIntensity={0.35}
         />
+      ) : (
+        // Static fallback — dotted "star" texture + center glow standing in
+        // for the galaxy field on reduced-motion / no-WebGL machines.
+        <>
+          <div className="landing-grid-noise absolute inset-0 opacity-40" />
+          <div className="absolute inset-0 [background:radial-gradient(52%_45%_at_50%_35%,color-mix(in_oklab,var(--color-primary)_8%,transparent)_0%,transparent_72%)]" />
+        </>
       )}
 
       {/* readability wash behind the headline block */}

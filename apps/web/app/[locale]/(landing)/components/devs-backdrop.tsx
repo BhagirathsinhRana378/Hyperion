@@ -4,6 +4,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
 import type { CSSProperties } from "react";
+import { useWebglSupported } from "./use-webgl-supported";
 
 /* three is client-only — split it out of the main bundle; the page
    renders instantly and the beam fades in when the chunk arrives. */
@@ -47,6 +48,8 @@ export function DevsBackdrop({
   dimmed = false,
 }: DevsBackdropProps) {
   const reduceMotion = useReducedMotion();
+  const webglSupported = useWebglSupported();
+  const showLive = !reduceMotion && webglSupported;
 
   return (
     <div
@@ -89,7 +92,7 @@ export function DevsBackdrop({
         ))}
       </div>
 
-      {!reduceMotion && (
+      {showLive ? (
         <div className="relative mx-auto h-full w-full max-w-screen-2xl px-6">
           <LaserFlow
             className="absolute inset-0"
@@ -105,6 +108,14 @@ export function DevsBackdrop({
             wispIntensity={6.5}
           />
         </div>
+      ) : (
+        // Static fallback beam — a soft vertical platinum shaft pinned to
+        // the same 3rd/4th-card anchor as the live LaserFlow, for
+        // reduced-motion / no-WebGL machines.
+        <div
+          className="absolute inset-y-0 left-1/2 w-40 -translate-x-1/2 blur-2xl sm:left-[71%] [background:linear-gradient(to_bottom,transparent_0%,color-mix(in_oklab,var(--color-primary)_10%,transparent)_45%,color-mix(in_oklab,var(--color-primary)_24%,transparent)_100%)]"
+          style={{ mixBlendMode: "screen" }}
+        />
       )}
     </div>
   );

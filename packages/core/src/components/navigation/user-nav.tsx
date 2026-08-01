@@ -148,9 +148,7 @@ function UserNavBase({
               </div>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onLogout}>
-              Log out
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onLogout}>Log out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

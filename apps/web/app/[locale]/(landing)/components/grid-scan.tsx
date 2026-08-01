@@ -234,11 +234,10 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     float edgeDistX = min(abs(hit.x - (-0.5)), abs(hit.x - 0.5));
     float edgeDistY = min(abs(hit.y - (-0.2)), abs(hit.y - 0.2));
     float edgeDist = mix(edgeDistY, edgeDistX, hitIsY);
-    float edgeGate = 1.0 - smoothstep(gridScale * 0.5, gridScale * 2.0, edgeDist);
+    float edgeGate = step(0.001, edgeDist);
     altMask *= edgeGate;
 
-  float lineMask = max(primaryMask, altMask);
-
+    float lineMask = max(primaryMask, altMask);
     float fade = exp(-dist * fadeStrength);
 
     float dur = max(0.05, uScanDuration);
@@ -394,7 +393,7 @@ export default function GridScan({
   linesColor = "#232221",
   scanColor = "#eeeeed",
   scanOpacity = 0.18,
-  gridScale = 0.08,
+  gridScale = 0.1,
   lineStyle = "solid",
   lineJitter = 0.02,
   scanDirection = "forward",

@@ -1,7 +1,7 @@
 import { siteConfig } from "@workspace/core/config/site";
 import type { Metadata, Viewport } from "next";
 import { Lora, Plus_Jakarta_Sans } from "next/font/google";
-import "@workspace/ui/globals.css";
+import "./globals.css";
 
 const fontSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
