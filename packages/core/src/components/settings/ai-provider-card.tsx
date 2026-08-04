@@ -277,13 +277,10 @@ export function AiProviderCard() {
     }
   }, [apiKey, provider, baseUrl, selectedModel, checkingHealth]);
 
-  // Cleanup cooldown interval on unmount
+  // Run health check initially
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional run-once-on-mount; checkAllHealth is redefined every render and would otherwise loop
   useEffect(() => {
-    return () => {
-      if (cooldownRef.current) {
-        clearInterval(cooldownRef.current);
-      }
-    };
+    checkAllHealth();
   }, []);
 
   return (

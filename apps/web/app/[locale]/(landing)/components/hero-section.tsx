@@ -3,7 +3,6 @@
 import { siteConfig } from "@workspace/core/config/site";
 import { fetchLatestGithubVersion } from "@workspace/core/lib/utils";
 import { BorderBeam } from "@workspace/ui/components/landing/border-beam";
-import CountUp from "@workspace/ui/components/marketing/CountUp";
 import {
   MagicBentoCard,
   MagicBentoGrid,
@@ -16,7 +15,6 @@ import {
   Bot,
   Check,
   Eye,
-  Github,
   LayoutGrid,
   SquareKanban,
   SquareTerminal,
@@ -35,9 +33,9 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import { HeroBackdrop } from "./hero-backdrop";
-import { CtaLink, Eyebrow, GlowCard, StatCard } from "./marketing-kit";
+import { CtaLink, Eyebrow, GlowCard } from "./marketing-kit";
 import { easeOut, Marquee } from "./motion-primitives";
-import { Terminal, type TerminalLineInput } from "./terminal";
+import type { TerminalLineInput } from "./terminal";
 
 /* ── Copy ─────────────────────────────────────────────────── */
 
@@ -51,17 +49,14 @@ const SUBHEAD = "One workspace, up to  8  AI agents—code, test, ship toget
    not button-shaped. */
 const FEATURE_PILLS = [
   { icon: Bot, label: "Multi-Agent" },
-  { icon: SquareTerminal, label: "Terminal Swarm" },
   { icon: SquareKanban, label: "Parallel Tasks" },
   { icon: Zap, label: "Real-Time Execution" },
-  { icon: Github, label: "Open Source" },
 ];
 
 const TICKER_MESSAGES = [
   "agent-02 refactored auth middleware · just now",
   "agent-05 opened PR #214 · 4s ago",
   "agent-03 ran 148 tests — all passing · 12s ago",
-  "swarm: 6 agents active across 12 terminals",
   "agent-01 resolved a merge conflict · 30s ago",
 ];
 
@@ -74,33 +69,6 @@ const CAPABILITIES = [
   "Live Previews",
   "Autonomous PRs",
   "Local-first",
-];
-
-const STATS = [
-  {
-    value: 8,
-    suffix: "",
-    label: "Terminals",
-    description: "Tiled into one adaptive workspace.",
-  },
-  {
-    value: 99.9,
-    suffix: "%",
-    label: "Agent Uptime",
-    description: "Autonomous agents that keep working.",
-  },
-  {
-    value: 10,
-    suffix: "×",
-    label: "Faster Delivery",
-    description: "Parallel agents cut iteration time.",
-  },
-  {
-    value: 100,
-    suffix: "%",
-    label: "Under Command",
-    description: "You approve every merge, always.",
-  },
 ];
 
 const FEATURES = [
@@ -150,7 +118,7 @@ const SWARM_CHECKLIST = [
   "Interrupt, redirect, or take over at any moment",
 ];
 
-const TERMINAL_LINES: TerminalLineInput[] = [
+const _TERMINAL_LINES: TerminalLineInput[] = [
   { text: "$ hyperion swarm start --agents 4" },
   { text: "" },
   { text: "workspace attached — 4 terminals tiled", status: "success" },
@@ -161,53 +129,7 @@ const TERMINAL_LINES: TerminalLineInput[] = [
   { text: "" },
   { text: "swarm active · 4 agents · you are in command" },
 ];
-
 /* ── Micro components ─────────────────────────────────────── */
-
-/** One floating glass stat card — counts up once on entry, then eases
- *  into an independent slow float+rotate drift (paused on hover).
- *  Lift + tilt + scale are cursor-driven (same recipe as GlowCard) on
- *  an inner element, kept separate from the float wrapper so the two
- *  transforms never fight over the same node. Every card is the same
- *  fixed height via grid stretch + h-full all the way down, and the
- *  description reserves a fixed two-line slot so no card's content
- *  shifts the number/label baseline relative to its neighbors. */
-function HeroStatCard({
-  value,
-  suffix,
-  label,
-  description,
-  index,
-}: {
-  value: number;
-  suffix: string;
-  label: string;
-  description: string;
-  index: number;
-}) {
-  return (
-    <Reveal className="h-full" direction="up" duration={340} index={index}>
-      <StatCard>
-        <span className="font-display text-4xl text-foreground md:text-5xl">
-          <CountUp
-            className="count-up-text"
-            delay={index * 0.12}
-            duration={1.3}
-            separator=","
-            to={value}
-          />
-          {suffix}
-        </span>
-        <span className="mt-1.5 font-medium text-[11px] text-muted-foreground uppercase tracking-[0.16em]">
-          {label}
-        </span>
-        <span className="mt-2 flex min-h-[2.25rem] items-center justify-center text-muted-foreground/70 text-xs leading-relaxed">
-          {description}
-        </span>
-      </StatCard>
-    </Reveal>
-  );
-}
 
 /** One headline word — blur-to-sharp rise, staggered by index. */
 function _Word({
@@ -391,7 +313,7 @@ export default function HeroSection() {
       <section className="relative flex min-h-[88svh] flex-col justify-center">
         <HeroBackdrop />
 
-        <div className="relative z-10 w-full pt-24 pb-20 md:pt-28">
+        <div className="relative z-10 w-full pt-16 pb-16 md:pt-28 md:pb-20">
           <div className="mx-auto max-w-7xl px-6">
             <div className="text-center">
               {/* Announcement pill */}
@@ -428,7 +350,7 @@ export default function HeroSection() {
               {/* Headline — per-word blur reveal, shimmer sweep on the payoff word.
                   Deliberately one size class down from a typical hero — the
                   content, not the type, should carry the section. */}
-              <div className="mx-auto mt-10 max-w-3xl text-balance font-display text-[2.75rem] leading-[1.08] tracking-tight max-md:font-semibold md:text-[3.75rem] lg:mt-12 lg:text-7xl xl:text-[5rem]">
+              <div className="mx-auto mt-8 max-w-3xl text-balance font-display text-4xl leading-[1.08] tracking-tight max-md:font-semibold md:text-[3.75rem] lg:mt-12 lg:text-7xl xl:text-[5rem]">
                 {/* First word */}
                 <span>{HEADLINE[0]}</span> {/* Shiny AI word */}
                 <ShinyText
@@ -444,7 +366,7 @@ export default function HeroSection() {
 
               <motion.p
                 animate={{ opacity: 1, y: 0 }}
-                className="mx-auto mt-6 max-w-2xl text-balance text-lg text-muted-foreground leading-relaxed"
+                className="mx-auto mt-5 max-w-2xl text-balance text-base text-muted-foreground leading-relaxed md:text-lg"
                 initial={reduceMotion ? false : { opacity: 0, y: 14 }}
                 transition={{ duration: 0.6, delay: 0.65, ease: easeOut }}
               >
@@ -452,11 +374,11 @@ export default function HeroSection() {
               </motion.p>
 
               {/* Feature pills — quiet glass chips in place of CTA buttons */}
-              <div className="mt-10 flex flex-wrap items-center justify-center gap-2.5">
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-2 md:mt-10 md:gap-2.5">
                 {FEATURE_PILLS.map((pill, i) => (
                   <motion.span
                     animate={{ opacity: 1, y: 0 }}
-                    className="group/pill inline-flex cursor-default items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3.5 py-1.5 text-muted-foreground text-xs backdrop-blur-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/30 hover:text-foreground hover:shadow-[0_0_20px_-6px] hover:shadow-primary/25"
+                    className="group/pill inline-flex cursor-default items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1.5 text-[11px] text-muted-foreground backdrop-blur-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/30 hover:text-foreground hover:shadow-[0_0_20px_-6px] hover:shadow-primary/25 md:px-3.5 md:text-xs"
                     initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                     key={pill.label}
                     transition={{
@@ -490,14 +412,14 @@ export default function HeroSection() {
           {/* The parent owns the 3D scene: deep perspective, with
               preserve-3d carried down so the tilt renders inside it. */}
           <div
-            className="mask-b-from-55% relative -mt-10 -mr-56 overflow-hidden px-2 pb-12 [perspective:2400px] sm:mr-0"
+            className="mask-b-from-55% relative -mt-10 overflow-hidden px-2 pb-12 [perspective:2400px]"
             ref={shotRef}
           >
             {/* Suspended-object bob (±3px) on its own element so it
                 composes with the scroll transforms below. */}
             <div className="landing-hover-bob [transform-style:preserve-3d]">
               <motion.div
-                className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-white/[0.07] bg-card/40 p-4 will-change-transform [transform-style:preserve-3d]"
+                className="relative mx-auto max-w-6xl overflow-hidden rounded-xl border border-white/[0.07] bg-card/40 p-2 will-change-transform [transform-style:preserve-3d] sm:rounded-2xl sm:p-4"
                 style={{ rotateX, scale, y: shotY, boxShadow: shotShadow }}
               >
                 {/* light catching the upper edge */}
@@ -507,10 +429,10 @@ export default function HeroSection() {
                 />
                 <Image
                   alt="Hyperion workspace screenshot"
-                  className="relative aspect-15/8 rounded-2xl border border-border/50"
+                  className="relative aspect-15/8 h-auto w-full rounded-lg border border-border/50 object-cover sm:rounded-2xl"
                   height="1080"
                   priority={true}
-                  src="/app-screen-dark.png"
+                  src="/hero_img.png"
                   width="1920"
                 />
                 <BorderBeam
@@ -542,24 +464,8 @@ export default function HeroSection() {
         </Marquee>
       </section>
 
-      {/* ── Stats ── */}
-      <section className="py-16 md:py-24">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 px-6 sm:grid-cols-2 lg:grid-cols-4">
-          {STATS.map((stat, i) => (
-            <HeroStatCard
-              description={stat.description}
-              index={i}
-              key={stat.label}
-              label={stat.label}
-              suffix={stat.suffix}
-              value={stat.value}
-            />
-          ))}
-        </div>
-      </section>
-
       {/* ── Feature grid ── */}
-      <section className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 md:py-24">
         <Reveal direction="up" duration={250}>
           <div className="text-center">
             <Eyebrow className="justify-center">Inside the workspace</Eyebrow>
@@ -645,7 +551,7 @@ export default function HeroSection() {
 
       {/* ── Swarm section ── */}
       <section className="landing-band-fade bg-card/20">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 md:py-24 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-12 sm:px-6 md:gap-12 md:py-24 lg:grid-cols-2">
           <div>
             <Reveal direction="up" duration={250}>
               <Eyebrow>Agent swarm</Eyebrow>
@@ -694,7 +600,7 @@ export default function HeroSection() {
       </section>
 
       {/* ── Live terminal ── */}
-      <section className="mx-auto max-w-6xl px-6 py-16 md:py-24">
+      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 md:py-24">
         <Reveal direction="up" duration={250}>
           <div className="text-center">
             <Eyebrow className="justify-center">Live from a workspace</Eyebrow>
@@ -704,17 +610,26 @@ export default function HeroSection() {
           </div>
         </Reveal>
         <div className="mx-auto mt-10 max-w-[1000px]">
-          <Terminal
-            lines={TERMINAL_LINES}
-            shell="zsh"
-            title="hyperion — swarm"
-            typing={true}
-          />
+          <div className="relative mx-auto w-full overflow-hidden rounded-xl border border-white/[0.07] bg-background shadow-[0_0_80px_-15px] shadow-primary/20 sm:rounded-2xl">
+            <div className="relative aspect-video w-full overflow-hidden bg-black/40">
+              <video
+                autoPlay
+                className="size-full object-contain sm:object-cover"
+                loop
+                muted
+                playsInline
+                src="/heroVideo.mp4"
+              />
+              {/* Solid inner border using box-shadow on desktop/tablet only, leaving mobile clean & 100% visible */}
+              <div className="pointer-events-none absolute inset-0 hidden sm:block sm:rounded-2xl sm:shadow-[inset_0_0_0_16px_hsl(var(--background)),inset_0_0_20px_20px_hsl(var(--background))] md:shadow-[inset_0_0_0_24px_hsl(var(--background)),inset_0_0_40px_40px_hsl(var(--background))]" />
+            </div>
+            <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/10 ring-inset sm:rounded-2xl" />
+          </div>
         </div>
       </section>
 
       {/* ── Final CTA ── */}
-      <section className="mx-auto max-w-5xl px-6 pb-20 md:pb-28">
+      <section className="mx-auto max-w-5xl px-4 pb-16 sm:px-6 md:pb-28">
         <Reveal direction="up" duration={350} offset={36}>
           <GlowCard
             beam={true}
@@ -729,7 +644,10 @@ export default function HeroSection() {
               your codebase today.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <CtaLink className="group h-11 px-6" href="/download">
+              <CtaLink
+                className="group hidden h-11 px-6 lg:inline-flex"
+                href="/download"
+              >
                 Download {siteConfig.name}
                 <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
               </CtaLink>

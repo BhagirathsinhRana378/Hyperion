@@ -2,6 +2,7 @@
 
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
+import { useWebglSupported } from "./use-webgl-supported";
 
 /* ogl is client-only — split it out of the main bundle; the page
    renders instantly and the rays fade in when the chunk arrives. */
@@ -17,13 +18,15 @@ const LightRays = dynamic(() => import("./light-rays"), { ssr: false });
  */
 export function ContactBackdrop() {
   const reduceMotion = useReducedMotion();
+  const webglSupported = useWebglSupported();
+  const showLive = !reduceMotion && webglSupported;
 
   return (
     <div
       aria-hidden={true}
       className="absolute inset-x-0 top-0 z-0 h-[480px] overflow-hidden"
     >
-      {!reduceMotion && (
+      {showLive ? (
         <LightRays
           className="absolute inset-0"
           fadeDistance={0.9}
@@ -36,6 +39,10 @@ export function ContactBackdrop() {
           raysSpeed={0.7}
           saturation={0}
         />
+      ) : (
+        // Static fallback — a top-center platinum wash echoing the rays'
+        // origin, for reduced-motion / no-WebGL machines.
+        <div className="absolute inset-0 [background:radial-gradient(50%_65%_at_50%_0%,color-mix(in_oklab,var(--color-primary)_12%,transparent)_0%,transparent_72%)]" />
       )}
 
       {/* readability wash behind the headline block */}

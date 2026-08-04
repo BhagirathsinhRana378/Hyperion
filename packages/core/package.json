@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.3",
+    "@clerk/themes": "^2.2.14",
     "@tauri-apps/api": "^2.11.0",
     "@tauri-apps/plugin-dialog": "~2.2.0",
     "@tauri-apps/plugin-http": "~2.5.9",
+    "@tauri-apps/plugin-opener": "~2.2.6",
     "@workspace/i18n": "workspace:*",
     "@workspace/ui": "workspace:*",
     "lucide-react": "^0.577.0",

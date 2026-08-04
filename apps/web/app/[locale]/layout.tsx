@@ -1,4 +1,5 @@
 import { siteConfig } from "@workspace/core/config/site";
+import { ClerkProvider } from "@workspace/core/providers/clerk-provider";
 import { themeInitScript } from "@workspace/core/scripts/theme-init";
 import { hasLocale, NextIntlClientProvider } from "@workspace/i18n";
 import { routing } from "@workspace/i18n/routing";
@@ -10,6 +11,7 @@ import {
   Plus_Jakarta_Sans,
 } from "next/font/google";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { SerwistProvider } from "../serwist";
 import "../globals.css";
 
@@ -111,19 +113,21 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning={true}>
-      <head>
-        <script
+      <body
+        className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} ${fontBody.variable} ${fontCode.variable} font-sans antialiased`}
+      >
+        <Script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted script
           dangerouslySetInnerHTML={{
             __html: themeInitScript,
           }}
+          id="theme-init"
+          strategy="beforeInteractive"
         />
-      </head>
-      <body
-        className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} ${fontBody.variable} ${fontCode.variable} font-sans antialiased`}
-      >
         <SerwistProvider swUrl="/serwist/sw.js">
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <ClerkProvider>
+            <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          </ClerkProvider>
         </SerwistProvider>
       </body>
     </html>

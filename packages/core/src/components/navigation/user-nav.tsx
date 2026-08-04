@@ -1,8 +1,8 @@
 "use client";
 
 import { useClerk, useUser } from "@clerk/clerk-react";
-
 import { navigationData } from "@workspace/core/config/navigation";
+import { useAuthStore } from "@workspace/core/stores/auth-store";
 import { useNotificationStore } from "@workspace/core/stores/notification-store";
 import { usePanelStore } from "@workspace/core/stores/panel-store";
 import { useTranslations } from "@workspace/i18n";
@@ -37,21 +37,25 @@ interface UserNavProps {
   user: UserNavUser;
 }
 
-export function UserNav({ user: defaultUser }: UserNavProps) {
+const hasClerkPublishableKey = !!(
+  typeof process !== "undefined" &&
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+);
+
+const isNativeApp =
+  typeof process !== "undefined" &&
+  process.env.NEXT_PUBLIC_IS_NATIVE === "true";
+
+function UserNavBase({
+  displayUser,
+  onLogout,
+}: {
+  displayUser: UserNavUser;
+  onLogout: () => void;
+}) {
   const t = useTranslations("Navigation");
-  const { user, isLoaded } = useUser();
-  const { signOut } = useClerk();
   const openPanel = usePanelStore((s) => s.openPanel);
   const openNotificationCenter = useNotificationStore((s) => s.setOpen);
-
-  const displayUser =
-    isLoaded && user
-      ? {
-          name: user.fullName || user.username || "User",
-          email: user.primaryEmailAddress?.emailAddress || "",
-          avatar: user.imageUrl,
-        }
-      : defaultUser;
 
   const handleSelect = (translationKey: string) => {
     switch (translationKey) {
@@ -65,7 +69,6 @@ export function UserNav({ user: defaultUser }: UserNavProps) {
         openPanel("billing");
         break;
       case "notifications":
-        // Delay opening to prevent focus-restore collisions with closing DropdownMenu
         setTimeout(() => {
           openNotificationCenter(true);
         }, 150);
@@ -145,12 +148,47 @@ export function UserNav({ user: defaultUser }: UserNavProps) {
               </div>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut()}>
-              Log out
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onLogout}>Log out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
   );
+}
+
+function ClerkUserNav({ defaultUser }: { defaultUser: UserNavUser }) {
+  const { user, isLoaded } = useUser();
+  const { signOut } = useClerk();
+
+  const displayUser =
+    isLoaded && user
+      ? {
+          name: user.fullName || user.username || "User",
+          email: user.primaryEmailAddress?.emailAddress || "",
+          avatar: user.imageUrl,
+        }
+      : defaultUser;
+
+  return <UserNavBase displayUser={displayUser} onLogout={() => signOut()} />;
+}
+
+function NativeUserNav({ defaultUser }: { defaultUser: UserNavUser }) {
+  const { session, logout } = useAuthStore();
+
+  const displayUser = session
+    ? {
+        name: session.name || session.email.split("@")[0] || "User",
+        email: session.email,
+        avatar: session.avatar || defaultUser.avatar,
+      }
+    : defaultUser;
+
+  return <UserNavBase displayUser={displayUser} onLogout={() => logout()} />;
+}
+
+export function UserNav({ user: defaultUser }: UserNavProps) {
+  if (!isNativeApp && hasClerkPublishableKey) {
+    return <ClerkUserNav defaultUser={defaultUser} />;
+  }
+  return <NativeUserNav defaultUser={defaultUser} />;
 }

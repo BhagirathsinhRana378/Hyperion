@@ -2,6 +2,7 @@
 
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
+import { useWebglSupported } from "./use-webgl-supported";
 
 /* ogl is client-only — split it out of the main bundle; the page
    renders instantly and the light streaks fade in when the chunk
@@ -19,13 +20,15 @@ const Lightfall = dynamic(() => import("./lightfall"), { ssr: false });
  */
 export function FeaturesBackdrop() {
   const reduceMotion = useReducedMotion();
+  const webglSupported = useWebglSupported();
+  const showLive = !reduceMotion && webglSupported;
 
   return (
     <div
       aria-hidden={true}
       className="absolute inset-x-0 top-0 z-0 h-[620px] overflow-hidden"
     >
-      {!reduceMotion && (
+      {showLive ? (
         <Lightfall
           backgroundGlow={0.35}
           className="absolute inset-0"
@@ -41,6 +44,10 @@ export function FeaturesBackdrop() {
           twinkle={0.6}
           zoom={3.4}
         />
+      ) : (
+        // Static fallback — a top-down platinum wash echoing the falling
+        // streaks, for reduced-motion / no-WebGL machines.
+        <div className="absolute inset-0 [background:radial-gradient(55%_55%_at_50%_28%,color-mix(in_oklab,var(--color-primary)_8%,transparent)_0%,transparent_72%)]" />
       )}
 
       {/* readability wash behind the headline block */}

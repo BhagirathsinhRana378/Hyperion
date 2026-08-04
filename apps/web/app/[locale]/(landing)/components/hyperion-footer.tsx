@@ -30,7 +30,11 @@ const footerSections = [
       { label: "Features", href: "/features" },
       { label: "AI Agent Swarm", href: "/features" },
       { label: "Terminal Multiplexer", href: "/features" },
-      { label: "Download", href: "/download" },
+      {
+        label: "Download",
+        href: "/download",
+        className: "hidden lg:inline-block",
+      },
     ],
   },
   {
@@ -46,7 +50,7 @@ const footerSections = [
     title: "Company",
     links: [
       { label: "About", href: "/about" },
-      { label: "Careers", href: "/about" },
+      { label: "Devs", href: "/devs" },
       { label: "Contact", href: "/contact" },
       { label: "Privacy", href: "/" },
     ],
@@ -64,7 +68,7 @@ const footerSections = [
 
 export function HyperionFooter() {
   return (
-    <footer className="px-6 sm:px-12 lg:px-16" data-slot="hyperion-footer">
+    <footer className="px-4 sm:px-6 lg:px-16" data-slot="hyperion-footer">
       {/* Near-full-width panel on the page's own black: rounded top
           corners only, a whisper of a border, and the whole lower
           third dissolving into the background via the fade mask — no
@@ -80,7 +84,7 @@ export function HyperionFooter() {
         <BorderTrace radius={PANEL_RADIUS} />
 
         <div
-          className={`${wordmarkFont.variable} px-8 pt-16 pb-8 md:px-14 md:pt-20 lg:px-20`}
+          className={`${wordmarkFont.variable} px-5 pt-12 pb-8 sm:px-8 md:px-14 md:pt-20 lg:px-20`}
         >
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-16">
             <div className="lg:col-span-1">
@@ -125,7 +129,7 @@ export function HyperionFooter() {
                 </h4>
                 <ul className="mt-4 space-y-3">
                   {section.links.map((link) => (
-                    <li key={link.label}>
+                    <li className={link.className} key={link.label}>
                       <Link
                         className="text-muted-foreground text-sm transition-colors duration-200 hover:text-primary"
                         href={link.href}

@@ -108,7 +108,30 @@ export default function DownloadContent({ release }: DownloadContentProps) {
     <main className="relative overflow-hidden">
       {/* Galaxy star field — replaces the old static radial glow */}
       <DownloadBackdrop />
-      <section className="relative z-10 pt-24 md:pt-36">
+      {/* Small & Mid screens notice */}
+      <section className="relative z-10 block px-6 pt-24 pb-20 lg:hidden">
+        <div className="mx-auto max-w-xl text-center">
+          <GlowCard className="p-8 text-center" tilt={false}>
+            <Eyebrow className="justify-center">Desktop Only</Eyebrow>
+            <h1 className="mt-4 font-display font-semibold text-3xl tracking-tight">
+              Desktop Application Download
+            </h1>
+            <p className="mt-4 text-balance text-muted-foreground text-sm leading-relaxed">
+              Hyperion Desktop application installers (Windows, macOS, and
+              Linux) are designed for desktop computers. Please open this page
+              on a desktop web browser to download the native app binaries.
+            </p>
+            <div className="mt-8 flex justify-center">
+              <CtaLink className="h-10 px-5" href="/docs" variant="ghost">
+                Read the Documentation
+              </CtaLink>
+            </div>
+          </GlowCard>
+        </div>
+      </section>
+
+      {/* Large screen full download content */}
+      <section className="relative z-10 hidden pt-24 lg:block lg:pt-36">
         <div className="mx-auto max-w-6xl px-6 text-center">
           <TextEffect
             as="h1"
