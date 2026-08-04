@@ -34,7 +34,7 @@ import {
   Trash2,
   XCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 function combineUrl(baseUrl: string, path: string): string {
@@ -58,7 +58,6 @@ export function AiProviderCard() {
     availableModels,
     setAvailableModels,
     health,
-    setHealth,
     clearProviderConfig,
   } = useAgentStore();
 
@@ -68,6 +67,13 @@ export function AiProviderCard() {
   const [isLoading, setIsLoading] = useState(false);
   const [checkingHealth, setCheckingHealth] = useState(false);
   const [providerError, setProviderError] = useState<string | null>(null);
+  const [lastCheckTime, setLastCheckTime] = useState<number>(0);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastCheckTimeRef = useRef<number>(0);
+
+  // Rate limit: 5 requests per minute (12 seconds between requests)
+  const RATE_LIMIT_MS = 12_000;
 
   const handleFetchModels = async () => {
     if (!apiKey) {
@@ -88,7 +94,9 @@ export function AiProviderCard() {
           setSelectedModel(claudeModels[0] || "");
         }
         toast.success("Loaded Anthropic Claude models successfully!");
-        setHealth("provider", true);
+        useAgentStore.setState((prev) => ({
+          health: { ...prev.health, provider: true },
+        }));
         return;
       }
 
@@ -107,7 +115,9 @@ export function AiProviderCard() {
           setSelectedModel(geminiModels[0] || "");
         }
         toast.success("Loaded Google Gemini models successfully!");
-        setHealth("provider", true);
+        useAgentStore.setState((prev) => ({
+          health: { ...prev.health, provider: true },
+        }));
         setProviderError(null);
         return;
       }
@@ -153,23 +163,66 @@ export function AiProviderCard() {
           setSelectedModel(models[0] || "");
         }
         toast.success(`Fetched ${models.length} models successfully!`);
-        setHealth("provider", true);
+        useAgentStore.setState((prev) => ({
+          health: { ...prev.health, provider: true },
+        }));
       } else {
         toast.error("Invalid response format from provider.");
       }
     } catch (error: any) {
       console.error(error);
       toast.error("Failed to fetch models. Check your Base URL and API Key.");
-      setHealth("provider", false);
+      useAgentStore.setState((prev) => ({
+        health: { ...prev.health, provider: false },
+      }));
       setProviderError(error.message || String(error));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const checkAllHealth = async () => {
+  const checkAllHealth = useCallback(async () => {
+    const now = Date.now();
+    const timeSinceLastCheck = now - lastCheckTimeRef.current;
+
+    // Rate limit: enforce minimum interval between checks
+    if (timeSinceLastCheck < RATE_LIMIT_MS) {
+      const waitSeconds = Math.ceil((RATE_LIMIT_MS - timeSinceLastCheck) / 1000);
+      toast.error(`Rate limited. Please wait ${waitSeconds}s before checking again.`);
+      return;
+    }
+
+    // Prevent concurrent runs
+    if (checkingHealth) {
+      return;
+    }
+
+    lastCheckTimeRef.current = now;
+    setLastCheckTime(now);
     setCheckingHealth(true);
+
+    // Start cooldown timer
+    setCooldownSeconds(Math.ceil(RATE_LIMIT_MS / 1000));
+    if (cooldownRef.current) {
+      clearInterval(cooldownRef.current);
+    }
+    cooldownRef.current = setInterval(() => {
+      setCooldownSeconds((prev) => {
+        if (prev <= 1) {
+          if (cooldownRef.current) {
+            clearInterval(cooldownRef.current);
+            cooldownRef.current = null;
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
     try {
+      // Batch all health updates into a single state change
+      const healthUpdates: { backend?: boolean; provider?: boolean; planner?: boolean } = {};
+
       // 1. Check Backend (Tauri check)
       const isTauri =
         typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -177,12 +230,12 @@ export function AiProviderCard() {
         try {
           const { invoke } = await import("@tauri-apps/api/core");
           await invoke("greet", { name: "Health" });
-          setHealth("backend", true);
+          healthUpdates.backend = true;
         } catch {
-          setHealth("backend", false);
+          healthUpdates.backend = false;
         }
       } else {
-        setHealth("backend", true); // In browser, simulation is alive
+        healthUpdates.backend = true; // In browser, simulation is alive
       }
 
       // 2. Check Provider (LLM Connection check)
@@ -191,7 +244,7 @@ export function AiProviderCard() {
         providerInstance.initialize(apiKey, baseUrl, selectedModel);
         try {
           const isOk = await providerInstance.healthCheck();
-          setHealth("provider", isOk);
+          healthUpdates.provider = isOk;
           if (isOk) {
             setProviderError(null);
           } else {
@@ -200,16 +253,21 @@ export function AiProviderCard() {
             );
           }
         } catch (err: any) {
-          setHealth("provider", false);
+          healthUpdates.provider = false;
           setProviderError(err.message || String(err));
         }
       } else {
-        setHealth("provider", false);
+        healthUpdates.provider = false;
         setProviderError("API Key is missing.");
       }
 
       // 3. Check Planner
-      setHealth("planner", true);
+      healthUpdates.planner = true;
+
+      // Apply all health updates in a single store update to avoid cascading renders
+      useAgentStore.setState((prev) => ({
+        health: { ...prev.health, ...healthUpdates },
+      }));
 
       toast.info("System health check completed.");
     } catch {
@@ -217,12 +275,16 @@ export function AiProviderCard() {
     } finally {
       setCheckingHealth(false);
     }
-  };
+  }, [apiKey, provider, baseUrl, selectedModel, checkingHealth]);
 
-  // Run health check initially
+  // Cleanup cooldown interval on unmount
   useEffect(() => {
-    checkAllHealth();
-  }, [checkAllHealth]);
+    return () => {
+      if (cooldownRef.current) {
+        clearInterval(cooldownRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="flex flex-col gap-4">
@@ -382,7 +444,7 @@ export function AiProviderCard() {
               </div>
             </div>
             <Button
-              disabled={checkingHealth}
+              disabled={checkingHealth || cooldownSeconds > 0}
               onClick={checkAllHealth}
               size="sm"
               variant="outline"
@@ -393,7 +455,11 @@ export function AiProviderCard() {
                   checkingHealth && "animate-spin"
                 )}
               />
-              Check Status
+              {checkingHealth
+                ? "Checking..."
+                : cooldownSeconds > 0
+                  ? `Wait ${cooldownSeconds}s`
+                  : "Run Health Check"}
             </Button>
           </div>
         </CardHeader>

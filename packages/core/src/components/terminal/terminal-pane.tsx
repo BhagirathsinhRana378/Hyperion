@@ -994,7 +994,7 @@ export function TerminalPane({
 
   if (!mounted) {
     return (
-      <div className="flex h-full flex-col overflow-auto overscroll-auto rounded-lg border border-border/30 bg-[#08080a] shadow-md">
+      <div className="terminal-scrollbar flex h-full flex-col overflow-hidden rounded-lg border border-border/30 bg-[#08080a] shadow-md">
         {/* Title Bar / Header Skeleton */}
         <div className="flex h-6.5 shrink-0 items-center justify-between border-border/20 border-b bg-[#0f0f12] px-3">
           <div className="flex items-center gap-2">
@@ -1003,7 +1003,7 @@ export function TerminalPane({
             </span>
           </div>
         </div>
-        <div className="relative flex-1 overflow-auto overscroll-auto bg-[#08080a]">
+        <div className="relative flex-1 overflow-hidden bg-[#08080a]">
           <TerminalPlaceholder shellType="Local Shell" />
         </div>
       </div>
@@ -1023,8 +1023,8 @@ export function TerminalPane({
       <div
         className={
           isFullscreen
-            ? "fixed inset-6 z-50 flex flex-col overflow-hidden rounded-xl border border-border/30 bg-[#08080a] shadow-2xl"
-            : "flex h-full flex-col overflow-auto rounded-lg border border-border/30 bg-[#08080a] shadow-md transition-all duration-300 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 hover:shadow-lg"
+            ? "terminal-scrollbar fixed inset-6 z-50 flex flex-col overflow-hidden rounded-xl border border-border/30 bg-[#08080a] shadow-2xl"
+            : "terminal-scrollbar flex h-full flex-col overflow-hidden rounded-lg border border-border/30 bg-[#08080a] shadow-md transition-all duration-300 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 hover:shadow-lg"
         }
       >
         {/* Title Bar / Header */}
@@ -1090,7 +1090,7 @@ export function TerminalPane({
 
         {/* xterm.js Container / Animated Transition */}
         <div
-          className="relative flex-1 overflow-auto bg-[#08080a]"
+          className="relative flex-1 overflow-hidden bg-[#08080a]"
           onPaste={isFullscreen ? handleImagePaste : undefined}
           style={{ minHeight: 0 }}
         >

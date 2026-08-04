@@ -8,6 +8,7 @@ import { AppSidebar } from "@workspace/core/components/layout/app-sidebar";
 import { PanelManager } from "@workspace/core/components/panels/panel-manager";
 import { navigationData } from "@workspace/core/config/navigation";
 import { useAppHotkeys } from "@workspace/core/hooks/use-app-hotkeys";
+import { useWorkspaceShortcuts } from "@workspace/core/hooks/use-workspace-shortcuts";
 
 import {
   SidebarInset,
@@ -33,6 +34,7 @@ interface AppLayoutProps {
 
 function HotkeysRegistrar({ navigate }: { navigate: (path: string) => void }) {
   useAppHotkeys({ navigate });
+  useWorkspaceShortcuts();
   return null;
 }
 
