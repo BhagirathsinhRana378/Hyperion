@@ -319,3 +319,41 @@
   background-size: 200% 100%;
   animation: terminal-shimmer 2.5s infinite linear;
 }
+
+/* ─── Terminal xterm.js custom scrollbar ─────────────────────────────── */
+/* Thin, translucent scrollbar that matches the dark terminal theme.
+   Applied via .terminal-scrollbar on the terminal wrapper; targets the
+   xterm-viewport element that actually scrolls inside xterm.js. */
+
+/* Firefox — scrollbar-width + scrollbar-color */
+.terminal-scrollbar .xterm-viewport {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(161, 158, 149, 0.2) transparent;
+}
+
+.terminal-scrollbar .xterm-viewport:hover {
+  scrollbar-color: rgba(161, 158, 149, 0.35) transparent;
+}
+
+/* Chrome / Safari / Edge — WebKit pseudo-elements */
+.terminal-scrollbar .xterm-viewport::-webkit-scrollbar {
+  width: 5px;
+}
+
+.terminal-scrollbar .xterm-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.terminal-scrollbar .xterm-viewport::-webkit-scrollbar-thumb {
+  background: rgba(161, 158, 149, 0.2);
+  border-radius: 9999px;
+}
+
+.terminal-scrollbar .xterm-viewport::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 158, 149, 0.4);
+}
+
+/* IE / Edge (legacy) fallback */
+.terminal-scrollbar {
+  -ms-overflow-style: none;
+}
