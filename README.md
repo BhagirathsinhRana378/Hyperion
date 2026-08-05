@@ -48,7 +48,7 @@ Hyperion collapses that loop into **a single view**. Every project gets its own 
 | Switching between five tools | One workspace, one view |
 | One project at a time | Multi-workspace sidebar |
 
-The desktop and web client is fully open source and lives in this repository. The hosted dashboard and website are closed-source (see [Open Source vs. Hosted](#open-source-vs-hosted)).
+The desktop and web client is fully open source and lives in this repository.
 
 ---
 
@@ -213,18 +213,6 @@ packages/
   i18n/                   10-language translations
   cli/                    Scaffolding tool
 ```
-
----
-
-## ⚖️ Open Source vs. Hosted
-
-| | **Open Source** | **Hosted** |
-|---|---|---|
-| Desktop & web client | ✅ Free + open source | — |
-| Nothing to configure | 🔧 Self-host | ✅ Managed |
-| Dashboard & website | — | ✅ Closed-source |
-
-The application is MIT licensed. The hosted platform is a separate, closed-source product.
 
 ---
 
